@@ -1,4 +1,4 @@
 wutrade
 =======
 
-exchange meal points
+buy and sell meal points.
