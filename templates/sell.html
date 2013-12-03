@@ -2,39 +2,27 @@
 
 {% block content %}
 
+<h1>get dough for your unused meal points</h1>
+
 <form method="post">
-    <div>
-        Amount
+    <p class="big">
+        <label>number of meal points</label>
         <input type="text" name="amount" value="{{amount}}">
-    </div>
-    <br>
     
-    <div>
-        Price per point
+        <label>price per point</label>
         <input type="text" name="price" value="{{price}}">
-    </div>
-    <br>
     
-    <div>
-        First name
+        <label>first name</label>
         <input type="text" name="first_name" value="{{first_name}}">
-    </div>
-    <br>
-    
-    <div>
-        Last name
+   
+        <label>last name</label>
         <input type="text" name="last_name" value="{{last_name}}">
-    </div>
-    <br>
     
-    <div>
-        Email
+        <label>email</label>
         <input type="text" name="email" value="{{email}}">
-    </div>
-    <br>
 
     <div><input type="submit" value="Okay"></div>
-    <br>
+    </p>
     <div class = "stat">{{stat}}</div>
     <div class="error">{{error}}</div> 
 </form>

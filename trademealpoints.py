@@ -10,11 +10,26 @@ template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
                                autoescape = True)
 
-# pseudocode outline
-# need: number of points, price per point
+#cool features
+    #current offers
+    #current buyers
+        #input for each
 
+    #records/stories
+
+    #avg price over time
+        #offers
+        #successful transactions
+
+    #offer amount over time
+
+#nice to have
+    #cool facts page
 def post_key(name = 'default'):
     return db.Key.from_path('post', name)
+
+def feedback_key(name = 'default'):
+    return db.Key.from_path('feedback', name)
 
 def render_str(template, **params):
     t = jinja_env.get_template(template)
@@ -31,27 +46,29 @@ class Handler(webapp2.RequestHandler):
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
 
-
 class MainPage(Handler):
     def get(self):
-        posts = Post.all().order('price')
-        self.render('mainpage.html')
-
+        self.render('about.html')
 
 class Post(db.Model):
-    amount = db.IntegerProperty(required = True)
-    price = db.FloatProperty(required = True)
+    amount = db.StringProperty(required = True)
+    price = db.StringProperty(required = True)
     first_name = db.StringProperty(required = True)
     last_name = db.StringProperty(required = True)
-    email = db.EmailProperty(required = True)
+    email = db.StringProperty(required = True)
 
     def render(self):
         return render_str("post.html", p = self)
 
+class Feedback(db.Model):
+    feedback = db.StringProperty(required = True)
 
-class NewPost(Handler):
+    def render(self):
+        return render_str("feedback.html", f = self)
+
+class Sell(Handler):
     def get(self):
-        self.render("newpost.html")
+        self.render("sell.html")
 
     def post(self):
         amount = self.request.get('amount')
@@ -62,22 +79,45 @@ class NewPost(Handler):
 
         if amount and price and first_name and last_name and email:
             post = Post(parent = post_key(), 
-                        amount = amount, price = price, 
-                        first_name = first_name, last_name = last_name,
-                        email = email)
+                amount = amount, price = price, 
+                first_name = first_name, last_name = last_name, 
+                email = email)
             post.put()
-            stat = "your entry has been recorded"
-            self.redirect('/')
+            stat = "your entry has been recorded! awesomeness"
+            self.render("sell.html", stat = stat)
 
         else:
             error = "sure you got everything?"
-            self.render("newpost.html", 
+            self.render("sell.html", 
                         amount = amount, price = price, 
                         first_name = first_name, last_name = last_name,
                         email = email, error=error)
 
+class Buy(Handler):
+    def get(self):
+        posts = Post.all().order('price')
+        self.render("buy.html", posts = posts)
+
+class FAQ(Handler):
+    def get(self):
+        self.render("faq.html")
+
+    def post(self):
+        feedback = self.request.get('feedback')
+
+        if feedback:
+            f = Feedback(parent = feedback_key(), feedback = feedback)
+            f.put()
+            stat = "gracias mucho :)"
+            self.render("faq.html", stat = stat)
+        else:
+            error = "oops! try typing that again"
+            self.render("faq.html", feedback = feedback, error = error)
 
 application = webapp2.WSGIApplication([
     ('/', MainPage),
-    ('/sell', NewPost),
+    ('/buy', Buy),
+    ('/sell', Sell),
+    ('/faq', FAQ),
+
 ], debug=True)

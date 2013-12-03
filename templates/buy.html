@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div>
+    current offers:
+    <form method="post">
+        {% for p in posts %}
+            {{ p.render() | safe }}
+            <br><br>
+        {% endfor %}
+    </form>
+</div>
+
+<div class = "section">
+    <div>
+    don't see an offer you want? jot down the amount/price you are looking for
+    </div>
+</div>
+{% endblock %}

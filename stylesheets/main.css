@@ -1,59 +1,122 @@
 body {
-    font-family:“Century Gothic”, CenturyGothic, AppleGothic, sans-serif;
-/*    font-family:Futura, “Trebuchet MS”, Arial, sans-serif;*/
+/*    font-family:“Century Gothic”, CenturyGothic, AppleGothic, sans-serif;*/
+    font-family:Futura, “Trebuchet MS”, Arial, sans-serif;
 /*  font-family: "Helvetica Neue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; */
 /*    font-family: monospace;*/
     font-weight: 100;
-    background-color: #ffffff;
+    background-color: white;
     text-align:center;
-    font-size: 25px;
-    color: #848484;
-/*
+    font-size: 20px;
+    color: #888;
     transform: scale(1.1);
-   transform-origin: 10% 10%;
-*/
+    transform-origin: 10% 10%;
 }
 
 #main_title {
     color:#4a4a4a;
     padding-top: 30px;
     padding-bottom:30px;
-    font-size: 40px;
+    font-size: 35px;
 }
 
-.box {
-    position: fixed;
-    font-weight:100;
-    position:absolute;
+.navbar {
+    padding-bottom: 30px;
+}
+
+.navlinks {
+    padding-left: 17px;
+    padding-right: 17px;
+    font-size: 25px;
+}
+
+#list {
+    position:relative;
+    text-align: center;
+    padding-left: 33%;
+}
+
+.answer {
+    position: relative;
+    padding-left:30%;
+    padding-right:30%;
     text-align: left;
-    top: 20%;
-    left: 10%;
-    right: 70%;
+}
+
+h1 {
+    font-size: 25px;
+    font-weight:100;
+    color: #a3a3a3;
+}
+
+li {
+    text-align: left;
 }
 
 #id {
     text-align: left;
 }
 
+label, input {
+    display: inline-block;
+}
+
+label {
+    width: 40%;
+    text-align: right;
+    color: #a3a3a3;
+}
+
+label + input {
+    margin-right: 20%;
+    margin-left: 2%;
+    
+    /* margin-right for new line
+       margin-left for gap */
+}
+
+h1 {
+    text-emphasis: bold;
+}
+
 .error {
     color: #a0ff00;
 }
 
+p.big {
+    line-height:150%;
+}
+
+table {
+    width: 45%;
+}
+
+#offers {
+    position: relative;
+    text-align: center;
+    margin-left: 27%;
+    margin-right: 35%;
+}
+
+#offers td, #offers th {
+    margin-left: 4%;
+}
+
+input[type=text] {
+    width: 20%;
+    font-size: 20px;
+    padding: 2px;
+    font-family: monospace;
+}
+
 input[type="submit"] {
-    width: 100px; 
+    width: 5%; 
     height: 50px;
     border: 0;
 }
 
-input[type=text] {
-    width: 200px;
-    font-size: 20px;
-    padding: 2px;
-    font-family: monospace;
-    color: #848484;
-}
 
-a:link {color:#848484; text-decoration:none;}      /* unvisited link */
-a:visited {color:#848484; text-decoration:none;}  /* visited link */
+
+a:link {color:#a3a3a3; text-decoration:none;}      /* unvisited link */
+a:visited {color:#a3a3a3; text-decoration:none;}  /* visited link */
 a:hover {color:#000; text-decoration:none;}  /* mouse over link */
-a:active {color:#848484; text-decoration:none;}  /* selected link */
+a:active {color:#a3a3a3; text-decoration:none;}  /* selected link */

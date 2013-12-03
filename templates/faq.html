@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div>frequently asked questions</div>
+
+<div>
+   
+<h1>how do i buy meal points?</h1>    
+<ol id = "list">
+    <li>check the offers you want to buy</li>
+    <li>jot down your contact info</li>
+    <li>seller receives email with your contact info</li>
+    <li>arrange w/ seller to sign the transfer form</li>
+</ol>
+
+    
+<h1>why use this over wutrade?</h1>
+<div class = "answer">
+this web app is completely free. with wutrade you have to pay five cents for every meal point you buy.
+</div>
+
+<br>
+
+<form class = "answer" method="post">
+    <div>got more questions/comments? jot them down here</div>
+    <input type="text" name="feedback" value="{{feedback}}">
+    <div class = "stat">{{stat}}</div>
+    <div class="error">{{error}}</div> 
+</form>
+</div>
+{% endblock %}
