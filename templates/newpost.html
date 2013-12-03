@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form method="post">
+    <div>
+        Amount
+        <input type="text" name="amount" value="{{amount}}">
+    </div>
+    <br>
+    
+    <div>
+        Price per point
+        <input type="text" name="price" value="{{price}}">
+    </div>
+    <br>
+    
+    <div>
+        First name
+        <input type="text" name="first_name" value="{{first_name}}">
+    </div>
+    <br>
+    
+    <div>
+        Last name
+        <input type="text" name="last_name" value="{{last_name}}">
+    </div>
+    <br>
+    
+    <div>
+        Email
+        <input type="text" name="email" value="{{email}}">
+    </div>
+    <br>
+
+    <div><input type="submit" value="Okay"></div>
+    <br>
+    <div class = "stat">{{stat}}</div>
+    <div class="error">{{error}}</div> 
+</form>
+{% endblock %}

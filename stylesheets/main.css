@@ -1,0 +1,59 @@
+body {
+    font-family:“Century Gothic”, CenturyGothic, AppleGothic, sans-serif;
+/*    font-family:Futura, “Trebuchet MS”, Arial, sans-serif;*/
+/*  font-family: "Helvetica Neue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; */
+/*    font-family: monospace;*/
+    font-weight: 100;
+    background-color: #ffffff;
+    text-align:center;
+    font-size: 25px;
+    color: #848484;
+/*
+    transform: scale(1.1);
+   transform-origin: 10% 10%;
+*/
+}
+
+#main_title {
+    color:#4a4a4a;
+    padding-top: 30px;
+    padding-bottom:30px;
+    font-size: 40px;
+}
+
+.box {
+    position: fixed;
+    font-weight:100;
+    position:absolute;
+    text-align: left;
+    top: 20%;
+    left: 10%;
+    right: 70%;
+}
+
+#id {
+    text-align: left;
+}
+
+.error {
+    color: #a0ff00;
+}
+
+input[type="submit"] {
+    width: 100px; 
+    height: 50px;
+    border: 0;
+}
+
+input[type=text] {
+    width: 200px;
+    font-size: 20px;
+    padding: 2px;
+    font-family: monospace;
+    color: #848484;
+}
+
+a:link {color:#848484; text-decoration:none;}      /* unvisited link */
+a:visited {color:#848484; text-decoration:none;}  /* visited link */
+a:hover {color:#000; text-decoration:none;}  /* mouse over link */
+a:active {color:#848484; text-decoration:none;}  /* selected link */
