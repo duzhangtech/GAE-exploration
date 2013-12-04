@@ -3,6 +3,7 @@ body {
     font-family:Futura, “Trebuchet MS”, Arial, sans-serif;
 /*  font-family: "Helvetica Neue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; */
 /*    font-family: monospace;*/
+    
     font-weight: 100;
     background-color: white;
     text-align:center;
@@ -15,7 +16,7 @@ body {
 #main_title {
     color:#4a4a4a;
     padding-top: 30px;
-    padding-bottom:30px;
+    padding-bottom:23px;
     font-size: 35px;
 }
 
@@ -35,8 +36,8 @@ body {
     padding-left: 33%;
 }
 
+
 .box {
-    position: relative;
     padding-left:30%;
     padding-right:30%;
     text-align: left;
@@ -52,10 +53,6 @@ li {
     text-align: left;
 }
 
-#id {
-    text-align: left;
-}
-
 label, input {
     display: inline-block;
 }
@@ -67,9 +64,8 @@ label {
 }
 
 label + input {
-    margin-right: 20%;
-    margin-left: 2%;
-    
+    margin-right: 25%;
+    margin-left: 1%;
     /* margin-right for new line
        margin-left for gap */
 }
@@ -78,33 +74,36 @@ h1 {
     text-emphasis: bold;
 }
 
-.error {
-    color: #a0ff00;
-}
-
 p.big {
     line-height:150%;
 }
 
 table {
-    width: 45%;
-}
-
-#offers {
-    position: relative;
     text-align: center;
-    margin-left: 27%;
-    margin-right: 35%;
 }
 
-#offers td, #offers th {
-    margin-left: 4%;
+.offerbox {
+    text-align:left;
+    width: 300px;
+    margin-left: 40%;
+    background-color:transparent;
 }
 
+#want_input {
+    background-color:transparent;
+}
+
+
+.wantbox {
+    text-align:left;
+    width: 300px;
+    margin-left: 40%;
+    background-color:transparent;
+
+}
 input[type=text] {
-    width: 20%;
+    width: 10%;
     font-size: 20px;
-    padding: 2px;
     font-family: monospace;
 }
 
@@ -114,9 +113,12 @@ input[type="submit"] {
     border: 0;
 }
 
+.error {
+    color: #a0ff00;
+}
 
 
 a:link {color:#a3a3a3; text-decoration:none;}      /* unvisited link */
 a:visited {color:#a3a3a3; text-decoration:none;}  /* visited link */
 a:hover {color:#000; text-decoration:none;}  /* mouse over link */
-a:active {color:#a3a3a3; text-decoration:none;}  /* selected link */
+a:active {color:#000; text-decoration:none;}  /* selected link */
