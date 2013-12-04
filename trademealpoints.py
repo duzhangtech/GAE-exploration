@@ -11,6 +11,7 @@ jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
                                autoescape = True)
 
 #cool features
+    #ppl watching offers; price per point + giftcards/other payment options
     #current offers
     #current buyers
         #input for each
@@ -25,8 +26,12 @@ jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
 
 #nice to have
     #cool facts page
-def post_key(name = 'default'):
-    return db.Key.from_path('post', name)
+
+def offer_key(name = 'default'):
+    return db.Key.from_path('offer', name)
+
+def want_key(name = 'default'):
+    return db.Key.from_path('want', name)
 
 def feedback_key(name = 'default'):
     return db.Key.from_path('feedback', name)
@@ -60,12 +65,20 @@ class Post(db.Model):
     def render(self):
         return render_str("post.html", p = self)
 
+class Want(db.Model):
+    want_amount = db.StringProperty(required = True)
+    want_price = db.StringProperty(required = True)
+
+    def render(self):
+        return render_str("want.html", w = self)
+
 class Feedback(db.Model):
     feedback = db.StringProperty(required = True)
 
     def render(self):
         return render_str("feedback.html", f = self)
 
+#input
 class Sell(Handler):
     def get(self):
         self.render("sell.html")
@@ -78,7 +91,7 @@ class Sell(Handler):
         email = self.request.get('email')
 
         if amount and price and first_name and last_name and email:
-            post = Post(parent = post_key(), 
+            post = Post(parent = offer_key(), 
                 amount = amount, price = price, 
                 first_name = first_name, last_name = last_name, 
                 email = email)
@@ -93,10 +106,31 @@ class Sell(Handler):
                         first_name = first_name, last_name = last_name,
                         email = email, error=error)
 
+#output
 class Buy(Handler):
     def get(self):
         posts = Post.all().order('price')
-        self.render("buy.html", posts = posts)
+        wants = Want.all().order('want_price')
+
+        self.render("buy.html", posts = posts, wants = wants)
+
+    def post(self):
+        posts = Post.all().order('price')
+        wants = Want.all().order('want_price')
+
+        want_amount = self.request.get('want_amount')
+        want_price = self.request.get('want_price')
+
+        if want_amount and want_price:
+            want = Want(parent = want_key(),
+                want_amount= want_amount, want_price = want_price)
+            want.put()
+            stat = "kay i got this"
+            self.render("buy.html", stat = stat, posts = posts, wants = wants)
+        else:
+            error = "sure you got all the boxes?"
+            self.render("buy.html", error = error)
+
 
 class FAQ(Handler):
     def get(self):

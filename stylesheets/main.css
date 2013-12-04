@@ -20,7 +20,7 @@ body {
 }
 
 .navbar {
-    padding-bottom: 30px;
+    padding-bottom: 20px;
 }
 
 .navlinks {
@@ -35,7 +35,7 @@ body {
     padding-left: 33%;
 }
 
-.answer {
+.box {
     position: relative;
     padding-left:30%;
     padding-right:30%;
@@ -43,9 +43,9 @@ body {
 }
 
 h1 {
-    font-size: 25px;
+    font-size: 20px;
     font-weight:100;
-    color: #a3a3a3;
+    color: #656565;
 }
 
 li {

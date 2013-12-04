@@ -2,19 +2,49 @@
 
 {% block content %}
 
-<div>
-    current offers:
-    <form method="post">
+<div class = "section1">
+current offers:
+<form method="post">
+    {%if posts.count() == 0 %}
+        <div class = "box">
+            it looks like all the offers have been bought. check back later :)
+        </div>
+    {%else%}
+    <table id = "offers">
+        <tr>
+        <th>number meal points</th>
+        <th>price per point</th>
+        </tr>
         {% for p in posts %}
             {{ p.render() | safe }}
             <br><br>
         {% endfor %}
-    </form>
+    </table>
+    {%endif%}
 </div>
 
-<div class = "section">
-    <div>
+<div class = "section2">
+    <div class = "box">
     don't see an offer you want? jot down the amount/price you are looking for
     </div>
+    
+    <label>number of meal points</label>
+    <input type="text" name="want_amount" value="{{want_amount}}">
+    
+    <label>price per point</label>
+    <input type="text" name="want_price" value="{{want_price}}">
 </div>
+
+<div>
+    offers people are looking for
+        {% for w in wants %}
+            {{ w.render() | safe }}
+            <br><br>
+        {% endfor %}
+    <input type="submit" value="Okay">
+    <div class = "stat">{{stat}}</div>
+    <div class="error">{{error}}</div> 
+    
+</div>
+</form>
 {% endblock %}
