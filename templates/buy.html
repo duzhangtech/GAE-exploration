@@ -2,74 +2,41 @@
 
 {% block content %}
 
+<form method="post">
+
 <div class = "section1">
-    <div class = "offerbox">
-        current offers:
-        {%if offers.count() == 0 %}
-        <div class = "box">
+    <div class = "sellbox">
+        <h1>current offers:</h1>
+        {%if sells.count() == 0 %}
+        <div>
             it looks like all the offers have been bought. check back later :)
         </div>
         {%else%}
         <table>
             <tr class = "table_label">
+            <th></th>
             <th>amount of mp</th>
             <th>price per mp</th>
             </tr>
-            {% for offer in offers %}
-                <input type = "checkbox" name = "option" value = "">
-                {{ offer.render() | safe }}
+            {% for sell in sells %}
+                {{ sell.render() | safe }}
                 </input>
             {% endfor %}
         </table>
+        <div><input type="submit" value="Okay"></div>
+        <div class="error">{{error}}</div> 
         {%endif%}
     </div>
-    
 </div>
-
 
 <br>
-<div class = "small_section">
-    <div id = "want_input">
-        <div class = "box"><h1>
-        don't see an offer you want? let sellers know the amount and price you are looking for
-        </h1></div>
-        
-        <form method="post">
-            <p class="big">
-            <label>number of meal points</label>
-            <input type="text" name="want_amount" value="{{want_amount}}">
-            
-            <label>price per point</label>
-            <input type="text" name="want_price" value="{{want_price}}">
-            
-            <div><input type="submit" value="Okay"></div>
-            </p>
-            <div class = "stat">{{stat}}</div>
-            <div class="error">{{error}}</div> 
-        </form>
-    </div>
-</div>
+
+<div class = "sellbox"><h1>
+don't see an offer you want? let sellers know the amount and price you are looking for
+<a href = "/newwish">here</a>
+</h1></div>
 
 
-<div class = "section2">
-    <div class = "wantbox">
-        what people are looking to buy:
-        {%if wants.count() == 0 %}
-        <div class = "box">
-            no one's posted yet :p
-        </div>
-        {%else%}
-        <table>
-            <tr>
-            <th>amount of mp</th>
-            <th>price per mp</th>
-            </tr>
-            {% for want in wants %}
-                {{ want.render() | safe }}
-            {% endfor %}
-        </table>
-        {%endif%}
-    </div>
-</div>
+
 
 {% endblock %}

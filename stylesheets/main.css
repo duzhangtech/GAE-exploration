@@ -36,7 +36,6 @@ body {
     padding-left: 33%;
 }
 
-
 .box {
     padding-left:30%;
     padding-right:30%;
@@ -82,25 +81,32 @@ table {
     text-align: center;
 }
 
-.offerbox {
+.sellbox {
     text-align:left;
     width: 300px;
     margin-left: 40%;
     background-color:transparent;
 }
 
-#want_input {
+#wish_input {
     background-color:transparent;
 }
 
 
-.wantbox {
-    text-align:left;
+.wishbox {
+    text-align:center;
     width: 300px;
     margin-left: 40%;
     background-color:transparent;
-
 }
+
+.newwish {
+    text-align:left;
+    width: 300px;
+    padding-right: 40%;
+    background-color:transparent;
+}
+
 input[type=text] {
     width: 10%;
     font-size: 20px;

@@ -5,6 +5,7 @@ from string import letters
 import jinja2
 import webapp2
 from google.appengine.ext import db
+from google.appengine.api import mail
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
@@ -15,29 +16,48 @@ jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
     #contact info input
     #send email
 
+    #edit info
+
 #cool features
-    #ppl watching offers; price per point + giftcards/other payment options
-    #when want offer matches offer: automatic email
+    #ppl watching sells; price per point + giftcards/other payment options
+    #when wish sell matches sell: automatic email
 
     #records/stories
 
     #avg price over time
-        #offers
+        #sells
         #successful transactions
 
-    #offer amount over time
+    #sell amount over time
 
 #nice to have
     #cool facts page
 
-def offer_key(name = 'default'):
-    return db.Key.from_path('offer', name)
+def sell_key(name = 'default'):
+    return db.Key.from_path('sell', name)
 
-def want_key(name = 'default'):
-    return db.Key.from_path('want', name)
+def wish_key(name = 'default'):
+    return db.Key.from_path('wish', name)
 
 def feedback_key(name = 'default'):
     return db.Key.from_path('feedback', name)
+
+#150 mp min, 10000 mp max
+AMOUNT_RE = re.compile(r'^[1-9][0-9]{0,4}$|^10000$')
+
+#min 0.01 per mp, max 2.00 per mp
+PRICE_RE = re.compile(r'^[0-1]+\.[0-9][0-9]$|^2\.00$')
+
+EMAIL_RE  = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
+
+def valid_amount(amount):
+    return amount and AMOUNT_RE.match(amount)
+
+def valid_price(price):
+    return price and PRICE_RE.match(price)
+
+def valid_email(email):
+    return email and EMAIL_RE.match(email)
 
 def render_str(template, **params):
     t = jinja_env.get_template(template)
@@ -58,85 +78,6 @@ class MainPage(Handler):
     def get(self):
         self.render('about.html')
 
-class Offer(db.Model):
-    amount = db.StringProperty(required = True)
-    price = db.StringProperty(required = True)
-    first_name = db.StringProperty(required = True)
-    last_name = db.StringProperty(required = True)
-    email = db.StringProperty(required = True)
-    #fulfilled = db.StringProperty(default = False)
-
-    def render(self):
-        return render_str("offer.html", o = self)
-
-class Want(db.Model):
-    want_amount = db.StringProperty(required = True)
-    want_price = db.StringProperty(required = True)
-
-    def render(self):
-        return render_str("want.html", w = self)
-
-class Feedback(db.Model):
-    feedback = db.StringProperty(required = True)
-    def render(self):
-        return render_str("feedback.html", f = self)
-
-#input
-class Sell(Handler):
-    def get(self):
-        self.render("sell.html")
-
-    def post(self):
-        amount = self.request.get('amount')
-        price = self.request.get('price')
-        first_name = self.request.get('first_name')
-        last_name = self.request.get('last_name')
-        email = self.request.get('email')
-
-        if amount and price and first_name and last_name and email:
-            offer = Offer(parent = offer_key(), 
-                amount = amount, price = price, 
-                first_name = first_name, last_name = last_name, 
-                email = email)
-            offer.put()
-            stat = "your entry has been recorded! awesomeness"
-            self.render("sell.html", stat = stat)
-
-        else:
-            error = "sure you got everything?"
-            self.render("sell.html", 
-                        amount = amount, price = price, 
-                        first_name = first_name, last_name = last_name,
-                        email = email, error=error)
-
-#output
-class Buy(Handler):
-    def get(self):
-        offers = Offer.all().order('price')
-        wants = Want.all().order('want_price')
-
-        self.render("buy.html", offers = offers, wants = wants)
-
-    def post(self):
-        offers = Offer.all().order('price')
-        wants = Want.all().order('want_price')
-
-        option = self.request.get_all('option')
-        want_amount = self.request.get('want_amount')
-        want_price = self.request.get('want_price')
-
- 
-        if want_amount and want_price:
-            want = Want(parent = want_key(),
-                want_amount= want_amount, want_price = want_price)
-            want.put()
-            stat = "kay i got this"
-            self.render("buy.html", stat = stat, offers = offers, wants = wants)
-        else:
-            error = "sure you got all the boxes?"
-            self.render("buy.html", error = error)
-
-
 class FAQ(Handler):
     def get(self):
         self.render("faq.html")
@@ -153,10 +94,145 @@ class FAQ(Handler):
             error = "oops! try typing that again"
             self.render("faq.html", feedback = feedback, error = error)
 
+class Feedback(db.Model):
+    feedback = db.StringProperty(required = True)
+    def render(self):
+        return render_str("feedback.html", f = self)
+
+class SellModel(db.Model):
+    amount = db.StringProperty(required = True)
+    price = db.StringProperty(required = True)
+    first_name = db.StringProperty(required = True)
+    last_name = db.StringProperty(required = True)
+    email = db.StringProperty(required = True)
+    #fulfilled = db.StringProperty(default = False)
+
+    def render(self):
+        return render_str("sellmodel.html", o = self)
+
+class WishModel(db.Model):
+    wish_amount = db.StringProperty(required = True)
+    wish_price = db.StringProperty(required = True)
+
+    def render(self):
+        return render_str("wishmodel.html", w = self)
+
+class Sell(Handler):
+    def get(self):
+        self.render("sell.html")
+
+    def post(self):
+        have_error = False;
+        amount = self.request.get('amount')
+        price = self.request.get('price')
+        first_name = self.request.get('first_name')
+        last_name = self.request.get('last_name')
+        seller_email = self.request.get('seller_email')
+
+        params = dict(amount = amount, 
+                        price = price,
+                        seller_email = seller_email)
+
+        #todo: display all error messages at once; js response if right
+
+        if not valid_amount(amount):
+            params['error_amount'] = "that amount was not valid"
+            have_error = True
+
+        if not valid_amount(amount):
+            params['error_price'] = "that price was not valid"
+            have_error = True
+
+        if not valid_email(seller_email):
+            params['error_email'] = "that email was't valid"
+            have_error = True
+
+        if have_error:
+            self.render("sell.html", **params)
+
+
+        if amount and price and first_name and last_name and seller_email and (have_error == False):
+            sell = SellModel(parent = sell_key(), 
+                amount = amount, price = price, 
+                first_name = first_name, last_name = last_name, 
+                seller_email = seller_email)
+            sell.put()
+            stat = "your entry has been recorded! awesomeness"
+            self.render("sell.html", stat = stat)
+
+        else:
+            error = "make sure you fill out every box"
+            self.render("sell.html", 
+                        amount = amount, price = price, 
+                        first_name = first_name, last_name = last_name,
+                        seller_email = seller_email, error=error)
+
+class Buy(Handler):
+    def get(self):
+        sells = SellModel.all().order('price')
+        self.render("buy.html", sells = sells)
+
+    def post(self):
+        checked = self.request.get_all('entry')
+
+        if checked:
+            self.redirect("/newbuy.html", checked = checked)
+        else:
+            error = "check at least one box to buy meal"
+            self.render("buy.html", sells = sells, error = error)
+
+class Wish(Handler):
+    def get(self):
+        wishes = WishModel.all().order('wish_price')
+        self.render("wish.html", wishes = wishes)
+
+class NewWish(Handler):
+    def get(self):
+        self.render("newwish.html")
+
+    def post(self):
+        wish_amount = self.request.get("wish_amount")
+        wish_price = self.request.get("wish_price")
+
+        if wish_amount and wish_price:
+            wish = WishModel(parent = wish_key(), 
+                            wish_amount = wish_amount, wish_price = wish_price)
+            wish.put()
+            stat = "success! your mp wish has been recorded :D"
+            self.render("newwish.html", stat = stat, 
+                            wish_amount = wish_amount, wish_price = wish_price)
+        else:
+            error = "sure you got both boxes?"
+            self.render("newwish.thml", error = error,
+                            wish_amount = wish_amount, wish_price = wish_price)
+
+class NewBuy(Handler):
+    def get(self):
+        self.render("newbuy.html")
+
+    def post(self):
+        buyer_email = self.request.get('buyer_email')
+        first_name = self.request.get('first_name')
+        last_name = self.request.get('last_name')
+
+        #seller_email =
+        #get seller email from sell key
+
+        # #validate email
+        # subject = "I wish to buy your meal points"
+        # body = "Hi! My name is %s and I'm interested in taking up your offer of x meal points at price per point") % first_name
+        # # mail.send_mail(buyer_email, seller_email, subject, body)
+        self.render("newbuy.html")
+
 application = webapp2.WSGIApplication([
     ('/', MainPage),
+
     ('/buy', Buy),
+    ('/contact', NewBuy),
+
     ('/sell', Sell),
+    ('/wish', Wish),
+    ('/newwish', NewWish),
     ('/faq', FAQ),
 
 ], debug=True)

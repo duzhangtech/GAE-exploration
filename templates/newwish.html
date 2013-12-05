@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form method = "post">
+    new meal point wish:
+    <p class="big">
+    <label>number of mp</label>
+    <input type="text" name="wish_amount" value="{{wish_amount}}">
+    
+    <label>price per mp</label>
+    <input type="text" name="wish_price" value="{{wish_price}}">
+    
+    <div><input type="submit" value="Okay"></div>
+    </p>
+    <div class = "stat">{{stat}}</div>
+    <div class="error">{{error}}</div> 
+</form>
+
+{% endblock %}

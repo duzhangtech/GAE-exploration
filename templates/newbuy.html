@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>contact the seller</h1>
+<div>you want to buy</div>
+<div>x meal points at x price per point</div>
+
+{% for check in checked %}
+    {{ check.render() | safe }}
+{% endfor %}
+
+<form method="post">
+    <p class="big">
+        <label>first name</label>
+        <input type="text" name="first_name" value="{{first_name}}">
+   
+        
+        <label>last name</label>
+        <input type="text" name="last_name" value="{{last_name}}">
+    
+        
+        <label>email</label>
+        <input type="text" name="buyer_email" value="{{buyer_email}}">
+
+        
+    <div><input type="submit" value="notify the seller"></div>
+    </p>
+    <div class = "stat">{{stat}}</div>
+    <div class="error">{{error}}</div> 
+{% endblock %}

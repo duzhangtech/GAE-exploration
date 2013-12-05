@@ -6,21 +6,28 @@
 
 <form method="post">
     <p class="big">
-        <label>number of meal points</label>
+        <label>number of mp</label>
         <input type="text" name="amount" value="{{amount}}">
-    
-        <label>price per point</label>
+        {{error_amount}}
+        
+        
+        <label>price per mp</label>
         <input type="text" name="price" value="{{price}}">
-    
+        {{error_price}}
+        
+        
         <label>first name</label>
         <input type="text" name="first_name" value="{{first_name}}">
    
+        
         <label>last name</label>
         <input type="text" name="last_name" value="{{last_name}}">
     
+        
         <label>email</label>
-        <input type="text" name="email" value="{{email}}">
-
+        <input type="text" name="seller_email" value="{{seller_email}}">
+        {{error_email}}
+        
     <div><input type="submit" value="Okay"></div>
     </p>
     <div class = "stat">{{stat}}</div>
