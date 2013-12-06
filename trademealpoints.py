@@ -1,11 +1,14 @@
 import os
 import re
+import urllib
 from string import letters
 
 import jinja2
 import webapp2
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 from google.appengine.api import mail
+from google.appengine.api import memcache
+
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
@@ -32,13 +35,13 @@ jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
     #cool data facts page
 
 def sell_key(name = 'default'):
-    return db.Key.from_path('sell', name)
+    return ndb.Key.from_path('sell', name)
 
 def wish_key(name = 'default'):
-    return db.Key.from_path('wish', name)
+    return ndb.Key.from_path('wish', name)
 
 def feedback_key(name = 'default'):
-    return db.Key.from_path('feedback', name)
+    return ndb.Key.from_path('feedback', name)
 
 #150 mp min, 10000 mp max
 AMOUNT_RE = re.compile(r'^[1-9][0-9]{0,4}$|^10000$')
@@ -92,25 +95,25 @@ class FAQ(Handler):
             error = "oops! try typing that again"
             self.render("faq.html", feedback = feedback, error = error)
 
-class Feedback(db.Model):
-    feedback = db.StringProperty(required = True)
+class Feedback(ndb.Model):
+    feedback = ndb.StringProperty(required = True)
     def render(self):
         return render_str("feedback.html", f = self)
 
-class SellModel(db.Model):
-    amount = db.StringProperty(required = True)
-    price = db.StringProperty(required = True)
-    first_name = db.StringProperty(required = True)
-    last_name = db.StringProperty(required = True)
-    seller_email = db.StringProperty(required = True)
-    checked = db.BooleanProperty()
+class SellModel(ndb.Model):
+    amount = ndb.StringProperty(required = True)
+    price = ndb.StringProperty(required = True)
+    first_name = ndb.StringProperty(required = True)
+    last_name = ndb.StringProperty(required = True)
+    seller_email = ndb.StringProperty(required = True)
+    checked = ndb.BooleanProperty(default = False)
 
     def render(self):
         return render_str("sellmodel.html", s = self)
 
-class WishModel(db.Model):
-    wish_amount = db.StringProperty(required = True)
-    wish_price = db.StringProperty(required = True)
+class WishModel(ndb.Model):
+    wish_amount = ndb.StringProperty(required = True)
+    wish_price = ndb.StringProperty(required = True)
 
     def render(self):
         return render_str("wishmodel.html", w = self)
@@ -126,7 +129,6 @@ class Sell(Handler):
         first_name = self.request.get('first_name')
         last_name = self.request.get('last_name')
         seller_email = self.request.get('seller_email')
-        checked = False;
 
         params = dict(amount = amount, 
                         price = price,
@@ -193,22 +195,23 @@ class NewWish(Handler):
 
 class Buy(Handler):
     def get(self):
-        sells = SellModel.all().order('price')
+        sells = SellModel.query().order(SellModel.price)
         for sell in sells:
-            sell.checked = False;
+            sell.checked = False
+            #memcache.set(sell.checked, False)
             sell.put()
+
         self.render("buy.html", sells = sells)
 
     def post(self):
-        sells = SellModel.all()
+        sells = SellModel.query().order(SellModel.price)
 
         boxcount = 0
-        mp_amount = []
-
         for sell in sells:
             check = self.request.get('check')
             if check:
                 sell.checked = True
+                memcache.set(sell.checked, True)
                 sell.put()
                 boxcount += 1
 
@@ -222,9 +225,7 @@ class Buy(Handler):
 class NewBuy(Buy):
     def get(self):
         #get every entry that was checked
-        cart = SellModel.all()
-        cart.filter("checked = ", True)
-        cart.order('price')
+        cart = SellModel.query(SellModel.checked == True)
         self.render("newbuy.html", cart = cart)
 
     def post(self):
