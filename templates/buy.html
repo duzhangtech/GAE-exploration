@@ -2,8 +2,7 @@
 
 {% block content %}
 
-<form method="post">
-
+<form method = "post">
 <div class = "section1">
     <div class = "sellbox">
         <h1>current offers:</h1>
@@ -20,7 +19,6 @@
             </tr>
             {% for sell in sells %}
                 {{ sell.render() | safe }}
-                </input>
             {% endfor %}
         </table>
         <div><input type="submit" value="Okay"></div>
@@ -28,6 +26,7 @@
         {%endif%}
     </div>
 </div>
+</form>
 
 <br>
 

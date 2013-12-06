@@ -2,11 +2,10 @@
 
 {% block content %}
 <h1>contact the seller</h1>
-<div>you want to buy</div>
-<div>x meal points at x price per point</div>
+<div>selected offers</div>
 
-{% for check in checked %}
-    {{ check.render() | safe }}
+{% for item in cart %}
+    {{ item.render() | safe }}
 {% endfor %}
 
 <form method="post">

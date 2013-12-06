@@ -11,12 +11,10 @@ template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
                                autoescape = True)
 
-#todo
-    #toggle
-    #contact info input
-    #send email
-
-    #edit info
+#TODO
+    # CHECKBOX
+    # EMAIL
+    # EDIT
 
 #cool features
     #ppl watching sells; price per point + giftcards/other payment options
@@ -31,7 +29,7 @@ jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
     #sell amount over time
 
 #nice to have
-    #cool facts page
+    #cool data facts page
 
 def sell_key(name = 'default'):
     return db.Key.from_path('sell', name)
@@ -104,11 +102,11 @@ class SellModel(db.Model):
     price = db.StringProperty(required = True)
     first_name = db.StringProperty(required = True)
     last_name = db.StringProperty(required = True)
-    email = db.StringProperty(required = True)
-    #fulfilled = db.StringProperty(default = False)
+    seller_email = db.StringProperty(required = True)
+    checked = db.BooleanProperty()
 
     def render(self):
-        return render_str("sellmodel.html", o = self)
+        return render_str("sellmodel.html", s = self)
 
 class WishModel(db.Model):
     wish_amount = db.StringProperty(required = True)
@@ -128,6 +126,7 @@ class Sell(Handler):
         first_name = self.request.get('first_name')
         last_name = self.request.get('last_name')
         seller_email = self.request.get('seller_email')
+        checked = False;
 
         params = dict(amount = amount, 
                         price = price,
@@ -167,20 +166,6 @@ class Sell(Handler):
                         first_name = first_name, last_name = last_name,
                         seller_email = seller_email, error=error)
 
-class Buy(Handler):
-    def get(self):
-        sells = SellModel.all().order('price')
-        self.render("buy.html", sells = sells)
-
-    def post(self):
-        checked = self.request.get_all('entry')
-
-        if checked:
-            self.redirect("/newbuy.html", checked = checked)
-        else:
-            error = "check at least one box to buy meal"
-            self.render("buy.html", sells = sells, error = error)
-
 class Wish(Handler):
     def get(self):
         wishes = WishModel.all().order('wish_price')
@@ -206,14 +191,54 @@ class NewWish(Handler):
             self.render("newwish.thml", error = error,
                             wish_amount = wish_amount, wish_price = wish_price)
 
-class NewBuy(Handler):
+class Buy(Handler):
     def get(self):
-        self.render("newbuy.html")
+        sells = SellModel.all().order('price')
+        for sell in sells:
+            sell.checked = False;
+            sell.put()
+        self.render("buy.html", sells = sells)
+
+    def post(self):
+        sells = SellModel.all()
+
+        boxcount = 0
+        mp_amount = []
+
+        for sell in sells:
+            check = self.request.get('check')
+            if check:
+                sell.checked = True
+                sell.put()
+                boxcount += 1
+
+        if boxcount == 0:
+            error = "plz check at least one box to buy meal points :)"
+            self.render("buy.html", error = error, sells = sells)
+        else:     
+            self.redirect('/contact') #aka NewBuy 
+               
+
+class NewBuy(Buy):
+    def get(self):
+        #get every entry that was checked
+        cart = SellModel.all()
+        cart.filter("checked = ", True)
+        cart.order('price')
+        self.render("newbuy.html", cart = cart)
 
     def post(self):
         buyer_email = self.request.get('buyer_email')
         first_name = self.request.get('first_name')
         last_name = self.request.get('last_name')
+
+
+
+        # if checked:
+        #     self.redirect("/newbuy.html", checked = checked)
+        # else:
+        #     error = "check at least one box to buy meal"
+        #     self.render("buy.html", sells = sells, error = error)
 
         #seller_email =
         #get seller email from sell key
