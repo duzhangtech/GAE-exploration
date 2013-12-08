@@ -83,9 +83,23 @@ class FAQ(Handler):
 
         if first_name and last_name and email and feedback:
             user = UserModel(parent = user_key(),
-                first_name = first_name, last_name = last_name, 
-                email = email)
-            user.put()
+                    first_name = first_name, last_name = last_name, 
+                    email = email)
+
+            database = UserModel.all().filter("email =", email)
+
+            count = 0
+            for data in database:
+                if data.email == email:
+                    count = 1
+            #user doesn't exist
+            if count == 0:
+                user.put()
+            #user exists
+            else:
+                #make key
+                u = UserModel.gql('where email = :email', email = email)
+                user = u.get()
 
             feedback = FeedbackModel(parent = feedback_key(),
                 user = user, feedback = feedback)
@@ -132,12 +146,30 @@ class Sell(Handler):
             have_error = True
 
         if amount and price and first_name and last_name and email and (have_error == False):
-            seller = email
-            sell = SellModel(parent = sell_key(seller), 
-                amount = amount, price = price, 
-                first_name = first_name, last_name = last_name, 
-                email = email)
-            sell_check_key = sell.put()
+
+            user = UserModel(parent = user_key(),
+                    first_name = first_name, last_name = last_name, 
+                    email = email)
+
+            database = UserModel.all().filter("email =", email)
+
+            count = 0
+            for data in database:
+                if data.email == email:
+                    count = 1
+            #user doesn't exist
+            if count == 0:
+                user.put()
+            #user exists
+            else:
+                #make key
+                u = UserModel.gql('where email = :email', email = email)
+                user = u.get()
+
+            sell = SellModel(parent = sell_key(), user = user,
+                amount = amount, price = price)
+            sell.put()
+
             stat = "your entry has been recorded! awesomeness"
             self.render("sell.html", stat = stat)
 
@@ -170,8 +202,6 @@ class NewWish(Handler):
                     first_name = first_name, last_name = last_name, 
                     email = email)
 
-            email = self.request.get('email')
-
             database = UserModel.all().filter("email =", email)
 
             count = 0
@@ -187,7 +217,7 @@ class NewWish(Handler):
                 u = UserModel.gql('where email = :email', email = email)
                 user = u.get()
 
-            wish = WishModel(parent = user, wish_amount = wish_amount, wish_price = wish_price)
+            wish = WishModel(parent = wish_key(), user = user, wish_amount = wish_amount, wish_price = wish_price)
             wish.put()
             stat = "success! your mp wish has been recorded :D"
             self.render("newwish.html", stat = stat)
