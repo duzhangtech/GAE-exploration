@@ -15,28 +15,6 @@ template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
                                autoescape = True)
 
-#TODO
-    # CHECKBOX
-    # EMAIL
-    # EDIT
-
-#cool features
-    #ppl watching sells; price per point + giftcards/other payment options
-    #when wish sell matches sell: automatic email
-
-    #records/stories
-
-    #avg price over time
-        #sells
-        #successful transactions
-
-    #sell amount over time
-    #sell patterns by year/class
-
-#nice to have
-    #cool data facts page
-    #cookie id to replace repeat user info input
-
 def user_key(name = "default"):
     return db.Key.from_path('user', name)
 
@@ -55,11 +33,17 @@ class UserModel(db.Model):
     email = db.StringProperty(required = True)
 
 class FeedbackModel(db.Model):
+    user = db.ReferenceProperty(UserModel, 
+                                collection_name = "feedback")
+
     feedback = db.StringProperty(required = True)
     def render(self):
         return render_str("feedback.html", f = self)
 
 class SellModel(db.Model):
+    user = db.ReferenceProperty(UserModel, 
+                                collection_name = "sells")
+
     amount = db.StringProperty(required = True)
     price = db.StringProperty(required = True)
     checked = db.BooleanProperty(default = False)
@@ -68,6 +52,9 @@ class SellModel(db.Model):
         return render_str("sellmodel.html", s = self)
 
 class WishModel(db.Model):
+    user = db.ReferenceProperty(UserModel, 
+                                collection_name = "wishes")
+
     wish_amount = db.StringProperty(required = True)
     wish_price = db.StringProperty(required = True)
 
@@ -103,13 +90,12 @@ class FAQ(Handler):
         if first_name and last_name and email and feedback:
             user = UserModel(parent = user_key(),
                 first_name = first_name, last_name = last_name, 
-                email = email, 
-                sells = FeedbackModel(parent = feedback_key(), feedback = feedback))
+                email = email)
             user.put()
 
-            # feedback = FeedbackModel(parent = feedback_key(),
-            #     user = user, feedback = feedback)
-            # feedback.put()
+            feedback = FeedbackModel(parent = feedback_key(),
+                user = user, feedback = feedback)
+            feedback.put()
 
             stat = "gracias mucho :)"
             self.render("faq.html", stat = stat)
@@ -120,7 +106,6 @@ class FAQ(Handler):
                 first_name = first_name, last_name = last_name, 
                 email = email, error = error)
 
-
 class Sell(Handler):
     def get(self):
         self.render("sell.html")
@@ -129,6 +114,7 @@ class Sell(Handler):
         have_error = False;
         amount = self.request.get('amount')
         price = self.request.get('price')
+
         first_name = self.request.get('first_name')
         last_name = self.request.get('last_name')
         email = self.request.get('email')
@@ -151,16 +137,12 @@ class Sell(Handler):
             params['error_email'] = "that email was't valid"
             have_error = True
 
-        if have_error:
-            self.render("sell.html", **params)
-
-
-        if amount and price and first_name and last_name and seller_email and (have_error == False):
-            seller = seller_email
+        if amount and price and first_name and last_name and email and (have_error == False):
+            seller = email
             sell = SellModel(parent = sell_key(seller), 
                 amount = amount, price = price, 
                 first_name = first_name, last_name = last_name, 
-                seller_email = seller_email)
+                email = email)
             sell_check_key = sell.put()
             stat = "your entry has been recorded! awesomeness"
             self.render("sell.html", stat = stat)
@@ -170,7 +152,7 @@ class Sell(Handler):
             self.render("sell.html", 
                         amount = amount, price = price, 
                         first_name = first_name, last_name = last_name,
-                        seller_email = seller_email, error=error)
+                        email = email, error=error)
 
 class Wish(Handler):
     def get(self):
@@ -182,25 +164,35 @@ class NewWish(Handler):
         self.render("newwish.html")
 
     def post(self):
+        first_name = self.request.get('first_name')
+        last_name = self.request.get('last_name')
+        email = self.request.get('email')
+
         wish_amount = self.request.get("wish_amount")
         wish_price = self.request.get("wish_price")
 
-        if wish_amount and wish_price:
+        if wish_amount and wish_price and first_name and last_name and email:
+            user = UserModel(parent = user_key(),
+                first_name = first_name, last_name = last_name, 
+                email = email)
+            #fixme: check if user exists to avoid unnecessary commit
+            #Model.get_or_insert
+            user.put()
+
             wish = WishModel(parent = wish_key(), 
-                            wish_amount = wish_amount, wish_price = wish_price)
+                            user = user, wish_amount = wish_amount, wish_price = wish_price)
             wish.put()
             stat = "success! your mp wish has been recorded :D"
-            self.render("newwish.html", stat = stat, 
-                            wish_amount = wish_amount, wish_price = wish_price)
+            self.render("newwish.html", stat = stat)
         else:
-            error = "sure you got both boxes?"
-            self.render("newwish.thml", error = error,
-                            wish_amount = wish_amount, wish_price = wish_price)
+            error = "sure you got every box?"
+            self.render("newwish.html", error = error,
+             wish_amount = wish_amount, wish_price = wish_price,first_name = first_name, last_name = last_name, 
+                    email = email)
 
 class Buy(Handler):
     def get(self):
-        sells = SellModel.query(ancestor = sell_key).order(SellModel.price)
-        #sells = sell_check_key.get()
+        sells = SellModel.all().ancestor(sell_key()).order('price')
 
         for sell in sells:
             sell.checked = False
@@ -209,8 +201,7 @@ class Buy(Handler):
         self.render("buy.html", sells = sells)
 
     def post(self):
-        sells = SellModel.query(ancestor = sell_key).order(SellModel.price)
-        #sells = sell_check_key.get()
+        sells = SellModel.all().order('price')
 
         boxcount = 0
         for sell in sells:
@@ -231,8 +222,7 @@ class Buy(Handler):
 #cart view
 class NewBuy(Buy):
     def get(self):
-        #cart = SellModel.query(SellModel.checked == True)
-        cart = sell_check_key.get(checked == True)
+        cart = SellModel.all().ancestor(sell_key()).filter("checked =", True).order('price')
         self.render("newbuy.html", cart = cart)
 
     def post(self):
@@ -248,13 +238,13 @@ class NewBuy(Buy):
         #     error = "check at least one box to buy meal"
         #     self.render("buy.html", sells = sells, error = error)
 
-        #seller_email =
+        #email =
         #get seller email from sell key
 
         # #validate email
         # subject = "I wish to buy your meal points"
         # body = "Hi! My name is %s and I'm interested in taking up your offer of x meal points at price per point") % first_name
-        # # mail.send_mail(buyer_email, seller_email, subject, body)
+        # # mail.send_mail(buyer_email, email, subject, body)
         self.render("newbuy.html")
 
 #150 mp min, 10000 mp max
@@ -290,3 +280,26 @@ application = webapp2.WSGIApplication([
     ('/faq', FAQ),
 
 ], debug=True)
+
+
+#TODO
+    # CHECKBOX
+    # EMAIL
+    # EDIT
+
+#cool features
+    #ppl watching sells; price per point + giftcards/other payment options
+    #when wish sell matches sell: automatic email
+
+    #records/stories
+
+    #avg price over time
+        #sells
+        #successful transactions
+
+    #sell amount over time
+    #sell patterns by year/class
+
+#nice to have
+    #cool data facts page
+    #cookie id to replace repeat user info input
