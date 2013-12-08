@@ -10,13 +10,13 @@ from google.appengine.api import mail
 from google.appengine.api import memcache
 
 
-
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
                                autoescape = True)
 
 def user_key(name = "default"):
     return db.Key.from_path('user', name)
+        #returns key
 
 def sell_key(name = "default"):
     return db.Key.from_path('sell', name)
@@ -33,17 +33,13 @@ class UserModel(db.Model):
     email = db.StringProperty(required = True)
 
 class FeedbackModel(db.Model):
-    user = db.ReferenceProperty(UserModel, 
-                                collection_name = "feedback")
-
+    user = db.ReferenceProperty(UserModel)
     feedback = db.StringProperty(required = True)
     def render(self):
         return render_str("feedback.html", f = self)
 
 class SellModel(db.Model):
-    user = db.ReferenceProperty(UserModel, 
-                                collection_name = "sells")
-
+    user = db.ReferenceProperty(UserModel)
     amount = db.StringProperty(required = True)
     price = db.StringProperty(required = True)
     checked = db.BooleanProperty(default = False)
@@ -52,9 +48,7 @@ class SellModel(db.Model):
         return render_str("sellmodel.html", s = self)
 
 class WishModel(db.Model):
-    user = db.ReferenceProperty(UserModel, 
-                                collection_name = "wishes")
-
+    user = db.ReferenceProperty(UserModel)
     wish_amount = db.StringProperty(required = True)
     wish_price = db.StringProperty(required = True)
 
@@ -173,14 +167,27 @@ class NewWish(Handler):
 
         if wish_amount and wish_price and first_name and last_name and email:
             user = UserModel(parent = user_key(),
-                first_name = first_name, last_name = last_name, 
-                email = email)
-            #fixme: check if user exists to avoid unnecessary commit
-            #Model.get_or_insert
-            user.put()
+                    first_name = first_name, last_name = last_name, 
+                    email = email)
 
-            wish = WishModel(parent = wish_key(), 
-                            user = user, wish_amount = wish_amount, wish_price = wish_price)
+            email = self.request.get('email')
+
+            database = UserModel.all().filter("email =", email)
+
+            count = 0
+            for data in database:
+                if data.email == email:
+                    count = 1
+
+            #user doesn't exist
+            if count == 0:
+                user.put()
+            #user exists
+            else:
+                u = UserModel.gql('where email = :email', email = email)
+                user = u.get()
+
+            wish = WishModel(parent = user, wish_amount = wish_amount, wish_price = wish_price)
             wish.put()
             stat = "success! your mp wish has been recorded :D"
             self.render("newwish.html", stat = stat)
