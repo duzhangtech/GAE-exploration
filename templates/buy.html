@@ -11,18 +11,35 @@
             it looks like all the offers have been bought. check back later :)
         </div>
         {%else%}
-        <table>
-            <tr class = "table_label">
-            <th></th>
-            <th>amount of mp</th>
-            <th>price per mp</th>
-            </tr>
-            {% for sell in sells %}
-                {{ sell.render() | safe }}
-            {% endfor %}
-        </table>
-        <div><input type="submit" value="Okay"></div>
-        <div class="error">{{error}}</div> 
+            <table>
+                <tr class = "table_label">
+                <th></th>
+                <th>amount of mp</th>
+                <th>price per mp</th>
+                </tr>
+                {% for sell in sells %}
+                    {{ sell.render() | safe }}
+                {% endfor %}
+            </table>
+            
+<!--
+            <p class="big">
+                <label>first name</label>
+                <input type="text" name="first_name" value="{{first_name}}">
+           
+                
+                <label>last name</label>
+                <input type="text" name="last_name" value="{{last_name}}">
+            
+                
+                <label>email</label>
+                <input type="text" name="buyer_email" value="{{buyer_email}}">
+    
+            <div><input type="submit" value="review your order"></div>
+            </p>
+-->
+            <div><input type="submit" value="get down your contact info"></div>
+            <div class="error">{{error}}</div> 
         {%endif%}
     </div>
 </div>
