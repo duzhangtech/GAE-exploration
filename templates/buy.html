@@ -13,7 +13,7 @@
         {%else%}
             <table>
                 <tr class = "table_label">
-                <th></th>
+                <th>offer #</th>
                 <th>amount of mp</th>
                 <th>price per mp</th>
                 </tr>
@@ -22,8 +22,10 @@
                 {% endfor %}
             </table>
             
-
             <p class="big">
+                <label># of offer that you want</label>
+                <input type="text" name="num" value="{{num}}">
+        
                 <label>first name</label>
                 <input type="text" name="first_name" value="{{first_name}}">
            

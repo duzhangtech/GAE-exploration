@@ -1,6 +1,7 @@
 import os
 import re
 import urllib
+import random
 from string import letters
 
 import jinja2
@@ -37,8 +38,8 @@ class UserModel(db.Model):
 
 class CartModel(db.Model):
     user = db.ReferenceProperty(UserModel)
-    cart_amount = db.StringProperty(required = True)
-    cart_price = db.StringProperty(required = True)
+    cart_amount = db.IntegerProperty(required = True)
+    cart_price = db.FloatProperty(required = True)
 
     def render(self):
         return render_str("cartmodel.html", c = self)
@@ -53,7 +54,7 @@ class SellModel(db.Model):
     user = db.ReferenceProperty(UserModel)
     amount = db.StringProperty(required = True)
     price = db.StringProperty(required = True)
-    checked = db.BooleanProperty(default = False)
+    num = db.IntegerProperty()
 
     def render(self):
         return render_str("sellmodel.html", s = self)
@@ -158,27 +159,51 @@ class Sell(Handler):
 
         if amount and price and first_name and last_name and email and (have_error == False):
 
-            user = UserModel(parent = user_key(),
-                    first_name = first_name, last_name = last_name, 
-                    email = email)
-
+            #check if user exists
             database = UserModel.all().filter("email =", email)
 
             count = 0
-            for data in database:
-                if data.email == email:
-                    count = 1
-            #user doesn't exist
-            if count == 0:
+            if database:
+                count = 1
+
+            if count == 0: #user doesn't exist
+                user = UserModel(parent = user_key(),
+                    first_name = first_name, last_name = last_name, 
+                    email = email)
                 user.put()
-            #user exists
-            else:
+
+            else: #user exists
                 #make key
                 u = UserModel.gql('where email = :email', email = email)
                 user = u.get()
 
+            #now assign num
+            total_sells = SellModel.all()
+            total_num = total_sells.count()
+
+            #get max sell num
+            max_num = 0
+            for item in total_sells:
+                if item.num > max_num:
+                    max_num = item.num
+
+            #when nums are 1, 2, 4
+            #in this case, there will always be
+            #unassigned integer from 0 to total_num
+            num = 1
+            if max_num > total_num:
+                for x in range(1, total_num+1):
+                    findnum = SellModel.all().filter("num = ", num)
+                    if not findnum:
+                        num = x
+                        break
+
+            #max_num will never be smaller than total_num
+            if max_num == total_num:
+                num = max_num + 1
+
             sell = SellModel(parent = sell_key(), user = user,
-                amount = amount, price = price)
+                amount = amount, price = price, num = num)
             sell.put()
 
             stat = "your entry has been recorded! awesomeness"
@@ -216,9 +241,8 @@ class NewWish(Handler):
             database = UserModel.all().filter("email =", email)
 
             count = 0
-            for data in database:
-                if data.email == email:
-                    count = 1
+            if database: 
+                count = 1
 
             #user doesn't exist
             if count == 0:
@@ -241,44 +265,25 @@ class NewWish(Handler):
 class Buy(Handler):
     def get(self):
         sells = SellModel.all().ancestor(sell_key()).order('price')
-
-        for sell in sells:
-            sell.checked = False
-            sell.put()
-
         self.render("buy.html", sells = sells)
 
     def post(self):
-
         first_name = self.request.get('first_name')
         last_name = self.request.get('last_name')
         email = self.request.get('email')
 
+        num = self.request.get('num')
+        #FIXME validate num
+
         sells = SellModel.all().ancestor(sell_key()).order('price')
 
-        boxcount = 0
-        for sell in sells:
-            check = self.request.get('check')
+        if first_name and last_name and email and num:
 
-            if check:
-                #checkbox was checked, update checked attribute
-                sell.checked = True
-                sell.put()
-                boxcount += 1
-
-        if boxcount == 0:
-            error = "plz check at least one box to buy meal points :)"
-            self.render("buy.html", error = error, sells = sells)
-        
-
-        else: #user has checked 1+ boxes
             #check if user exists
             database = UserModel.all().filter("email =", email)
-
             count = 0
-            for data in database:
-                if data.email == email:
-                    count = 1
+            if database:
+                count = 1
             #user doesn't exist
             if count == 0:
                 user = UserModel(parent = user_key(),
@@ -289,24 +294,36 @@ class Buy(Handler):
             else:
                 #make key, get user from key
                 u = UserModel.gql('where email = :email', email = email)
-                user = u.get()   
+                user = u.get() 
 
-                cart_items = SellModel.all().ancestor(sell_key()).filter('checked = ', True)
+            num = self.request.get('num')
 
-                #loop through checked item
-                for item in cart_items:
-                    #commit item to cart_key
-                    cart_amount = item.amount
-                    cart_price = item.price
-                    cart = CartModel(parent = cart_key(), user = user, cart_amount = cart_amount, cart_price = cart_price)
-                    cart.put()
+            derp = SellModel.gql('where num = :num', num = num)
+            cart_item = derp.get()
+
+            cart_amount = cart_item.amount
+            cart_price = cart_item.price
+
+            # cart_amount = 50
+            # cart_price = 0.5
+            # cart_item = SellModel.all().filter('num = ', num)
+            # for item in cart_item: #should only be one item
+            #     cart_amount = item.amount
+            #     cart_price = item.price
+            cart = CartModel(parent = cart_key(), user = user, cart_amount = cart_amount, cart_price = cart_price)
+            cart.put()
 
             self.redirect('/contact')  
-               
+
+
+        else:
+            error = "plz jot down an offer # from the list to buy meal points :)"
+            self.render("buy.html", error = error, sells = sells)
+        
 #cart view
 class NewBuy(Buy):
     def get(self):
-        cart = CartModel.all().ancestor(cart_key()).order('cart_price')
+        cart = CartModel.all()
         self.render("newbuy.html", cart = cart)
 
     # def post(self):
