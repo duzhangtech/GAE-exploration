@@ -14,9 +14,12 @@ template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
                                autoescape = True)
 
+def cart_key(name="default"):
+    return db.Key.from_path('cart', name)
+
+#basic user can sell, wish, and give feedback
 def user_key(name = "default"):
     return db.Key.from_path('user', name)
-        #returns key
 
 def sell_key(name = "default"):
     return db.Key.from_path('sell', name)
@@ -31,6 +34,14 @@ class UserModel(db.Model):
     first_name = db.StringProperty(required = True)
     last_name = db.StringProperty(required = True)
     email = db.StringProperty(required = True)
+
+class CartModel(db.Model):
+    user = db.ReferenceProperty(UserModel)
+    cart_amount = db.StringProperty(required = True)
+    cart_price = db.StringProperty(required = True)
+
+    def render(self):
+        return render_str("cartmodel.html", c = self)
 
 class FeedbackModel(db.Model):
     user = db.ReferenceProperty(UserModel)
@@ -233,39 +244,70 @@ class Buy(Handler):
 
         for sell in sells:
             sell.checked = False
-            sell_check_key = sell.put()
+            sell.put()
 
         self.render("buy.html", sells = sells)
 
     def post(self):
-        sells = SellModel.all().order('price')
+
+        first_name = self.request.get('first_name')
+        last_name = self.request.get('last_name')
+        email = self.request.get('email')
+
+        sells = SellModel.all().ancestor(sell_key()).order('price')
 
         boxcount = 0
         for sell in sells:
             check = self.request.get('check')
 
             if check:
+                #FIXME: directly commit cartmodel instance
                 sell.checked = True
-
-                sell_check_key = sell.put()
+                sell.put()
                 boxcount += 1
 
         if boxcount == 0:
             error = "plz check at least one box to buy meal points :)"
             self.render("buy.html", error = error, sells = sells)
-        else:     
+        else:
+            user = UserModel(parent = user_key(),
+                    first_name = first_name, last_name = last_name, 
+                    email = email)
+
+            database = UserModel.all().filter("email =", email)
+
+            count = 0
+            for data in database:
+                if data.email == email:
+                    count = 1
+            #user doesn't exist
+            if count == 0:
+                user.put()
+            #user exists
+            else:
+                #make key
+                u = UserModel.gql('where email = :email', email = email)
+                user = u.get()   
+
+                for sell in sells:
+                    check = self.request.get('check')
+
+                    if check:
+                        #commit each "True" box to cart_key
+                        cart_amount = sell.amount
+                        cart_price = sell.price
+                        cart = CartModel(parent = cart_key(), user = user, cart_amount = cart_amount, cart_price = cart_price)
+                        cart.put()
             self.redirect('/contact') #aka NewBuy 
                
 #cart view
 class NewBuy(Buy):
     def get(self):
-        cart = SellModel.all().ancestor(sell_key()).filter("checked =", True).order('price')
+        cart = CartModel.all().ancestor(cart_key()).order('cart_price')
         self.render("newbuy.html", cart = cart)
 
-    def post(self):
-        buyer_email = self.request.get('buyer_email')
-        first_name = self.request.get('first_name')
-        last_name = self.request.get('last_name')
+    # def post(self):
+        
 
 
 
