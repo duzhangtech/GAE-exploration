@@ -261,7 +261,7 @@ class Buy(Handler):
             check = self.request.get('check')
 
             if check:
-                #FIXME: directly commit cartmodel instance
+                #checkbox was checked, update checked attribute
                 sell.checked = True
                 sell.put()
                 boxcount += 1
@@ -269,11 +269,10 @@ class Buy(Handler):
         if boxcount == 0:
             error = "plz check at least one box to buy meal points :)"
             self.render("buy.html", error = error, sells = sells)
-        else:
-            user = UserModel(parent = user_key(),
-                    first_name = first_name, last_name = last_name, 
-                    email = email)
+        
 
+        else: #user has checked 1+ boxes
+            #check if user exists
             database = UserModel.all().filter("email =", email)
 
             count = 0
@@ -282,23 +281,27 @@ class Buy(Handler):
                     count = 1
             #user doesn't exist
             if count == 0:
+                user = UserModel(parent = user_key(),
+                    first_name = first_name, last_name = last_name, 
+                    email = email)
                 user.put()
             #user exists
             else:
-                #make key
+                #make key, get user from key
                 u = UserModel.gql('where email = :email', email = email)
                 user = u.get()   
 
-                for sell in sells:
-                    check = self.request.get('check')
+                cart_items = SellModel.all().ancestor(sell_key()).filter('checked = ', True)
 
-                    if check:
-                        #commit each "True" box to cart_key
-                        cart_amount = sell.amount
-                        cart_price = sell.price
-                        cart = CartModel(parent = cart_key(), user = user, cart_amount = cart_amount, cart_price = cart_price)
-                        cart.put()
-            self.redirect('/contact') #aka NewBuy 
+                #loop through checked item
+                for item in cart_items:
+                    #commit item to cart_key
+                    cart_amount = item.amount
+                    cart_price = item.price
+                    cart = CartModel(parent = cart_key(), user = user, cart_amount = cart_amount, cart_price = cart_price)
+                    cart.put()
+
+            self.redirect('/contact')  
                
 #cart view
 class NewBuy(Buy):
@@ -308,9 +311,6 @@ class NewBuy(Buy):
 
     # def post(self):
         
-
-
-
         # if checked:
         #     self.redirect("/newbuy.html", checked = checked)
         # else:
