@@ -36,10 +36,18 @@ class UserModel(db.Model):
     last_name = db.StringProperty(required = True)
     email = db.StringProperty(required = True)
 
-class CartModel(db.Model):
+class SellModel(db.Model):
     user = db.ReferenceProperty(UserModel)
-    cart_amount = db.IntegerProperty(required = True)
-    cart_price = db.FloatProperty(required = True)
+    amount = db.StringProperty(required = True)
+    price = db.StringProperty(required = True)
+    num = db.IntegerProperty(required = True)
+
+    def render(self):
+        return render_str("sellmodel.html", s = self)
+
+#inherits from sellmodel
+class CartModel(db.Model):
+    cart = db.ReferenceProperty(SellModel)
 
     def render(self):
         return render_str("cartmodel.html", c = self)
@@ -49,15 +57,6 @@ class FeedbackModel(db.Model):
     feedback = db.StringProperty(required = True)
     def render(self):
         return render_str("feedback.html", f = self)
-
-class SellModel(db.Model):
-    user = db.ReferenceProperty(UserModel)
-    amount = db.StringProperty(required = True)
-    price = db.StringProperty(required = True)
-    num = db.IntegerProperty(required = True)
-
-    def render(self):
-        return render_str("sellmodel.html", s = self)
 
 class WishModel(db.Model):
     user = db.ReferenceProperty(UserModel)
@@ -303,6 +302,7 @@ class Buy(Handler):
 
             derpamount = cart_item.amount
             derpprice = cart_item.price
+            derpnum = cart_item.num
 
             #FIXME, nonetype error
             # derpamount = 50
@@ -313,7 +313,7 @@ class Buy(Handler):
             #     derpamount = item.amount
             #     derpprice = item.price
 
-            cart = CartModel(parent = cart_key(), user = user, cart_amount = derpamount, cart_price = derpprice)
+            cart = CartModel(parent = cart_key(), user = user, cart_amount = derpamount, cart_price = derpprice, cart_num = derpnum)
             cart.put()
 
             self.redirect('/contact')  
