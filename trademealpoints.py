@@ -54,7 +54,7 @@ class SellModel(db.Model):
     user = db.ReferenceProperty(UserModel)
     amount = db.StringProperty(required = True)
     price = db.StringProperty(required = True)
-    num = db.IntegerProperty()
+    num = db.IntegerProperty(required = True)
 
     def render(self):
         return render_str("sellmodel.html", s = self)
@@ -301,16 +301,19 @@ class Buy(Handler):
             derp = SellModel.gql('where num = :num', num = num)
             cart_item = derp.get()
 
-            cart_amount = cart_item.amount
-            cart_price = cart_item.price
+            derpamount = cart_item.amount
+            derpprice = cart_item.price
 
-            # cart_amount = 50
-            # cart_price = 0.5
+            #FIXME, nonetype error
+            # derpamount = 50
+            # derpprice = 0.5
             # cart_item = SellModel.all().filter('num = ', num)
+
             # for item in cart_item: #should only be one item
-            #     cart_amount = item.amount
-            #     cart_price = item.price
-            cart = CartModel(parent = cart_key(), user = user, cart_amount = cart_amount, cart_price = cart_price)
+            #     derpamount = item.amount
+            #     derpprice = item.price
+
+            cart = CartModel(parent = cart_key(), user = user, cart_amount = derpamount, cart_price = derpprice)
             cart.put()
 
             self.redirect('/contact')  
