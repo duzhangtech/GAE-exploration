@@ -1,13 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>contact the seller</h1>
-<div>selected offers</div>
+<h1>hi {{first_name}}, you have selected to buy</h1>
+<h1>{{amount}} meal points for {{price}} per point</h1>
 
+<!--
 {% for item in cart %}
     {{ item.render() | safe }}
 {% endfor %}
+-->
 
+<!--
 <form method="post">
     <p class="big">
         
@@ -29,4 +32,5 @@
     <div class = "stat">{{stat}}</div>
     <div class="error">{{error}}</div> 
 </form>
+-->
 {% endblock %}

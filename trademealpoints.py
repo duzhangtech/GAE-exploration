@@ -40,14 +40,14 @@ class SellModel(db.Model):
     user = db.ReferenceProperty(UserModel)
     amount = db.StringProperty(required = True)
     price = db.StringProperty(required = True)
-    num = db.IntegerProperty(required = True)
+    num = db.StringProperty(required = True)
 
     def render(self):
         return render_str("sellmodel.html", s = self)
 
-#inherits from sellmodel
 class CartModel(db.Model):
-    cart = db.ReferenceProperty(SellModel)
+    user = db.ReferenceProperty(UserModel)
+    num = db.StringProperty()
 
     def render(self):
         return render_str("cartmodel.html", c = self)
@@ -280,6 +280,7 @@ class Buy(Handler):
 
             #check if user exists
             database = UserModel.all().filter("email =", email)
+
             count = 0
             if database:
                 count = 1
@@ -297,26 +298,19 @@ class Buy(Handler):
 
             num = self.request.get('num')
 
-            derp = SellModel.gql('where num = :num', num = num)
-            cart_item = derp.get()
-
-            derpamount = cart_item.amount
-            derpprice = cart_item.price
-            derpnum = cart_item.num
-
-            #FIXME, nonetype error
-            # derpamount = 50
-            # derpprice = 0.5
-            # cart_item = SellModel.all().filter('num = ', num)
-
-            # for item in cart_item: #should only be one item
-            #     derpamount = item.amount
-            #     derpprice = item.price
-
-            cart = CartModel(parent = cart_key(), user = user, cart_amount = derpamount, cart_price = derpprice, cart_num = derpnum)
+            cart = CartModel(parent = cart_key(), user = user, num = num)
             cart.put()
 
-            self.redirect('/contact')  
+            #cart now has user info and num of desired order
+            #rerender new page showing selected order
+            #get amount and price froms sellmodel
+
+            derp = SellModel.gql('where num = :num', num = num)
+            numkey = derp.get()
+            amount = numkey.amount
+            price = numkey.price
+
+            self.render('newbuy.html', first_name = first_name, amount = amount, price = price)  
 
 
         else:
