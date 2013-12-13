@@ -40,15 +40,13 @@ class SellModel(db.Model):
     user = db.ReferenceProperty(UserModel)
     amount = db.StringProperty(required = True)
     price = db.StringProperty(required = True)
-    num = db.StringProperty(required = True)
-
+    num = db.IntegerProperty(required = True)
     def render(self):
         return render_str("sellmodel.html", s = self)
 
 class CartModel(db.Model):
     user = db.ReferenceProperty(UserModel)
-    num = db.StringProperty()
-
+    num = db.IntegerProperty()
     def render(self):
         return render_str("cartmodel.html", c = self)
 
@@ -158,20 +156,21 @@ class Sell(Handler):
 
         if amount and price and first_name and last_name and email and (have_error == False):
 
-            #check if user exists
+            user = UserModel(parent = user_key(),
+                    first_name = first_name, last_name = last_name, 
+                    email = email)
+
             database = UserModel.all().filter("email =", email)
 
             count = 0
-            if database:
-                count = 1
-
-            if count == 0: #user doesn't exist
-                user = UserModel(parent = user_key(),
-                    first_name = first_name, last_name = last_name, 
-                    email = email)
+            for data in database:
+                if data.email == email:
+                    count = 1
+            #user doesn't exist
+            if count == 0:
                 user.put()
-
-            else: #user exists
+            #user exists
+            else:
                 #make key
                 u = UserModel.gql('where email = :email', email = email)
                 user = u.get()
@@ -298,14 +297,14 @@ class Buy(Handler):
 
             num = self.request.get('num')
 
-            cart = CartModel(parent = cart_key(), user = user, num = num)
+            cart = CartModel(parent = cart_key(), user = user, num = int(num))
             cart.put()
 
             #cart now has user info and num of desired order
             #rerender new page showing selected order
-            #get amount and price froms sellmodel
+            #get amount and price from sellmodel, cast num to int since input is string
 
-            derp = SellModel.gql('where num = :num', num = num)
+            derp = SellModel.gql('where num = :num', num = int(num))
             numkey = derp.get()
             amount = numkey.amount
             price = numkey.price
