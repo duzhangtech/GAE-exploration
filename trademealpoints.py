@@ -46,7 +46,7 @@ class SellModel(db.Model):
 
 class CartModel(db.Model):
     user = db.ReferenceProperty(UserModel)
-    num = db.IntegerProperty()
+    num = db.IntegerProperty(required = True)
     def render(self):
         return render_str("cartmodel.html", c = self)
 
@@ -295,26 +295,33 @@ class Buy(Handler):
                 u = UserModel.gql('where email = :email', email = email)
                 user = u.get() 
 
-            num = self.request.get('num')
+            num = int(self.request.get('num'))
 
-            cart = CartModel(parent = cart_key(), user = user, num = int(num))
-            cart.put()
+            #fixme: add ability to edit cart
+            #did user already put the same item (num) in cart? 
+            item_check = CartModel.all().filter("email = ", email)
+            item_check = item_check.filter("num = ", num)
 
-            #cart now has user info and num of desired order
-            #rerender new page showing selected order
-            #get amount and price from sellmodel, cast num to int since input is string
+            item_count = 0
+            if item_check: #order already added to cart!
+                self.write("ELLOHAY")
+                item_count = 1
 
-            derp = SellModel.gql('where num = :num', num = int(num))
-            numkey = derp.get()
-            amount = numkey.amount
-            price = numkey.price
-
-            self.render('newbuy.html', first_name = first_name, amount = amount, price = price)  
-
-
-        else:
-            error = "plz jot down an offer # from the list to buy meal points :)"
-            self.render("buy.html", error = error, sells = sells)
+            if item_count == 0:
+                cart = CartModel(parent = cart_key(), user = user, num = num)
+                cart.put()
+                numkey = SellModel.gql('where num = :num', num = num)
+                derp = numkey.get()
+                amount = derp.amount
+                price = derp.price
+                self.render('newbuy.html', first_name = first_name, amount = amount, price = price)  
+            else: 
+                cart_error = "this offer is already in your cart"
+                self.render("buy.html", cart_error = cart_error, sells = sells)
+ 
+        else: 
+            cart_error = "you already selected this order"
+            self.render("buy.html", cart_error = cart_error, sells = sells)
         
 #cart view
 class NewBuy(Buy):
@@ -345,6 +352,7 @@ AMOUNT_RE = re.compile(r'^[1-9][0-9]{0,4}$|^10000$')
 #min 0.01 per mp, max 2.00 per mp
 PRICE_RE = re.compile(r'^[0-1]+\.[0-9][0-9]$|^2\.00$')
 
+#wustl.edu
 EMAIL_RE  = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
 
 def valid_amount(amount):

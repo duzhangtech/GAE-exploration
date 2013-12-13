@@ -3,46 +3,51 @@
 {% block content %}
 
 <form method = "post">
-<div class = "section1">
-    <div class = "sellbox">
-        <h1>current offers:</h1>
-        {%if sells.count() == 0 %}
-        <div>
-            it looks like all the offers have been bought. check back later :)
-        </div>
-        {%else%}
-            <table>
-                <tr class = "table_label">
-                <th>offer #</th>
-                <th>amount of mp</th>
-                <th>price per mp</th>
-                </tr>
-                {% for sell in sells %}
-                    {{ sell.render() | safe }}
-                {% endfor %}
-            </table>
-            
-            <p class="big">
-                <label># of offer that you want</label>
-                <input type="text" name="num" value="{{num}}">
-        
-                <label>first name</label>
-                <input type="text" name="first_name" value="{{first_name}}">
-           
-                
-                <label>last name</label>
-                <input type="text" name="last_name" value="{{last_name}}">
-            
-                
-                <label>email</label>
-                <input type="text" name="email" value="{{email}}">
-            </p>
-        
-            <div><input type="submit" value="review your order"></div>
-            <div class="error">{{error}}</div> 
-        {%endif%}
+    
+<div class = "sellbox">
+    <h1>current offers:</h1>
+    
+    {%if sells.count() == 0 %}
+    <div>
+        it looks like all the offers have been bought. check back later :)
     </div>
+    
+    {%else%}
+    <table>
+        <tr class = "table_label">
+        <th>offer #</th>
+        <th>amount of mp</th>
+        <th>price per mp</th>
+        </tr>
+        {% for sell in sells %}
+            {{ sell.render() | safe }}
+        {% endfor %}
+    </table>
 </div>
+
+<div class = "apple">
+<p class="big">
+    <label class = "buy_label">offer #</label>
+    <input type="text" class = "buy_input" name="num" value="{{num}}">
+
+    <label class = "buy_label">first name</label>
+    <input type="text" class = "buy_input" name="first_name" value="{{first_name}}">
+
+    
+    <label class = "buy_label">last name</label>
+    <input type="text" class = "buy_input" name="last_name" value="{{last_name}}">
+
+    
+    <label class = "buy_label">email</label>
+    <input type="text" class = "buy_input" name="email" value="{{email}}">
+</p>
+
+<div><input type="submit" class = "button" value="review your order"></div>
+<div class="error">{{cart_error}}</div> 
+<div class="error">{{error}}</div> 
+</div>
+    
+{%endif%}
 </form>
 
 <br>

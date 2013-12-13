@@ -2,36 +2,37 @@
 
 {% block content %}
 
-<div>frequently asked questions</div>
+<div class = "apple">
+<!--
+    <h2>frequently asked questions</h2>
+-->
 
-<div>
-   
-<h1>how do i buy meal points?</h1>    
-<ol id = "list">
-    <li>check the offers you want to buy</li>
-    <li>jot down your contact info</li>
-    <li>seller receives email with your contact info</li>
-    <li>arrange w/ seller to sign the transfer form</li>
-</ol>
+    <h1>how do i buy meal points?</h1>    
+    <ol class = "list">
+        <li>check the offers you want to buy</li>
+        <li>jot down your contact info</li>
+        <li>seller receives email with your contact info</li>
+        <li>arrange w/ seller to sign the transfer form</li>
+    </ol>
 
 <br>
 
-<form class = "box" method="post">
-    <div>got more questions/comments? jot them down here</div>
-    <input type="text" name="feedback" value="{{feedback}}">
+<form method="post">
+    <label class = "faq_label">feedback</label>
+    <input type="text" name="feedback" class = "faq_input" value="{{feedback}}">
     
-    <label>first name</label>
-    <input type="text" name="first_name" value="{{first_name}}">
-    
-    
-    <label>last name</label>
-    <input type="text" name="last_name" value="{{last_name}}">
+    <label class = "faq_label">first name</label>
+    <input type="text" name="first_name" class = "faq_input" value="{{first_name}}">
     
     
-    <label>email</label>
-    <input type="text" name="email" value="{{email}}">
+    <label class = "faq_label">last name</label>
+    <input type="text" name="last_name" class = "faq_input" value="{{last_name}}">
+    
+    
+    <label class = "faq_label">email</label>
+    <input type="text" name="email" class = "faq_input" value="{{email}}">
 
-    <div><input type="submit" value="Okay"></div>
+    <div><input type="submit" class = "button" value="Okay"></div>
 
     <div class = "stat">{{stat}}</div>
     <div class="error">{{error}}</div> 

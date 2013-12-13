@@ -4,33 +4,35 @@
 
 <h1>get dough for your unused meal points</h1>
 
+<div class = "apple">
 <form method="post">
     <p class="big">
-        <label>number of mp</label>
-        <input type="text" name="amount" value="{{amount}}">
+        <label class = "sell_label">number of mp</label>
+        <input type="text" class = "sell_input" name="amount" value="{{amount}}">
         {{error_amount}}
         
         
-        <label>price per mp</label>
-        <input type="text" name="price" value="{{price}}">
+        <label class = "sell_label">price per mp</label>
+        <input type="text" class = "sell_input" name="price" value="{{price}}">
         {{error_price}}
         
         
-        <label>first name</label>
-        <input type="text" name="first_name" value="{{first_name}}">
+        <label class = "sell_label">first name</label>
+        <input type="text" class = "sell_input" name="first_name" value="{{first_name}}">
    
         
-        <label>last name</label>
-        <input type="text" name="last_name" value="{{last_name}}">
+        <label class = "sell_label">last name</label>
+        <input type="text" class = "sell_input" name="last_name" value="{{last_name}}">
     
         
-        <label>email</label>
-        <input type="text" name="email" value="{{email}}">
+        <label class = "sell_label">email</label>
+        <input type="text" class = "sell_input" name="email" value="{{email}}">
         {{error_email}}
         
-    <div><input type="submit" value="Okay"></div>
+    <div><input type="submit" class = "button" value="Okay"></div>
     </p>
     <div class = "stat">{{stat}}</div>
     <div class="error">{{error}}</div> 
 </form>
+</div>
 {% endblock %}
