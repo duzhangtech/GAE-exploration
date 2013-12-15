@@ -60,16 +60,15 @@ h2 {
     text-align: left;
 }
 
+li {
+    text-align: left;
+}
+
 .box {
     padding-left:30%;
     padding-right:30%;
     text-align: left;
 }
-
-li {
-    text-align: left;
-}
-
 
 .buy_label, .buy_input {
     display: inline-block;
@@ -127,6 +126,23 @@ li {
     background-color:transparent;
 }
 
+.newwish_label, .newwish_input {
+    display: inline-block;
+}
+.newwish_label + .newwish_input {
+    display: inline-block;
+    padding-right: 25%;
+    margin-left: 2%;
+}
+.newwish_input {
+    width:30%;
+}
+.newwish_label {
+    width: 40%;
+    text-align: right;
+    color: #a3a3a3;
+    background-color:transparent;
+}
 .feedback_text {
     height: 50%;
     width:50%;
@@ -142,14 +158,6 @@ p.big {
 table {
     text-align: center;
 }
-
-.sellbox {
-    text-align:left;
-    width: 300px;
-    margin-left: 40%;
-    background-color:transparent;
-}
-
 #wish_input {
     background-color:transparent;
 }
@@ -190,7 +198,8 @@ input[type="submit"] {
     font-family:Futura, “Trebuchet MS”, Arial, sans-serif;
     font-weight: 100;
     font-size: 20px;
-    border:black;
+    border:2px solid black;
+    border-radius: 25px;
 }
 .button:hover {
     border-color: #32ac97;

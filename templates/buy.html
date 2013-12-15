@@ -4,28 +4,28 @@
 
 <form method = "post">
     
-<div class = "sellbox">
-    <h1>current offers:</h1>
-    
-    {%if sells.count() == 0 %}
-    <div>
-        it looks like all the offers have been bought. check back later :)
-    </div>
-    
-    {%else%}
-    <table>
-        <tr class = "table_label">
-        <th>offer #</th>
-        <th>amount of mp</th>
-        <th>price per mp</th>
-        </tr>
-        {% for sell in sells %}
-            {{ sell.render() | safe }}
-        {% endfor %}
-    </table>
+<div class = "apple">
+<h1>current offers:</h1>
 </div>
 
+{%if sells.count() == 0 %}
 <div class = "apple">
+    it looks like all the offers have been bought. check back later :)
+</div>
+
+{%else%}
+<div class = "apple">
+<table>
+    <tr class = "table_label">
+    <th>offer #</th>
+    <th>amount of mp</th>
+    <th>price per mp</th>
+    </tr>
+    {% for sell in sells %}
+        {{ sell.render() | safe }}
+    {% endfor %}
+</table>
+
 <p class="big">
     <label class = "buy_label">offer #</label>
     <input type="text" class = "buy_input" name="num" value="{{num}}">
@@ -48,14 +48,15 @@
 </div>
     
 {%endif%}
-</form>
 
 <br>
 
-<div class = "sellbox"><h1>
+<div class = "apple">
 don't see an offer you want? let sellers know the amount and price you are looking for
 <a href = "/newwish">here</a>
-</h1></div>
+</div>
+</form>
+
 
 
 

@@ -3,26 +3,28 @@
 {% block content %}
 <div>mp wishlist</div>
 
-<div class = "section1">
-    <div class = "wishbox">
-        {%if wishes.count() == 0 %}
-        <div>
-            no wishes for now...make <a href = "/newwish">new meal point wish</a>
-        </div>
-        {%else%}
-        <div>offers people are looking to buy:</div>
-        <table>
-            <tr>
-            <th>amount of mp</th>
-            <th>price per mp</th>
-            </tr>
-            {% for wish in wishes %}
-                {{ wish.render() | safe }}
-            {% endfor %}
-        </table>
-        <br>
-        <a href = "/newwish">make new meal point wish</a>
-        {%endif%}
-    </div>
+{%if wishes.count() == 0 %}
+<div class = "wishbox">
+no wishes for now...
+</div>
+
+{%else%}
+<div class = "wishbox">
+offers people are looking to buy:
+<table>
+<tr>
+<th>amount of mp</th>
+<th>price per mp</th>
+</tr>
+{% for wish in wishes %}
+    {{ wish.render() | safe }}
+{% endfor %}
+</table>
+<br>
+</div>
+{%endif%}
+
+<div class = "wishbox">
+make <a href = "/newwish">new meal point wish</a>
 </div>
 {% endblock %}
