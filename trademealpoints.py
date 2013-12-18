@@ -173,7 +173,7 @@ def add_user(ip, user):
     return str(user.key().id()) #return 
 
 def get_user(update = False): #GET FROM or WRITE USER/AGE TO MEMCACHE
-    q = UserModel.gql('where email = :email', email = email)
+    u = UserModel.gql('where email = :email', email = email)
     memcache_key = 'USER'
 
     user, age = age_get(memcache_key)   #get from memcache
@@ -186,6 +186,8 @@ class Buy(Handler):
     def get(self):
         #GET SELLS FROM MEMCACHE
         sells, age = get_sells()
+        if sells is None:
+            sells = SellModel.all().order('price')
         self.render("buy.html", sells = sells, age = age_str(age))
 
     def post(self):
@@ -294,16 +296,30 @@ class Sell(Handler):
 
         if amount and price and first_name and last_name and email and (have_error == False):
 
-            user, age = get_user()
+            user, age = age_get("USER")   
+            if user is None:    #not in memcache
+                u = UserModel.gql('where email = :email', email = email)
+                user = u.get()
+                if user:    #in database               
+                    age_set("USER", list(user)) #write to memcache
+                else:   #commit and write
+                    user = UserModel(parent = user_key(), 
+                        first_name = first_name, last_name = last_name, email = email)
+                    user.put()
+                    age_set("USER", user)
             
             #now assign num
             #CHECK ALL SELLS IN MEMCACHE FOR NUMS
-            sells, age = age_get(memcache_key)  #returns sells and age
-            total_num = sells.count()
+            sells, age = age_get("SELLS")  #returns sells and age
+
+            # count = 0
+            # for sell in sells:
+            #     count = count+1
+            total_num = sells.count(sells)
 
             #get max sell num
             max_num = 0
-            for item in total_sells:
+            for item in sells:
                 if item.num > max_num:
                     max_num = item.num
 
@@ -322,7 +338,11 @@ class Sell(Handler):
             if max_num == total_num:
                 num = max_num + 1
 
-            self.add_sell()
+
+            sell = SellModel(parent = sell_key(), user = user,
+                amount = amount, price = price, num = num)
+            sell.put()                  #commit to db
+            age_set("SELLS", sell)      #update memcache with new sel
 
             stat = "your entry has been recorded! awesomeness"
             self.render("sell.html", stat = stat)
