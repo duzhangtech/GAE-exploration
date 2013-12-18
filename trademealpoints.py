@@ -2,10 +2,15 @@ import os
 import re
 import urllib
 import random
-from string import letters
-
+import hmac
+import logging
+import json
 import jinja2
 import webapp2
+
+from string import letters
+from datetime import datetime, timedelta
+
 from google.appengine.ext import db
 from google.appengine.api import mail
 from google.appengine.api import memcache
@@ -30,6 +35,41 @@ def wish_key(name = "default"):
 
 def feedback_key(name = "default"):
     return db.Key.from_path('feedback', name)
+
+def age_set(key, val):
+    save_time = datetime.utcnow()
+    memcache.set(key, (val, save_time))
+
+def age_get(key):
+    r = memcache.get(key)
+    if r:
+        val, save_time = r
+        age = (datetime.utcnow() - save_time).total_seconds()
+    else:
+        val, age = None, 0
+    return val, age
+
+def add_user(ip, user):
+    user.put()
+    get_user(update = True) #override memcache
+    return str(user.key().id()) #return 
+
+def get_user(update = False): 
+    q = UserModel.all()
+    memcache_key = 'BlOGS'
+
+    user, age = age_get(memcache_key) #get from memcache
+    if update or user is None: #if not in memcache
+        user = list(q) #query db
+        age_set(memcache_key, user) #set key to user
+    return user, age
+
+def age_str(age):
+    s = "queried %s seconds ago"
+    age = int(age)
+    if age == 1:
+        s = s.replace('seconds', 'second')
+    return s % age
 
 class UserModel(db.Model):
     first_name = db.StringProperty(required = True)
@@ -262,8 +302,9 @@ class NewWish(Handler):
 
 class Buy(Handler):
     def get(self):
+        users, age = get_user()
         sells = SellModel.all().ancestor(sell_key()).order('price')
-        self.render("buy.html", sells = sells)
+        self.render("buy.html", sells = sells, age = age_str(age))
 
     def post(self):
         first_name = self.request.get('first_name')
@@ -277,7 +318,7 @@ class Buy(Handler):
 
         if first_name and last_name and email and num:
 
-            #check if user exists
+            #check CACHEif user exists
             database = UserModel.all().filter("email =", email)
 
             count = 0
