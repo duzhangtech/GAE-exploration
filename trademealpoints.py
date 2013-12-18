@@ -36,40 +36,6 @@ def wish_key(name = "default"):
 def feedback_key(name = "default"):
     return db.Key.from_path('feedback', name)
 
-def age_set(key, val):
-    save_time = datetime.utcnow()
-    memcache.set(key, (val, save_time))
-
-def age_get(key):
-    r = memcache.get(key)
-    if r:
-        val, save_time = r
-        age = (datetime.utcnow() - save_time).total_seconds()
-    else:
-        val, age = None, 0
-    return val, age
-
-def add_user(ip, user):
-    user.put()
-    get_user(update = True) #override memcache
-    return str(user.key().id()) #return 
-
-def get_user(update = False): 
-    q = UserModel.all()
-    memcache_key = 'BlOGS'
-
-    user, age = age_get(memcache_key) #get from memcache
-    if update or user is None: #if not in memcache
-        user = list(q) #query db
-        age_set(memcache_key, user) #set key to user
-    return user, age
-
-def age_str(age):
-    s = "queried %s seconds ago"
-    age = int(age)
-    if age == 1:
-        s = s.replace('seconds', 'second')
-    return s % age
 
 class UserModel(db.Model):
     first_name = db.StringProperty(required = True)
@@ -96,6 +62,7 @@ class FeedbackModel(db.Model):
     def render(self):
         return render_str("feedback.html", f = self)
 
+#TODO: ADD FREQUENCY PARAM
 class WishModel(db.Model):
     user = db.ReferenceProperty(UserModel)
     wish_amount = db.StringProperty(required = True)
@@ -163,147 +130,61 @@ class FAQ(Handler):
                 first_name = first_name, last_name = last_name, 
                 email = email, error = error)
 
-class Sell(Handler):
-    def get(self):
-        self.render("sell.html")
+def age_set(key, val): #WRITE VALUE, KEY, AND NOWTIME TO MEMCACHE
+    save_time = datetime.utcnow()
+    memcache.set(key, (val, save_time))
 
-    def post(self):
-        have_error = False;
-        amount = self.request.get('amount')
-        price = self.request.get('price')
+def age_get(key):   #GET MEMCACHE VALUE AND AGE FROM KEY
+    r = memcache.get(key)
+    if r:
+        val, save_time = r
+        age = (datetime.utcnow() - save_time).total_seconds()
+    else:
+        val, age = None, 0
+    return val, age
+    
+def age_str(age):   #TIME SINCE LAST QUERY
+    s = "queried %s seconds ago"
+    age = int(age)
+    if age == 1:
+        s = s.replace('seconds', 'second')
+    return s % age
 
-        first_name = self.request.get('first_name')
-        last_name = self.request.get('last_name')
-        email = self.request.get('email')
+def get_sells(update = False): #GET FROM/WRITE TO MEMCACHE
+    q = SellModel.all()
+    memcache_key = 'SELLS'
 
-        params = dict(amount = amount, 
-                        price = price,
-                        email = email)
+    sells, age = age_get(memcache_key)  #get from memcache
+    if update or sells is None:         #if updating/not in memcache
+        sells = list(q)                 #query db
+        age_set(memcache_key, sells)    #update memcache
+    return sells, age
 
-        #todo: display all error messages at once; js response if right
-
-        if not valid_amount(amount):
-            params['error_amount'] = "that amount was not valid"
-            have_error = True
-
-        if not valid_amount(amount):
-            params['error_price'] = "that price was not valid"
-            have_error = True
-
-        if not valid_email(email):
-            params['error_email'] = "that email was't valid"
-            have_error = True
-
-        if amount and price and first_name and last_name and email and (have_error == False):
-
-            user = UserModel(parent = user_key(),
-                    first_name = first_name, last_name = last_name, 
-                    email = email)
-
-            database = UserModel.all().filter("email =", email)
-
-            count = 0
-            for data in database:
-                if data.email == email:
-                    count = 1
-            #user doesn't exist
-            if count == 0:
-                user.put()
-            #user exists
-            else:
-                #make key
-                u = UserModel.gql('where email = :email', email = email)
-                user = u.get()
-
-            #now assign num
-            total_sells = SellModel.all()
-            total_num = total_sells.count()
-
-            #get max sell num
-            max_num = 0
-            for item in total_sells:
-                if item.num > max_num:
-                    max_num = item.num
-
-            #when nums are 1, 2, 4
-            #in this case, there will always be
-            #unassigned integer from 0 to total_num
-            num = 1
-            if max_num > total_num:
-                for x in range(1, total_num+1):
-                    findnum = SellModel.all().filter("num = ", num)
-                    if not findnum:
-                        num = x
-                        break
-
-            #max_num will never be smaller than total_num
-            if max_num == total_num:
-                num = max_num + 1
-
-            sell = SellModel(parent = sell_key(), user = user,
+def add_sell():     #COMMIT SELL TO DB, WRITE TO MEMCACHE
+    sell = SellModel(parent = sell_key(), user = user,
                 amount = amount, price = price, num = num)
-            sell.put()
+    sell.put()                  #commit to db
+    age_set("SELLS", sell)      #update memcache with new sell
 
-            stat = "your entry has been recorded! awesomeness"
-            self.render("sell.html", stat = stat)
+def add_user(ip, user):
+    user.put()
+    get_user(update = True) #override memcache
+    return str(user.key().id()) #return 
 
-        else:
-            error = "make sure you fill out every box"
-            self.render("sell.html", 
-                        amount = amount, price = price, 
-                        first_name = first_name, last_name = last_name,
-                        email = email, error=error)
+def get_user(update = False): #GET FROM or WRITE USER/AGE TO MEMCACHE
+    q = UserModel.gql('where email = :email', email = email)
+    memcache_key = 'USER'
 
-class Wish(Handler):
-    def get(self):
-        wishes = WishModel.all().order('wish_price')
-        self.render("wish.html", wishes = wishes)
-
-class NewWish(Handler):
-    def get(self):
-        self.render("newwish.html")
-
-    def post(self):
-        first_name = self.request.get('first_name')
-        last_name = self.request.get('last_name')
-        email = self.request.get('email')
-
-        wish_amount = self.request.get("wish_amount")
-        wish_price = self.request.get("wish_price")
-
-        if wish_amount and wish_price and first_name and last_name and email:
-            user = UserModel(parent = user_key(),
-                    first_name = first_name, last_name = last_name, 
-                    email = email)
-
-            database = UserModel.all().filter("email =", email)
-
-            count = 0
-            if database: 
-                count = 1
-
-            #user doesn't exist
-            if count == 0:
-                user.put()
-            #user exists
-            else:
-                u = UserModel.gql('where email = :email', email = email)
-                user = u.get()
-
-            wish = WishModel(parent = wish_key(), user = user, wish_amount = wish_amount, wish_price = wish_price)
-            wish.put()
-            stat = "success! your mp wish has been recorded :D"
-            self.render("newwish.html", stat = stat)
-        else:
-            error = "sure you got every box?"
-            self.render("newwish.html", error = error,
-             wish_amount = wish_amount, wish_price = wish_price,first_name = first_name, last_name = last_name, 
-                    email = email)
+    user, age = age_get(memcache_key)   #get from memcache
+    if update or user is None:          #if not in memcache
+        user = u.get                    #query db
+        age_set(memcache_key, user)     #set key to user in memcacher
+    return user, age
 
 class Buy(Handler):
     def get(self):
-        users, age = get_user()
-        sells = SellModel.all().ancestor(sell_key()).order('price')
+        #GET SELLS FROM MEMCACHE
+        sells, age = get_sells()
         self.render("buy.html", sells = sells, age = age_str(age))
 
     def post(self):
@@ -314,27 +195,22 @@ class Buy(Handler):
         num = self.request.get('num')
         #FIXME validate num
 
-        sells = SellModel.all().ancestor(sell_key()).order('price')
+        #GET SELLS FROM MEMCACHE
+        sells, age = get_sells()
 
         if first_name and last_name and email and num:
 
-            #check CACHEif user exists
-            database = UserModel.all().filter("email =", email)
-
-            count = 0
-            if database:
-                count = 1
-            #user doesn't exist
-            if count == 0:
-                user = UserModel(parent = user_key(),
-                    first_name = first_name, last_name = last_name, 
-                    email = email)
-                user.put()
-            #user exists
-            else:
-                #make key, get user from key
+            #CHECK IF USER ALREADY EXISTS
+            user, age = age_get(memcache_key)
+            if user is None:        #not in memcache
                 u = UserModel.gql('where email = :email', email = email)
-                user = u.get() 
+                user = u.get()
+
+                if user is None:    #not in database
+                    user = UserModel(parent = user_key(),
+                        first_name = first_name, last_name = last_name, 
+                        email = email)
+                    user.put()
 
             num = int(self.request.get('num'))
 
@@ -364,7 +240,6 @@ class Buy(Handler):
             cart_error = "you already selected this order"
             self.render("buy.html", cart_error = cart_error, sells = sells)
         
-#cart view
 class NewBuy(Buy):
     def get(self):
         cart = CartModel.all()
@@ -386,6 +261,135 @@ class NewBuy(Buy):
         # body = "Hi! My name is %s and I'm interested in taking up your offer of x meal points at price per point") % first_name
         # # mail.send_mail(buyer_email, email, subject, body)
         self.render("newbuy.html")
+
+class Sell(Handler):
+    def get(self):
+        self.render("sell.html")
+
+    def post(self):
+        have_error = False;
+        amount = self.request.get('amount')
+        price = self.request.get('price')
+
+        first_name = self.request.get('first_name')
+        last_name = self.request.get('last_name')
+        email = self.request.get('email')
+
+        params = dict(amount = amount, 
+                        price = price,
+                        email = email)
+
+        if not valid_amount(amount):
+            params['error_amount'] = "that amount was not valid"
+            have_error = True
+
+        if not valid_amount(amount):
+            params['error_price'] = "that price was not valid"
+            have_error = True
+
+        if not valid_email(email):
+            params['error_email'] = "that email was't valid"
+            have_error = True
+
+        if amount and price and first_name and last_name and email and (have_error == False):
+
+            user, age = get_user()
+            
+            #now assign num
+            #CHECK ALL SELLS IN MEMCACHE FOR NUMS
+            sells, age = age_get(memcache_key)  #returns sells and age
+            total_num = sells.count()
+
+            #get max sell num
+            max_num = 0
+            for item in total_sells:
+                if item.num > max_num:
+                    max_num = item.num
+
+            #when nums are 1, 2, 4
+            #in this case, there will always be
+            #unassigned integer between 0 and total_num
+            num = 1
+            if max_num > total_num:
+                for x in range(1, total_num+1):
+                    findnum = SellModel.all().filter("num = ", num)
+                    if not findnum:
+                        num = x
+                        break
+
+            #max_num will never be smaller than total_num
+            if max_num == total_num:
+                num = max_num + 1
+
+            self.add_sell()
+
+            stat = "your entry has been recorded! awesomeness"
+            self.render("sell.html", stat = stat)
+
+        else:
+            error = "make sure you fill out every box"
+            self.render("sell.html", 
+                        amount = amount, price = price, 
+                        first_name = first_name, last_name = last_name,
+                        email = email, error=error)
+
+class Wish(Handler):
+    def get(self):
+        wishes, age = age_get("WISHES")
+        wishes.order('wish_price')
+
+        if wishes is None:
+            wishes = WishModel.all().order('wish_price')
+        self.render("wish.html", wishes = wishes)
+
+class NewWish(Handler):
+    def get(self):
+        self.render("newwish.html")
+
+    def post(self):
+        first_name = self.request.get('first_name')
+        last_name = self.request.get('last_name')
+        email = self.request.get('email')
+
+        wish_amount = self.request.get("wish_amount")
+        wish_price = self.request.get("wish_price")
+
+        if wish_amount and wish_price and first_name and last_name and email:
+            user, age = get_user()
+
+            #HAS USER SUBMITTED SAME WISH? CHECK MEMCACHE
+            wishes, age = age_get("WISHES")
+            wishes = wishes.filter("user = ", user).filter("wish_amount = ", wish_amount).filter("wish_price =", wish_price)
+
+            if wishes is None:                   #CHECK DATABASE
+                wishes = WishModel.all()
+                wishes = wishes.filter("user = ", user).filter("wish_amount = ", wish_amount).filter("wish_price =", wish_price)
+
+                if wishes is None:
+                    #SUBMIT WISH! UPDATE MEMCACHE
+                    wish = WishModel(parent = wish_key(), user = user, wish_amount = wish_amount, wish_price = wish_price)
+                    wish.put()
+                    age_set("WISHES", wish)
+                    stat = "success! your mp wish has been recorded :D"
+                    self.render("newwish.html", stat = stat)
+
+                else:
+                    error = "you have already submitted this wish"
+                    self.render("newwish.html", error = error,
+                        wish_amount = wish_amount, wish_price = wish_price,
+                        first_name = first_name, last_name = last_name, email = email)
+            else:
+                error = "you have already submitted this wish"
+                self.render("newwish.html", error = error,
+                        wish_amount = wish_amount, wish_price = wish_price,
+                        first_name = first_name, last_name = last_name, email = email)
+
+
+        else:
+            error = "fill in every box"
+            self.render("newwish.html", error = error,
+             wish_amount = wish_amount, wish_price = wish_price,first_name = first_name, last_name = last_name, 
+                    email = email)
 
 #150 mp min, 10000 mp max
 AMOUNT_RE = re.compile(r'^[1-9][0-9]{0,4}$|^10000$')
