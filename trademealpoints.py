@@ -3,6 +3,7 @@ import re
 import urllib
 import random
 import hmac
+
 import logging
 import json
 import jinja2
@@ -336,11 +337,12 @@ class Sell(Handler):
 class Wish(Handler):
     def get(self):
         wishes, age = age_get("WISHES")
-        wishes.order('wish_price')
-
         if wishes is None:
             wishes = WishModel.all().order('wish_price')
-        self.render("wish.html", wishes = wishes)
+        else:
+            wishes = wishes.order('wish_price')
+
+        self.render("wish.html", wishes = wishes, age = age_str(age))
 
 class NewWish(Handler):
     def get(self):
@@ -397,7 +399,7 @@ AMOUNT_RE = re.compile(r'^[1-9][0-9]{0,4}$|^10000$')
 #min 0.01 per mp, max 2.00 per mp
 PRICE_RE = re.compile(r'^[0-1]+\.[0-9][0-9]$|^2\.00$')
 
-#wustl.edu
+#TODO: wustl.edu
 EMAIL_RE  = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
 
 def valid_amount(amount):
@@ -426,10 +428,6 @@ application = webapp2.WSGIApplication([
 
 ], debug=True)
 
-#TODO
-    # CHECKBOX
-    # EMAIL
-    # EDIT
 
 #cool features
     #ppl watching sells; price per point + giftcards/other payment options

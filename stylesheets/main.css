@@ -32,26 +32,28 @@ h2 {
 
 #main_title {
     color:#32ac97;
-    padding-top: 30px;
-    padding-bottom:23px;
+    padding-top: 40px;
+    padding-bottom:25px;
     font-size: 35px;
 }
 
 .navbar {
-    margin-bottom: 25px;
+    margin-bottom: 27px;
 }
 
 .navlinks {
     padding-left: 17px;
     padding-right: 17px;
-    font-size: 25px;
+    font-size: 27px;
 }
 
 .apple {
     text-align: left;
-    margin-left: 33%;
-    margin-right: 33%;
+    margin-left: 31%;
+    margin-right: 31%;
+    padding-top: 10px;
     line-height: 150%;
+    background-color:transparent;
 }
 
 .about_q {
@@ -64,10 +66,6 @@ h2 {
 
 .list {
     position:relative;
-    text-align: left;
-}
-
-li {
     text-align: left;
 }
 
@@ -104,17 +102,44 @@ li {
 }
 .sell_label + .sell_input {
     display: inline-block;
-    padding-right: 25%;
+    margin-right: 10%;
     margin-left: 2%;
 }
 .sell_input {
+    font-size: 19px;
+    font-family:inherit;
+    color:inherit;
+    padding-left:8px;
+    padding-right:8px;
+    
     width:30%;
+    border: 1px solid #bebebe;
+    border-radius:6px;
 }
 .sell_label {
     width: 45%;
     text-align: right;
-    color: #a3a3a3;
+    color: #bebebe;
     background-color:transparent;
+}
+.sell_button {
+    margin-top:10px;
+    margin-right:18%;
+    font-family:inherit;
+    font-size:inherit;
+    text-align:center;
+    float:right;
+    
+    width:60px;
+    background-color:white;
+    color:#bebebe;
+    border: 1px solid #bebebe;
+    border-radius:6px;
+}
+.sell_button:hover {
+    border-color: #32ac97;
+    color: #32ac97;
+    transition-duration: 400ms;
 }
 
 
@@ -135,35 +160,59 @@ li {
     color: #a3a3a3;
     background-color:transparent;
 }
+.feedback_text {
+    height: 50%;
+    width:50%;
+}
+
+
 
 .newwish_label, .newwish_input {
     display: inline-block;
 }
 .newwish_label + .newwish_input {
     display: inline-block;
-    padding-right: 25%;
     margin-left: 2%;
 }
 .newwish_input {
-    width:30%;
+    font-size: 19px;
+    font-family:inherit;
+    color:inherit;
+    padding-left:8px;
+    padding-right:8px;
+    
+    width: 110px;
+    border: 1px solid #bebebe;
+    border-radius:6px;
 }
 .newwish_label {
     width: 40%;
     text-align: right;
-    color: #a3a3a3;
+    color: #bebebe;
     background-color:transparent;
+    margin-left:8%;
 }
-.feedback_text {
-    height: 50%;
-    width:50%;
+.wish_button {
+    margin-top:10px;
+    margin-right:20%;
+    font-family:inherit;
+    font-size:inherit;
+    text-align:center;
+    float:right;
+    
+    width:60px;
+    background-color:white;
+    color:#bebebe;
+    border: 1px solid #bebebe;
+    border-radius:6px;
 }
-h1 {
-    text-emphasis: bold;
+.wish_button:hover {
+    border-color: #32ac97;
+    color: #32ac97;
+    transition-duration: 400ms;
 }
 
-p.big {
-    line-height:150%;
-}
+
 
 table {
     text-align: center;
@@ -187,34 +236,8 @@ table {
     background-color:transparent;
 }
 
-input[type=text] {
-    width: 10%;
-    font-size: 20px;
-    font-family: monospace;
-}
 
-input[type="submit"] {
-    position: relative;
-    width: 30%; 
-    height: 50px;
-    border: 0;
-    padding-left:40px;
-}
-.button {
-    width: 30%;
-    background-color:transparent;
-    transition: all 500ms ease;
-    color: #9b9b9d;
-    font-family:Futura, “Trebuchet MS”, Arial, sans-serif;
-    font-weight: 100;
-    font-size: 20px;
-    border:2px solid black;
-    border-radius: 25px;
-}
-.button:hover {
-    border-color: #32ac97;
-    color: #32ac97;
-}
+
 .error {
     color: #a0ff00;
 }
