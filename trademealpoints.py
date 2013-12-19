@@ -198,21 +198,6 @@ def add_sell():     #COMMIT SELL TO DB, WRITE TO MEMCACHE
     sell.put()                  #commit to db
     age_set("SELLS", sell)      #update memcache with new sell
 
-def add_user(ip, user):
-    user.put()
-    get_user(update = True) #override memcache
-    return str(user.key().id()) #return 
-
-def get_user(email, update = False): #GET FROM or WRITE USER/AGE TO MEMCACHE
-    u = UserModel.gql('where email = :email', email = email)
-    memcache_key = 'USER'
-
-    user, age = age_get(memcache_key)   #get from memcache
-    if update or user is None:          #if not in memcache
-        user = u.get                    #query db
-        age_set(memcache_key, user)     #set key to user in memcache
-    return user, age
-
 class Buy(Handler):
     def get(self):
         sells, age = age_get("SELLS")
@@ -299,7 +284,7 @@ class Sell(Handler):
                 u = UserModel.gql('where email = :email', email = email)
                 user = u.get()
                 if user:    #in database               
-                    age_set("USER", list(user)) #write to memcache
+                    age_set("USER", user) #write to memcache
                 else:   #commit and write
                     user = UserModel(parent = user_key(), 
                         first_name = first_name, last_name = last_name, email = email)
@@ -365,7 +350,7 @@ class Wish(Handler):
                 age_set("WISHES", wish)
         else:
             count = 1
-        self.render("wish.html", wishes = wishes, count = count, age = age_str(age))
+        self.render("wish.html", wishes = list(wishes), count = count, age = age_str(age))
 
 class NewWish(Handler):
     def get(self):
@@ -380,21 +365,36 @@ class NewWish(Handler):
         wish_price = self.request.get("wish_price")
 
         if wish_amount and wish_price and first_name and last_name and email:
-            user = UserModel(parent=user_key(), first_name = first_name, last_name = last_name, email = email)
+
+            user, age = age_get("USER")   
+            if user is None:
+                u = UserModel.gql('where email = :email', email = email)          
+                user = u.get()
+                
+                if user is None: #db
+                    user = UserModel(parent = user_key(), first_name = first_name, last_name = last_name, email = email)
+                    user.put()
+                    logging.error("NEW USER")
+                    age_set("USER", user)
+
+                else:
+                    age_set("USER", user)
+
+
             wishes, age = age_get("WISHES") 
 
             if wishes is None:
                 wishes = WishModel.all().filter("wish_amount = ", wish_amount).filter("wish_price =", wish_price)
 
-                if wishes: #db duplicate!
-                    error = "this wish has already been submitted ELLOYHAY"
+                if wishes.count() != 0: #db duplicate!
+                    error = "looks like your wish has already been recorded. sweet"
+                    logging.error("DUPLICATE DB WISH")
                     age_set("WISHES", list(wishes))
                     self.render("newwish.html", error = error,
                         wish_amount = wish_amount, wish_price = wish_price,
                         first_name = first_name, last_name = last_name, email = email)
                     
                 else: 
-                    user.put()
                     wish = WishModel(parent = wish_key(), user = user, wish_amount = wish_amount, wish_price = wish_price)
                     wish.put()
                     wishes = WishModel.all().ancestor(wish_key())
@@ -409,7 +409,8 @@ class NewWish(Handler):
                         duplicate = True
 
                 if duplicate:
-                    error = "this wish has already been submitted"
+                    error = "looks like your wish has already been recorded. sweet"
+                    logging.error("DUPLICATE MEMCACHE WISH")
                     self.render("newwish.html", error = error,
                             wish_amount = wish_amount, wish_price = wish_price,
                             first_name = first_name, last_name = last_name, email = email)
