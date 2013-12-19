@@ -188,9 +188,9 @@ class Buy(Handler):
         sells, age = age_get("SELLS")
         if sells is None:
             sells = SellModel.all().order('price')
-            count = sells.count(sells)
+            count = len(list(sells))
         else: 
-            count = sells.count()
+            count = len(sells)
         self.render("buy.html", sells = sells, count = count, age = age_str(age))
 
     def post(self):
