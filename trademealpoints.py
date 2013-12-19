@@ -380,43 +380,41 @@ class NewWish(Handler):
         wish_price = self.request.get("wish_price")
 
         if wish_amount and wish_price and first_name and last_name and email:
+            user = UserModel(parent=user_key(), first_name = first_name, last_name = last_name, email = email)
+            wishes, age = age_get("WISHES") 
 
-            user, age = age_get("USER")   
-            if user is None:
-                u = UserModel.gql('where email = :email', email = email)          
-                user = u.get()
-                
-                if user is None: #check db
-                    user = UserModel(parent = user_key(), first_name = first_name, last_name = last_name, email = email)
+            if wishes is None:
+                wishes = WishModel.all().filter("wish_amount = ", wish_amount).filter("wish_price =", wish_price)
+
+                if wishes: #db duplicate!
+                    error = "this wish has already been submitted ELLOYHAY"
+                    age_set("WISHES", list(wishes))
+                    self.render("newwish.html", error = error,
+                        wish_amount = wish_amount, wish_price = wish_price,
+                        first_name = first_name, last_name = last_name, email = email)
+                    
+                else: 
                     user.put()
-                    age_set("USER", user)
-
-                else:
-                    age_set("USER", user)
-
-            #memcache: duplicate wishes?
-            wishes, age = age_get("WISHES")
-
-            if wishes is None:                   
-                wish = WishModel(parent = wish_key(), user = user, wish_amount = wish_amount, wish_price = wish_price)
-                wish.put()
-                wishes = WishModel.all().ancestor(wish_key())
-                age_set("WISHES", list(wishes))
-                stat = "success! your mp wish has been recorded :D"
-                self.render("newwish.html", stat = stat)
+                    wish = WishModel(parent = wish_key(), user = user, wish_amount = wish_amount, wish_price = wish_price)
+                    wish.put()
+                    wishes = WishModel.all().ancestor(wish_key())
+                    age_set("WISHES", list(wishes))
+                    stat = "success! your mp wish has been recorded :D"
+                    self.render("newwish.html", stat = stat)
 
             else:
                 duplicate = False
                 for wish in wishes:
-                    if wish.wish_amount == wish_amount:
+                    if wish.wish_amount == wish_amount and wish.wish_price == wish_price:
                         duplicate = True
 
                 if duplicate:
-                    error = "you have already submitted this wish"
+                    error = "this wish has already been submitted"
                     self.render("newwish.html", error = error,
                             wish_amount = wish_amount, wish_price = wish_price,
                             first_name = first_name, last_name = last_name, email = email)
                 else:
+                    user.put()
                     wish = WishModel(parent = wish_key(), user = user, wish_amount = wish_amount, wish_price = wish_price)
                     wish.put()
                     wishes = WishModel.all().ancestor(wish_key())
