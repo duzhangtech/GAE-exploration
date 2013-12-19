@@ -179,16 +179,19 @@ def get_user(update = False): #GET FROM or WRITE USER/AGE TO MEMCACHE
     user, age = age_get(memcache_key)   #get from memcache
     if update or user is None:          #if not in memcache
         user = u.get                    #query db
-        age_set(memcache_key, user)     #set key to user in memcacher
+        age_set(memcache_key, user)     #set key to user in memcache
     return user, age
 
 class Buy(Handler):
     def get(self):
         #GET SELLS FROM MEMCACHE
-        sells, age = get_sells()
+        sells, age = age_get("SELLS")
         if sells is None:
             sells = SellModel.all().order('price')
-        self.render("buy.html", sells = sells, age = age_str(age))
+            count = sells.count(sells)
+        else: 
+            count = sells.count()
+        self.render("buy.html", sells = sells, count = count, age = age_str(age))
 
     def post(self):
         first_name = self.request.get('first_name')
@@ -240,7 +243,7 @@ class Buy(Handler):
                 self.render("buy.html", cart_error = cart_error, sells = sells)
  
         else: 
-            cart_error = "you already selected this order"
+            cart_error = "fill in all the boxes"
             self.render("buy.html", cart_error = cart_error, sells = sells)
         
 class NewBuy(Buy):
@@ -308,41 +311,43 @@ class Sell(Handler):
                     user.put()
                     age_set("USER", user)
             
-            #now assign num
-            #CHECK ALL SELLS IN MEMCACHE FOR NUMS
-            sells, age = age_get("SELLS")  #returns sells and age
+            #assign num
+            sells, age = age_get("SELLS")  #check memcache
 
-            # count = 0
-            # for sell in sells:
-            #     count = count+1
-            total_num = sells.count(sells)
+            if sells is None: 
+                num = 1
 
-            #get max sell num
-            max_num = 0
-            for item in sells:
-                if item.num > max_num:
-                    max_num = item.num
+            else: 
+                total_num = len(sells)
 
-            #when nums are 1, 2, 4
-            #in this case, there will always be
-            #unassigned integer between 0 and total_num
-            num = 1
-            if max_num > total_num:
-                for x in range(1, total_num+1):
-                    findnum = SellModel.all().filter("num = ", num)
-                    if not findnum:
-                        num = x
-                        break
+                #get max sell num
+                max_num = 0
+                for sell in sells:
+                    if sell.num > max_num:
+                        max_num = sell.num
 
-            #max_num will never be smaller than total_num
-            if max_num == total_num:
-                num = max_num + 1
+                #when nums are 1, 2, 4
+                #in this case, there will always be
+                #unassigned integer between 0 and total_num
+                num = 1
+                if max_num > total_num:
+                    for x in range(1, total_num+1):
+                        findnum = SellModel.all().filter("num = ", num)
+                        if not findnum:
+                            num = x
+                            break
+
+                #max_num will never be smaller than total_num
+                if max_num == total_num:
+                    num = max_num + 1
 
 
             sell = SellModel(parent = sell_key(), user = user,
                 amount = amount, price = price, num = num)
             sell.put()                  #commit to db
-            age_set("SELLS", sell)      #update memcache with new sel
+
+            sells = SellModel.all().ancestor(sell_key())
+            age_set("SELLS", list(sells))      #update memcache with new sell
 
             stat = "your entry has been recorded! awesomeness"
             self.render("sell.html", stat = stat)
