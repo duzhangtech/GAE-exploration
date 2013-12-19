@@ -80,12 +80,10 @@ class Handler(webapp2.RequestHandler):
         uid = self.read_secure_cookie('user')
         self.user = uid 
 
-
 class UserModel(db.Model):
     first_name = db.StringProperty(required = True)
     last_name = db.StringProperty(required = True)
     email = db.StringProperty(required = True)
-
 
 class SellModel(db.Model):
     user = db.ReferenceProperty(UserModel)
@@ -215,17 +213,16 @@ def get_user(email, update = False): #GET FROM or WRITE USER/AGE TO MEMCACHE
         age_set(memcache_key, user)     #set key to user in memcache
     return user, age
 
-
 class Buy(Handler):
     def get(self):
         sells, age = age_get("SELLS")
         if sells is None:
             sells = SellModel.all().order('price')
             logging.error("DB QUERY")
-            count = len(list(sells))
+            count = 0
         else: 
-            count = len(sells)
-        self.render("buy.html", sells = sells, count = count, age = age_str(age))
+            count = 1
+        self.render("buy.html", sells = list(sells), count = count, age = age_str(age))
 
     def post(self):
         first_name = self.request.get('first_name')
@@ -240,7 +237,7 @@ class Buy(Handler):
             self.redirect('/contact')
         else: 
             cart_error = "fill in all the boxes"
-            self.render("buy.html", cart_error = cart_error, sells = sells)
+            self.render("buy.html", cart_error = cart_error, sells = list(sells))
         
 class NewBuy(Buy):
     def get(self):
@@ -364,9 +361,10 @@ class Wish(Handler):
             wishes = WishModel.all().order('wish_price')
             logging.error("DB QUERY")
             count = len(list(wishes))
+            for wish in wishes:
+                age_set("WISHES", wish)
         else:
-            count = len(wishes)
-
+            count = 1
         self.render("wish.html", wishes = wishes, count = count, age = age_str(age))
 
 class NewWish(Handler):
@@ -382,7 +380,19 @@ class NewWish(Handler):
         wish_price = self.request.get("wish_price")
 
         if wish_amount and wish_price and first_name and last_name and email:
-            user, age = get_user(email)
+
+            user, age = age_get("USER")   
+            if user is None:
+                u = UserModel.gql('where email = :email', email = email)          
+                user = u.get()
+                
+                if user is None: #check db
+                    user = UserModel(parent = user_key(), first_name = first_name, last_name = last_name, email = email)
+                    user.put()
+                    age_set("USER", user)
+
+                else:
+                    age_set("USER", user)
 
             #memcache: duplicate wishes?
             wishes, age = age_get("WISHES")
@@ -396,8 +406,12 @@ class NewWish(Handler):
                 self.render("newwish.html", stat = stat)
 
             else:
-                wishes = wishes.filter("user = ", user).filter("wish_amount = ", wish_amount).filter("wish_price =", wish_price)
-                if wishes:
+                duplicate = False
+                for wish in wishes:
+                    if wish.wish_amount == wish_amount:
+                        duplicate = True
+
+                if duplicate:
                     error = "you have already submitted this wish"
                     self.render("newwish.html", error = error,
                             wish_amount = wish_amount, wish_price = wish_price,
