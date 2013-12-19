@@ -21,6 +21,8 @@ template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
                                autoescape = True)
 
+secret = "cherrytreeshark"
+
 def cart_key(name="default"):
     return db.Key.from_path('cart', name)
 
@@ -38,10 +40,52 @@ def feedback_key(name = "default"):
     return db.Key.from_path('feedback', name)
 
 
+def make_secure_val(val):
+    return '%s|%s' % (val, hmac.new(secret, val).hexdigest())
+
+def check_secure_val(secure_val):
+    val = secure_val.split('|')[0]
+    if secure_val == make_secure_val(val):
+        return val
+
+class Handler(webapp2.RequestHandler):
+    def write(self, *a, **kw):
+        self.response.out.write(*a, **kw)
+
+    def render_str(self, template, **params):
+        t = jinja_env.get_template(template)
+        return t.render(params)
+
+    def render(self, template, **kw):
+        self.write(self.render_str(template, **kw))
+
+    def set_secure_cookie(self, user, val):
+        cookie_val = make_secure_val(val)
+        self.response.headers.add_header(
+            'Set-Cookie',
+            '%s=%s; Path=/' % (user, cookie_val))
+
+    def read_secure_cookie(self, user):
+        cookie_val = self.request.cookies.get(user)
+        return cookie_val and check_secure_val(cookie_val)
+
+    def new_cart(self, user):
+        self.set_secure_cookie('user', str(user))
+
+    def clear_cart(self):
+        self.response.headers.add_header('Set-Cookie', 'user=; Path=/')
+
+    def initialize(self, *a, **kw):
+        webapp2.RequestHandler.initialize(self, *a, **kw)
+        uid = self.read_secure_cookie('user')
+        self.user = uid 
+
+
 class UserModel(db.Model):
     first_name = db.StringProperty(required = True)
     last_name = db.StringProperty(required = True)
     email = db.StringProperty(required = True)
+
 
 class SellModel(db.Model):
     user = db.ReferenceProperty(UserModel)
@@ -71,17 +115,6 @@ class WishModel(db.Model):
 
     def render(self):
         return render_str("wishmodel.html", w = self)
-
-class Handler(webapp2.RequestHandler):
-    def write(self, *a, **kw):
-        self.response.out.write(*a, **kw)
-
-    def render_str(self, template, **params):
-        t = jinja_env.get_template(template)
-        return t.render(params)
-
-    def render(self, template, **kw):
-        self.write(self.render_str(template, **kw))
 
 class MainPage(Handler):
     def get(self):
@@ -172,7 +205,7 @@ def add_user(ip, user):
     get_user(update = True) #override memcache
     return str(user.key().id()) #return 
 
-def get_user(update = False): #GET FROM or WRITE USER/AGE TO MEMCACHE
+def get_user(email, update = False): #GET FROM or WRITE USER/AGE TO MEMCACHE
     u = UserModel.gql('where email = :email', email = email)
     memcache_key = 'USER'
 
@@ -182,12 +215,13 @@ def get_user(update = False): #GET FROM or WRITE USER/AGE TO MEMCACHE
         age_set(memcache_key, user)     #set key to user in memcache
     return user, age
 
+
 class Buy(Handler):
     def get(self):
-        #GET SELLS FROM MEMCACHE
         sells, age = age_get("SELLS")
         if sells is None:
             sells = SellModel.all().order('price')
+            logging.error("DB QUERY")
             count = len(list(sells))
         else: 
             count = len(sells)
@@ -195,61 +229,25 @@ class Buy(Handler):
 
     def post(self):
         first_name = self.request.get('first_name')
-        last_name = self.request.get('last_name')
-        email = self.request.get('email')
+        
+        #TODO: VALIDATE NUM
+        num = int(self.request.get('num'))
 
-        num = self.request.get('num')
-        #FIXME validate num
-
-        #GET SELLS FROM MEMCACHE
         sells, age = get_sells()
 
-        if first_name and last_name and email and num:
-
-            #CHECK IF USER ALREADY EXISTS
-            user, age = age_get(memcache_key)
-            if user is None:        #not in memcache
-                u = UserModel.gql('where email = :email', email = email)
-                user = u.get()
-
-                if user is None:    #not in database
-                    user = UserModel(parent = user_key(),
-                        first_name = first_name, last_name = last_name, 
-                        email = email)
-                    user.put()
-
-            num = int(self.request.get('num'))
-
-            #fixme: add ability to edit cart
-            #did user already put the same item (num) in cart? 
-            item_check = CartModel.all().filter("email = ", email)
-            item_check = item_check.filter("num = ", num)
-
-            item_count = 0
-            if item_check: #order already added to cart!
-                self.write("ELLOHAY")
-                item_count = 1
-
-            if item_count == 0:
-                cart = CartModel(parent = cart_key(), user = user, num = num)
-                cart.put()
-                numkey = SellModel.gql('where num = :num', num = num)
-                derp = numkey.get()
-                amount = derp.amount
-                price = derp.price
-                self.render('newbuy.html', first_name = first_name, amount = amount, price = price)  
-            else: 
-                cart_error = "this offer is already in your cart"
-                self.render("buy.html", cart_error = cart_error, sells = sells)
- 
+        if first_name and num:
+            self.new_cart(first_name) #add cookie
+            self.redirect('/contact')
         else: 
             cart_error = "fill in all the boxes"
             self.render("buy.html", cart_error = cart_error, sells = sells)
         
 class NewBuy(Buy):
     def get(self):
-        cart = CartModel.all()
-        self.render("newbuy.html", cart = cart)
+        last_name = self.request.get('last_name')
+        email = self.request.get('email')
+
+        self.render("newbuy.html")
 
     # def post(self):
         
@@ -364,10 +362,12 @@ class Wish(Handler):
         wishes, age = age_get("WISHES")
         if wishes is None:
             wishes = WishModel.all().order('wish_price')
+            logging.error("DB QUERY")
+            count = len(list(wishes))
         else:
-            wishes = wishes.order('wish_price')
+            count = len(wishes)
 
-        self.render("wish.html", wishes = wishes, age = age_str(age))
+        self.render("wish.html", wishes = wishes, count = count, age = age_str(age))
 
 class NewWish(Handler):
     def get(self):
@@ -382,34 +382,33 @@ class NewWish(Handler):
         wish_price = self.request.get("wish_price")
 
         if wish_amount and wish_price and first_name and last_name and email:
-            user, age = get_user()
+            user, age = get_user(email)
 
-            #HAS USER SUBMITTED SAME WISH? CHECK MEMCACHE
+            #memcache: duplicate wishes?
             wishes, age = age_get("WISHES")
-            wishes = wishes.filter("user = ", user).filter("wish_amount = ", wish_amount).filter("wish_price =", wish_price)
 
-            if wishes is None:                   #CHECK DATABASE
-                wishes = WishModel.all()
+            if wishes is None:                   
+                wish = WishModel(parent = wish_key(), user = user, wish_amount = wish_amount, wish_price = wish_price)
+                wish.put()
+                wishes = WishModel.all().ancestor(wish_key())
+                age_set("WISHES", list(wishes))
+                stat = "success! your mp wish has been recorded :D"
+                self.render("newwish.html", stat = stat)
+
+            else:
                 wishes = wishes.filter("user = ", user).filter("wish_amount = ", wish_amount).filter("wish_price =", wish_price)
-
-                if wishes is None:
-                    #SUBMIT WISH! UPDATE MEMCACHE
-                    wish = WishModel(parent = wish_key(), user = user, wish_amount = wish_amount, wish_price = wish_price)
-                    wish.put()
-                    age_set("WISHES", wish)
-                    stat = "success! your mp wish has been recorded :D"
-                    self.render("newwish.html", stat = stat)
-
-                else:
+                if wishes:
                     error = "you have already submitted this wish"
                     self.render("newwish.html", error = error,
-                        wish_amount = wish_amount, wish_price = wish_price,
-                        first_name = first_name, last_name = last_name, email = email)
-            else:
-                error = "you have already submitted this wish"
-                self.render("newwish.html", error = error,
-                        wish_amount = wish_amount, wish_price = wish_price,
-                        first_name = first_name, last_name = last_name, email = email)
+                            wish_amount = wish_amount, wish_price = wish_price,
+                            first_name = first_name, last_name = last_name, email = email)
+                else:
+                    wish = WishModel(parent = wish_key(), user = user, wish_amount = wish_amount, wish_price = wish_price)
+                    wish.put()
+                    wishes = WishModel.all().ancestor(wish_key())
+                    age_set("WISHES", list(wishes))
+                    stat = "success! your mp wish has been recorded :D"
+                    self.render("newwish.html", stat = stat)
 
 
         else:

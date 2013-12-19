@@ -4,33 +4,18 @@
 <h1>Hi {{first_name}}, you have selected to buy</h1>
 <h1>{{amount}} meal points for ${{price}} per meal point</h1>
 
-<!--
-{% for item in cart %}
-    {{ item.render() | safe }}
-{% endfor %}
--->
-
-<!--
 <form method="post">
-    <p class="big">
-        
 
-        <label>first name</label>
-        <input type="text" name="first_name" value="{{first_name}}">
-   
-        
-        <label>last name</label>
-        <input type="text" name="last_name" value="{{last_name}}">
-    
-        
-        <label>email</label>
-        <input type="text" name="buyer_email" value="{{buyer_email}}">
+    <label class = "buy_label">last name</label>
+    <input type="text" class = "buy_input" name="last_name" value="{{last_name}}">
 
+    <label class = "buy_label">email</label>
+    <input type="text" class = "buy_input" name="email" value="{{email}}">    
         
     <div><input type="submit" value="notify the seller"></div>
-    </p>
+
     <div class = "stat">{{stat}}</div>
     <div class="error">{{error}}</div> 
 </form>
--->
+
 {% endblock %}
