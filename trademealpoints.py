@@ -77,8 +77,8 @@ class Handler(webapp2.RequestHandler):
 
     def initialize(self, *a, **kw):
         webapp2.RequestHandler.initialize(self, *a, **kw)
-        uid = self.read_secure_cookie('user')
-        self.user = uid 
+        username = self.read_secure_cookie('user')
+        self.user = username 
 
 class UserModel(db.Model):
     first_name = db.StringProperty(required = True)
@@ -200,6 +200,7 @@ def add_sell():     #COMMIT SELL TO DB, WRITE TO MEMCACHE
 
 class Buy(Handler):
     def get(self):
+        self.clear_cart()
         sells, age = age_get("SELLS")
         if sells is None:
             sells = SellModel.all().order('price')
@@ -218,21 +219,31 @@ class Buy(Handler):
         sells, age = get_sells()
 
         if first_name and num:
+            selected = SellModel.gql("where num = :num", num=num).get()
+            amount = selected.amount
+            price = selected.price
+
             self.new_cart(first_name) #add cookie
-            self.redirect('/contact')
+            self.redirect('/contact?first_name=' + first_name + "&amount=" + amount + "&price=" + price)
         else: 
             cart_error = "fill in all the boxes"
             self.render("buy.html", cart_error = cart_error, sells = list(sells))
         
-class NewBuy(Buy):
+class NewBuy(Handler):
     def get(self):
-        last_name = self.request.get('last_name')
-        email = self.request.get('email')
+        first_name = self.request.get("first_name")
+        amount = self.request.get("amount")
+        price = self.request.get("price")
 
-        self.render("newbuy.html")
-
+        if not first_name:
+            logging.error("NO FIRST NAME")
+        self.new_cart(first_name)
+        self.render("newbuy.html", first_name=first_name, amount = amount, price = price) 
+        return
     # def post(self):
-        
+        # last_name = self.request.get('last_name')
+        # email = self.request.get('email')
+
         # if checked:
         #     self.redirect("/newbuy.html", checked = checked)
         # else:
