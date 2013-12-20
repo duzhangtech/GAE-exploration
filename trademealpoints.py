@@ -224,7 +224,7 @@ class Buy(Handler):
             price = selected.price
 
             self.new_cart(first_name) #add cookie
-            self.redirect('/contact?first_name=' + first_name + "&amount=" + amount + "&price=" + price)
+            self.redirect('/contact?first_name=' + first_name + "&amount=" + amount + "&price=" + price + "&num=" + str(num))
         else: 
             cart_error = "fill in all the boxes"
             self.render("buy.html", cart_error = cart_error, sells = list(sells))
@@ -234,30 +234,45 @@ class NewBuy(Handler):
         first_name = self.request.get("first_name")
         amount = self.request.get("amount")
         price = self.request.get("price")
+        num = self.request.get("num")
 
         if not first_name:
             logging.error("NO FIRST NAME")
         self.new_cart(first_name)
-        self.render("newbuy.html", first_name=first_name, amount = amount, price = price) 
+        self.render("newbuy.html", first_name=first_name, amount = amount, price = price, num = num) 
         return
-    # def post(self):
-        # last_name = self.request.get('last_name')
-        # email = self.request.get('email')
 
-        # if checked:
-        #     self.redirect("/newbuy.html", checked = checked)
-        # else:
-        #     error = "check at least one box to buy meal"
-        #     self.render("buy.html", sells = sells, error = error)
+    def post(self):
+        last_name = self.request.get('last_name')
+        email = self.request.get('email')
 
-        #email =
-        #get seller email from sell key
+        if last_name and email:
+            message = mail.EmailMessage()
+            message.subject = "I wish to buy your meal points"
+            message.sender = email
 
-        # #validate email
-        # subject = "I wish to buy your meal points"
-        # body = "Hi! My name is %s and I'm interested in taking up your offer of x meal points at price per point") % first_name
-        # # mail.send_mail(buyer_email, email, subject, body)
-        self.render("newbuy.html")
+            name = self.request.get("first_name")
+            amount = self.request.get("amount")
+            price = self.request.get("price")
+            num = self.request.get("num")
+
+            if not num:
+                logging.error("NO NUM")
+            else:
+                seller = SellModel.gql("where num = :num", num = int(num)).get()
+                if not seller:
+                    logging.error("NO SELLER")
+                else:
+                    message.to = seller.user.email
+           
+            message.body = ("My name is %s and I am interested in taking up your offer of %s meal points at %s per point" % (name, amount, price))
+            message.send()
+
+            stat = "email sent to seller"
+            self.render("newbuy.html", stat = stat)
+        else:
+            error = "fill in every box"
+            self.render("newbuy.html", error = error)
 
 class Sell(Handler):
     def get(self):
