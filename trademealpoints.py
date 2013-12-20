@@ -243,6 +243,11 @@ class NewBuy(Handler):
         return
 
     def post(self):
+        first_name = self.request.get("first_name")
+        amount = self.request.get("amount")
+        price = self.request.get("price")
+        num = self.request.get("num")
+
         last_name = self.request.get('last_name')
         email = self.request.get('email')
 
@@ -269,10 +274,10 @@ class NewBuy(Handler):
             message.send()
 
             stat = "email sent to seller"
-            self.render("newbuy.html", stat = stat)
+            self.render("newbuy.html", stat = stat, first_name=first_name, amount = amount, price = price, num = num)
         else:
             error = "fill in every box"
-            self.render("newbuy.html", error = error)
+            self.render("newbuy.html", error = error, first_name=first_name, amount = amount, price = price, num = num)
 
 class Sell(Handler):
     def get(self):
