@@ -93,6 +93,51 @@ input {
 }
 
 
+.outer{
+    background: white;
+    display: table;
+    max-width: 400px;
+    border: 2px solid #bebebe;
+    border-radius:6px;
+    border-spacing:5px;
+    margin-left:23%;
+}
+.inner{
+    text-align:center;
+    background-color:white;
+}
+th{
+    min-width:80px;
+}
+td {
+    padding: 1;
+}
+
+
+
+.buy_input {
+    width:20%;
+}
+.review_button {
+    font-family:inherit;
+    font-size:16px;
+    text-align:center;
+    float:right;
+    margin-top:10px;
+    margin-right:28%;
+    
+    width:107px;
+    background-color:white;
+    color:#bebebe;
+    border: 1px solid #bebebe;
+    border-radius:6px;
+}
+.review_button:hover {
+    border-color: #32ac97;
+    color: #32ac97;
+    transition-duration: 400ms;
+}
+
 .sell_button {
     font-family:inherit;
     font-size:inherit;

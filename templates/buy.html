@@ -14,27 +14,29 @@ it looks like all the offers have been bought. check back later :)
 <br>
     
 {%elif count == 1%}
-<table class = "table">
+<div class = "outer">
+<table class = "inner">
     <tr class = "table_label">
-    <th>offer #</th>
-    <th>amount of mp</th>
-    <th>price per mp</th>
+    <th>offer#</th>
+    <th>amount</th>  
+    <th>price</th>  
     </tr>
     {% for sell in sells %}
         {{ sell.render() | safe }}
     {% endfor %}
 </table>
-    
-    <label class = "buy_label">offer #</label>
-    <input type="text" class = "buy_input" name="num" value="{{num}}">
+</div>
+<br>
+<label class = "buy_label">offer#</label>
+<input type="text" class = "buy_input" name="num" value="{{num}}">
 
-    <label class = "buy_label">first name</label>
-    <input type="text" class = "buy_input" name="first_name" value="{{first_name}}">
+<label class = "buy_label">first name</label>
+<input type="text" class = "buy_input" name="first_name" value="{{first_name}}">
 
-<div><input type="submit" class = "button" value="review your order"></div>
+<div><input type="submit" class = "review_button" value="review order"></div>
 <div class="error">{{cart_error}}</div> 
 <div class="error">{{error}}</div> 
-
+<br><br>
 {%endif%}
 
 <br>
