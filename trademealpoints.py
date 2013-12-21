@@ -376,7 +376,7 @@ class Wish(Handler):
         if wishes is None:
             wishes = WishModel.all().order('wish_price')
             logging.error("DB QUERY")
-            count = len(list(wishes))
+            count = 0
             for wish in wishes:
                 age_set("WISHES", wish)
         else:

@@ -2,17 +2,19 @@
 
 {% block content %}
 
+<!--
 <div class = "age">{{age}}</div>
+-->
 <form method = "post">
     
-<div class = "apple">
 <h1>current offers:</h1>
 
 {%if count == 0 %}
 it looks like all the offers have been bought. check back later :)
-
-{%else%}
-<table>
+<br>
+    
+{%elif count == 1%}
+<table class = "table">
     <tr class = "table_label">
     <th>offer #</th>
     <th>amount of mp</th>
@@ -22,8 +24,7 @@ it looks like all the offers have been bought. check back later :)
         {{ sell.render() | safe }}
     {% endfor %}
 </table>
-
-<p class="big">
+    
     <label class = "buy_label">offer #</label>
     <input type="text" class = "buy_input" name="num" value="{{num}}">
 
@@ -33,16 +34,13 @@ it looks like all the offers have been bought. check back later :)
 <div><input type="submit" class = "button" value="review your order"></div>
 <div class="error">{{cart_error}}</div> 
 <div class="error">{{error}}</div> 
-</div>
-    
+
 {%endif%}
 
 <br>
 
-<div class = "apple">
 don't see an offer you want? let sellers know the amount and price you are looking for
 <a href = "/newwish">here</a>
-</div>
 </form>
 
 
