@@ -202,11 +202,22 @@ class Buy(Handler):
     def get(self):
         self.clear_cart()
         sells, age = age_get("SELLS")
+
         if sells is None:
-            sells = SellModel.all().order('price')
             logging.error("DB QUERY")
-            count = 0
-        else: 
+
+            sells = SellModel.all()
+            if sells.count() == 0:
+                logging.error("EMPTY DB")
+                count = 0
+            else:
+                logging.error("DB WRITE TO MC")
+                count = 1
+                age_set("SELLS", sells)
+
+        else:
+            sells.sort(key = lambda x:x.price)
+            logging.error("MEMCACHE HAS STUFF")
             count = 1
         self.render("buy.html", sells = list(sells), count = count, age = age_str(age))
 
@@ -311,24 +322,32 @@ class Sell(Handler):
         if amount and price and first_name and last_name and email and (have_error == False):
 
             user, age = age_get("USER")   
-            if user is None:    #not in memcache
+
+            if user is None:
+                logging.error("EMPTY MC, DB QUERY")
                 u = UserModel.gql('where email = :email', email = email)
                 user = u.get()
-                if user:    #in database               
-                    age_set("USER", user) #write to memcache
-                else:   #commit and write
+
+                if user:    
+                    logging.error("DB WRITE TO MC")            
+                    age_set("USER", user) 
+
+                else:   
+                    logging.error("DB COMMIT, MC WRITE")
                     user = UserModel(parent = user_key(), 
                         first_name = first_name, last_name = last_name, email = email)
                     user.put()
                     age_set("USER", user)
             
             #assign num
-            sells, age = age_get("SELLS")  #check memcache
+            sells, age = age_get("SELLS")
 
-            if sells is None: 
+            if not sells: 
+                logging.error("EMPTY MEMCACHE")
                 num = 1
 
             else: 
+                logging.error("MEMCACHE HAS STUFF")
                 total_num = len(sells)
 
                 #get max sell num
