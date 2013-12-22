@@ -192,12 +192,6 @@ def get_sells(update = False): #GET FROM/WRITE TO MEMCACHE
         age_set(memcache_key, sells)    #update memcache
     return sells, age
 
-def add_sell():     #COMMIT SELL TO DB, WRITE TO MEMCACHE
-    sell = SellModel(parent = sell_key(), user = user,
-                amount = amount, price = price, num = num)
-    sell.put()                  #commit to db
-    age_set("SELLS", sell)      #update memcache with new sell
-
 class Buy(Handler):
     def get(self):
         self.clear_cart()
@@ -217,7 +211,7 @@ class Buy(Handler):
 
         else:
             sells.sort(key = lambda x:x.price)
-            logging.error("MEMCACHE HAS STUFF")
+            logging.error("STUFF IN MEMCACHE")
             count = 1
         self.render("buy.html", sells = list(sells), count = count, age = age_str(age))
 
@@ -393,12 +387,19 @@ class Wish(Handler):
     def get(self):
         wishes, age = age_get("WISHES")
         if wishes is None:
-            wishes = WishModel.all().order('wish_price')
             logging.error("DB QUERY")
-            count = 0
-            for wish in wishes:
+
+            wishes = WishModel.all()
+            if wishes.count() == 0:
+                logging.error("EMPTY DB")
+                count = 0
+            else:
+                logging.error("DB WRITE TO MC")
+                count = 1
                 age_set("WISHES", wish)
         else:
+            wishes.sort(key = lambda x:x.wish_price)
+            logging.error("STUFF IN MEMCACHE")
             count = 1
         self.render("wish.html", wishes = list(wishes), count = count, age = age_str(age))
 
