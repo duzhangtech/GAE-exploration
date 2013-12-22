@@ -9,7 +9,8 @@
 
 {%else%}
 <h1>offers people are looking to buy:</h1>
-<table>
+<div class = "outer">
+<table class = "inner">
 <tr>
 <th>amount of mp</th>
 <th>price per mp</th>
@@ -18,6 +19,7 @@
     {{ wish.render() | safe }}
 {% endfor %}
 </table>
+</div>
 <br>
 {%endif%}
 

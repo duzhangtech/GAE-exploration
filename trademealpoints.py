@@ -182,16 +182,6 @@ def age_str(age):   #TIME SINCE LAST QUERY
         s = s.replace('seconds', 'second')
     return s % age
 
-def get_sells(update = False): #GET FROM/WRITE TO MEMCACHE
-    q = SellModel.all()
-    memcache_key = 'SELLS'
-
-    sells, age = age_get(memcache_key)  #get from memcache
-    if update or sells is None:         #if updating/not in memcache
-        sells = list(q)                 #query db
-        age_set(memcache_key, sells)    #update memcache
-    return sells, age
-
 class Buy(Handler):
     def get(self):
         self.clear_cart()
@@ -210,18 +200,14 @@ class Buy(Handler):
                 age_set("SELLS", sells)
 
         else:
-            sells.sort(key = lambda x:x.price)
             logging.error("STUFF IN MEMCACHE")
+            sells.sort(key = lambda x:x.price)
             count = 1
         self.render("buy.html", sells = list(sells), count = count, age = age_str(age))
 
     def post(self):
         first_name = self.request.get('first_name')
-        
-        #TODO: VALIDATE NUM
-        num = int(self.request.get('num'))
-
-        sells, age = get_sells()
+        num = int(self.request.get('num')) #TODO: VALIDATE NUM
 
         if first_name and num:
             selected = SellModel.gql("where num = :num", num=num).get()
@@ -274,8 +260,9 @@ class NewBuy(Handler):
                     logging.error("NO SELLER")
                 else:
                     message.to = seller.user.email
-           
+
             message.body = ("My name is %s and I am interested in taking up your offer of %s meal points at %s per point" % (name, amount, price))
+            logging.error("BODY: %s" % message.body)
             message.send()
 
             stat = "email sent to seller"
@@ -342,7 +329,7 @@ class Sell(Handler):
 
             else: 
                 logging.error("MEMCACHE HAS STUFF")
-                total_num = len(sells)
+                total_num = len(list(sells))
 
                 #get max sell num
                 max_num = 0
@@ -396,10 +383,10 @@ class Wish(Handler):
             else:
                 logging.error("DB WRITE TO MC")
                 count = 1
-                age_set("WISHES", wish)
+                age_set("WISHES", list(wishes))
         else:
-            wishes.sort(key = lambda x:x.wish_price)
             logging.error("STUFF IN MEMCACHE")
+            wishes.sort(key = lambda x:x.wish_price)
             count = 1
         self.render("wish.html", wishes = list(wishes), count = count, age = age_str(age))
 
