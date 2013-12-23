@@ -275,6 +275,7 @@ class NewBuy(Handler):
 class LogSenderHandler(InboundMailHandler):
     def receive(self, mail_message):
         logging.info("Received a message from: " + mail_message.sender)
+        for text in plaintext:
 
 class Sell(Handler):
     def get(self):
