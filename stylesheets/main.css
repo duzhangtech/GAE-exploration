@@ -2,21 +2,22 @@ body {
     font-family:Futura, “Trebuchet MS”, Arial, sans-serif;
     font-weight: 100;
     text-align:left;
-    font-size: 20px;
-    color: #717171;
+    font-size: 22px;
+    color: #848484;
     transform: scale(1.1);
     transform-origin: 10% 10%;
     
     float:center;
     margin-left: 31%;
-    margin-right: 31%;
+    margin-right: 39%;
     min-width:450px;
     max-width:450px;
 }
 .box {
     background-color:transparent;
+    margin-left:9px;
+    line-height:160%;
 }
-
 age {
     position:absolute;
     bottom:0;
@@ -25,29 +26,22 @@ age {
     font-size:12px;
 }
 h1 {
-    font-size: 20px;
+    font-size: 22px;
     font-weight:100;
     text-align:center;
-    color: #656565;
-    line-height:80%;
-}
-h2 {
-    font-size: 25px;
-    color: #4a4a4a;
-    text-align:left;
+    color: #848484;
 }
 
 #main_title {
     color:#32ac97;
     padding-top: 40px;
-    padding-bottom:25px;
+    padding-bottom:23px;
     font-size: 34px;
     min-width:500px;
-    
 }
 
 .navbar {
-    margin-bottom: 27px;
+    margin-bottom: 25px;
     min-width:500px;
 }
 
@@ -58,6 +52,7 @@ h2 {
 }
 .about_q {
     text-align:right;
+    margin-right:15px;
 }
 .text_link {
     color: #888;
@@ -161,7 +156,7 @@ td {
 
 .wish_button {
     margin-top:10px;
-    margin-right:20%;
+    margin-right:18%;
     font-family:inherit;
     font-size:inherit;
     text-align:center;
@@ -220,19 +215,19 @@ td {
     color: #a0ff00;
 }
 a:link {
-    color:#a3a3a3; 
+    color:#606060; 
     text-decoration:none; 
 }      
 a:visited {
-    color:#a3a3a3; 
+    color:#606060; 
     text-decoration:none; 
 }
 a:hover {
-    color:#4e4e4e; 
+    color:#848484; 
     text-decoration:none; 
     transition: all 500ms ease;
 }  
 a:active {
-    color:#4e4e4e; 
+    color:#606060; 
     text-decoration:none;
 }  /* selected */

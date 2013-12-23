@@ -271,7 +271,7 @@ class NewBuy(Handler):
 
                 + "To complete the transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (first_name)
 
-                + "Remember WashU is going to take a 15 point transaction fee, 7.5 points per person. (Ugh Iknowright? Isn't the tuition enough? But hey I'm just a bot what can I do) \n\n" 
+                + "Remember that WashU is going to take a 15 point transaction fee, 7.5 points per person. (Ugh Iknowright? Isn't the tuition enough? But hey I'm just a bot what can I do) \n\n" 
 
                 + "If you have any questions/comments/just want to say hi, please leave them in the feedback box! \n\n"
 
