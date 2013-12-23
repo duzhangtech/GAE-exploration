@@ -188,7 +188,7 @@ class Buy(Handler):
         sells, age = age_get("SELLS")
 
         if sells is None:
-            logging.error("DB QUERY")
+            logging.error("EMPTY OFFER MC, DB QUERY")
 
             sells = SellModel.all()
             if sells.count() == 0:
@@ -200,7 +200,7 @@ class Buy(Handler):
                 age_set("SELLS", sells)
 
         else:
-            logging.error("STUFF IN MEMCACHE")
+            logging.error("OFFERS IN MEMCACHE")
             sells.sort(key = lambda x:x.price)
             count = 1
         self.render("buy.html", sells = list(sells), count = count, age = age_str(age))
@@ -243,10 +243,8 @@ class NewBuy(Handler):
         email = self.request.get('email')
 
         if last_name and email:
-            
             subject = "I want to buy your meal points"
-            #sender = email
-            sender = "yingjief5312@gmail.com"
+            sender = email
             
             name = self.request.get("first_name")
             amount = self.request.get("amount")
@@ -310,26 +308,40 @@ class Sell(Handler):
                 u = UserModel.gql('where email = :email', email = email)
                 user = u.get()
 
-                if user:    
-                    logging.error("DB WRITE TO MC")            
+                if user:
+                    logging.error("DB WRITE USER TO MC")            
                     age_set("USER", user) 
 
                 else:   
-                    logging.error("DB COMMIT, MC WRITE")
+                    logging.error("DB COMMIT, MC WRITE USER")
                     user = UserModel(parent = user_key(), 
                         first_name = first_name, last_name = last_name, email = email)
                     user.put()
                     age_set("USER", user)
             
+            else:
+                logging.error("MC HAS USERS, USER EXIST?")
+                count = 0
+                for user in list(user):
+                    if user.email == email:
+                        count = 1
+                        logging.error("USER EXISTS IN MC")
+
+                if count == 0:
+                    logging.error("DB COMMIT, MC WRITE USER")
+                    user = UserModel(parent = user_key(), 
+                        first_name = first_name, last_name = last_name, email = email)
+                    user.put()
+                    age_set("USER", user)
             #assign num
             sells, age = age_get("SELLS")
 
             if not sells: 
-                logging.error("EMPTY MEMCACHE")
+                logging.error("EMPTY NUM MEMCACHE")
                 num = 1
 
             else: 
-                logging.error("MEMCACHE HAS STUFF")
+                logging.error("MEMCACHE HAS NUM")
                 total_num = len(list(sells))
 
                 #get max sell num
