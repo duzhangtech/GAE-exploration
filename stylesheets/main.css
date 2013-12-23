@@ -31,6 +31,15 @@ h1 {
     text-align:center;
     color: #848484;
 }
+h2 {
+    font-size:inherit;
+    font-weight:100;
+    text-align:left;
+    color: #606060;
+}
+.spacing {
+    line-height:140%;
+}
 
 #main_title {
     color:#32ac97;
@@ -92,7 +101,7 @@ input {
     background: white;
     display: table;
     max-width: 400px;
-    border: 2px solid white;
+    border: 1px solid white;
     border-radius:6px;
     border-spacing:5px;
     margin-left:23%;
@@ -141,7 +150,7 @@ td {
     margin-top:10px;
     margin-right:18%;
     
-    width:60px;
+    width:70px;
     background-color:white;
     color:#bebebe;
     border: 1px solid #bebebe;
@@ -162,7 +171,7 @@ td {
     text-align:center;
     float:right;
     
-    width:60px;
+    width:70px;
     background-color:white;
     color:#bebebe;
     border: 1px solid #bebebe;
@@ -192,7 +201,7 @@ td {
     margin-top:10px;
     margin-right:23%;
     
-    width:60px;
+    width:70px;
     background-color:white;
     color:#bebebe;
     border: 1px solid #bebebe;
