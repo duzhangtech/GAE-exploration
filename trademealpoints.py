@@ -231,6 +231,7 @@ class NewBuy(Handler):
 
         if not first_name:
             logging.error("NO FIRST NAME")
+
         self.new_cart(first_name)
         self.render("newbuy.html", first_name=first_name, amount = amount, price = price, num = num) 
         return
@@ -245,7 +246,7 @@ class NewBuy(Handler):
         email = self.request.get('email')
 
         if last_name and email:
-            subject = "I want to buy your meal points"
+            subject = "A BUYER!"
             sender = "bot@trademealpoints.appspotmail.com"
             
             name = self.request.get("first_name")
@@ -262,7 +263,19 @@ class NewBuy(Handler):
                 else:
                     receiver = seller.user.email
 
-            body = ("My name is %s and I am interested in taking up your offer of %s meal points at %s per point" % (name, amount, price))
+            body = (
+
+                "Hey there, savvy meal point seller. It looks like %s %s is interested in buying your offer of %s meal points at $%s per point! \n\n" % (first_name, last_name, amount, price) 
+
+                + "You can reach %s %s at %s. \n \n" % (first_name, last_name, email) 
+
+                + "To complete the transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (first_name)
+
+                + "Remember WashU is going to take a 15 point transaction fee, 7.5 points per person. (Ugh Iknowright? Isn't the tuition enough? But hey I'm just a bot what can I do) \n\n" 
+
+                + "If you have any questions/comments/just want to say hi, please leave them in the feedback box! \n\n"
+
+                + "All right, I'm done now. You've been a real spiffy human to serve. Have an A1 Day!")
 
             mail.send_mail(sender, receiver, subject, body)
 
