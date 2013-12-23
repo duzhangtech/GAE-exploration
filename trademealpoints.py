@@ -15,6 +15,8 @@ from datetime import datetime, timedelta
 from google.appengine.ext import db
 from google.appengine.api import mail
 from google.appengine.api import memcache
+from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
+
 
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
@@ -244,7 +246,7 @@ class NewBuy(Handler):
 
         if last_name and email:
             subject = "I want to buy your meal points"
-            sender = email
+            sender = "bot@trademealpoints.appspotmail.com"
             
             name = self.request.get("first_name")
             amount = self.request.get("amount")
@@ -269,6 +271,10 @@ class NewBuy(Handler):
         else:
             error = "fill in every box"
             self.render("newbuy.html", error = error, first_name=first_name, amount = amount, price = price, num = num)
+
+class LogSenderHandler(InboundMailHandler):
+    def receive(self, mail_message):
+        logging.info("Received a message from: " + mail_message.sender)
 
 class Sell(Handler):
     def get(self):
@@ -301,38 +307,18 @@ class Sell(Handler):
 
         if amount and price and first_name and last_name and email and (have_error == False):
 
-            user, age = age_get("USER")   
+            u = UserModel.gql('where email = :email', email = email)
+            user = u.get()
 
-            if user is None:
-                logging.error("EMPTY MC, DB QUERY")
-                u = UserModel.gql('where email = :email', email = email)
-                user = u.get()
+            if user:
+                logging.error("DB HAS USER")            
 
-                if user:
-                    logging.error("DB WRITE USER TO MC")            
-                    age_set("USER", user) 
+            else:   
+                logging.error("USER DOESN'T EXIST, DB COMMIT")
+                user = UserModel(parent = user_key(), 
+                    first_name = first_name, last_name = last_name, email = email)
+                user.put()            
 
-                else:   
-                    logging.error("DB COMMIT, MC WRITE USER")
-                    user = UserModel(parent = user_key(), 
-                        first_name = first_name, last_name = last_name, email = email)
-                    user.put()
-                    age_set("USER", user)
-            
-            else:
-                logging.error("MC HAS USERS, USER EXIST?")
-                count = 0
-                for user in list(user):
-                    if user.email == email:
-                        count = 1
-                        logging.error("USER EXISTS IN MC")
-
-                if count == 0:
-                    logging.error("DB COMMIT, MC WRITE USER")
-                    user = UserModel(parent = user_key(), 
-                        first_name = first_name, last_name = last_name, email = email)
-                    user.put()
-                    age_set("USER", user)
             #assign num
             sells, age = age_get("SELLS")
 
@@ -504,17 +490,17 @@ def render_str(template, **params):
     return t.render(params)
 
 application = webapp2.WSGIApplication([
-    ('/', MainPage),
+                    ('/', MainPage),
 
-    ('/buy', Buy),
-    ('/contact', NewBuy),
+                    ('/buy', Buy),
+                    ('/contact', NewBuy),
 
-    ('/sell', Sell),
-    ('/wish', Wish),
-    ('/newwish', NewWish),
-    ('/faq', FAQ),
-
-], debug=True)
+                    ('/sell', Sell),
+                    ('/wish', Wish),
+                    ('/newwish', NewWish),
+                    ('/faq', FAQ), 
+                    LogSenderHandler.mapping()],
+                    debug=True)
 
 
 #cool features

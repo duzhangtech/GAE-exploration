@@ -11,6 +11,10 @@ handlers:
 - url: /.*
   script: trademealpoints.application
 
+- url: /_ah/mail/.+
+  script: handle_incoming_email.app
+  login: admin
+  
 libraries:
 - name: webapp2
   version: latest
