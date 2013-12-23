@@ -274,8 +274,13 @@ class NewBuy(Handler):
 
 class LogSenderHandler(InboundMailHandler):
     def receive(self, mail_message):
-        logging.info("Received a message from: " + mail_message.sender)
+        logging.info("from: " + mail_message.sender)
+        plaintext = mail_message.bodies(content_type='text/plain')
         for text in plaintext:
+            m = ""
+            m = text[1].decode()
+            logging.info("message: %s" % m)
+            self.response.out.write(m)
 
 class Sell(Handler):
     def get(self):
