@@ -243,10 +243,11 @@ class NewBuy(Handler):
         email = self.request.get('email')
 
         if last_name and email:
-            message = mail.EmailMessage()
-            message.subject = "I wish to buy your meal points"
-            message.sender = email
-
+            
+            subject = "I want to buy your meal points"
+            #sender = email
+            sender = "yingjief5312@gmail.com"
+            
             name = self.request.get("first_name")
             amount = self.request.get("amount")
             price = self.request.get("price")
@@ -259,11 +260,11 @@ class NewBuy(Handler):
                 if not seller:
                     logging.error("NO SELLER")
                 else:
-                    message.to = seller.user.email
+                    receiver = seller.user.email
 
-            message.body = ("My name is %s and I am interested in taking up your offer of %s meal points at %s per point" % (name, amount, price))
-            logging.error("BODY: %s" % message.body)
-            message.send()
+            body = ("My name is %s and I am interested in taking up your offer of %s meal points at %s per point" % (name, amount, price))
+
+            mail.send_mail(sender, receiver, subject, body)
 
             stat = "email sent to seller"
             self.render("newbuy.html", stat = stat, first_name=first_name, amount = amount, price = price, num = num)
