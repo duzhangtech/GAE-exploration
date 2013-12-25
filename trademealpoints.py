@@ -264,22 +264,42 @@ class NewBuy(Handler):
                     receiver = seller.user.email
 
             body = (
-
                 "Hey there, savvy meal point seller. It looks like %s %s is interested in buying your offer of %s meal points at $%s per point! \n\n" % (first_name, last_name, amount, price) 
 
                 + "You can reach %s %s at %s. \n \n" % (first_name, last_name, email) 
 
                 + "To complete the transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (first_name)
 
-                + "Remember that WashU is going to take a 15 point transaction fee, 7.5 points per person. (Ugh Iknowright? Isn't the tuition enough? But hey I'm just a bot what can I do) \n\n" 
+                + "Remember that WashU is going to take a 15 point transaction fee, 7.5 points per person. \n\n" 
 
-                + "If you have any questions/comments/just want to say hi, please leave them in the feedback box! \n\n"
+                + "If you have any questions/comments/just want to say hi, please leave them in the feedback box on the FAQ page! \n\n"
 
-                + "All right, I'm done now. You've been a real spiffy human to serve. Have an A1 Day!")
+                + "All right, I'm done now. You've been a real spiffy human to serve. Have an A1 Day! \n\n"
+
+                + "Mechanically yours, \n\n"
+                + "Bot")
 
             mail.send_mail(sender, receiver, subject, body)
 
-            stat = "email sent to seller"
+
+            receiver = email
+            subject = "MEAL POINTS"
+            body = (
+                "Hey there, savvy meal point buyer. You can reach %s %s at %s regarding %s's offer of %s meal points at $%s per point. \n \n" % (seller.user.first_name, seller.user.last_name, seller.user.email, seller.user.first_name, amount, price)
+
+                + "To complete the transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (seller.user.first_name)
+
+                + "Remember that WashU is going to take a 15 point transaction fee, 7.5 points per person. \n\n" 
+
+                + "If you have any questions/comments/just want to say hi, please leave them in the feedback box on the FAQ page! \n\n"
+
+                + "All right, I'm done now. You've been a real spiffy human to serve. Have an A1 Day!\n\n"
+                + "Mechanically yours, \n\n"
+                + "Bot")
+
+            mail.send_mail(sender, receiver, subject, body)
+
+            stat = "check your inbox!"
             self.render("newbuy.html", stat = stat, first_name=first_name, amount = amount, price = price, num = num)
         else:
             error = "fill in every box"
