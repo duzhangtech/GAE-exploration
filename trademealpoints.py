@@ -168,14 +168,14 @@ class Buy(Handler):
         sells = memcache.get("SELLS")
 
         if sells is None:
-            logging.error("EMPTY OFFER MC, DB QUERY")
+            logging.error("EMPTY BUY MC, DB QUERY")
 
-            sells = SellModel.all().filter("fulfilled", False)
-            if sells.count() == 0:
+            query =  SellModel.all().ancestor(sell_key()).filter("fulfilled", False)
+            if query.count() == 0:
                 logging.error("EMPTY DB")
                 count = 0
             else:
-                logging.error("DB WRITE TO MC")
+                logging.error("DB WRITE TO MC %s" % sells)
                 count = 1
                 memcache.set("SELLS", sells)
 
@@ -275,12 +275,7 @@ class NewBuy(Handler):
 
             seller.fulfilled = True
             seller.put()
-            
-            sells = SellModel.all().ancestor(sell_key()).filter("fulfilled", False)
-            if sells.count() == 0:
-                memcache.set("SELLS", None)
-            else:
-                memcache.replace("SELLS", sells)
+            memcache.replace("FULFILLED SELL", seller)
             
             stat = "check your inbox!"
             self.render("newbuy.html", stat = stat, first_name=first_name, amount = amount, price = price, num = num)
@@ -342,10 +337,9 @@ class Sell(Handler):
                 user.put()            
 
             #assign num
-            sells = SellModel.all()
+            sells = SellModel.all().ancestor(sell_key())
             total_num = sells.count
 
-            #get max sell num
             max_num = 0
             for sell in sells:
                 if sell.num > max_num:
@@ -357,7 +351,7 @@ class Sell(Handler):
             num = 1
             if max_num > total_num:
                 for x in range(1, total_num+1):
-                    findnum = SellModel.all().filter("num = ", num)
+                    findnum = sells.filter("num = ", x)
                     if not findnum:
                         num = x
                         break
