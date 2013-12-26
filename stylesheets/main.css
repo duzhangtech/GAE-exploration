@@ -2,20 +2,20 @@ body {
     font-family:Futura, “Trebuchet MS”, Arial, sans-serif;
     font-weight: 100;
     text-align:left;
-    font-size: 22px;
+    font-size: 19px;
     color: #8e8e8e;
     transform: scale(1.1);
     transform-origin: 10% 10%;
     
     float:center;
     margin-left: 31%;
-    margin-right: 39%;
-    min-width:450px;
-    max-width:450px;
+    min-width:460px;
+    max-width:460px;
+    background-color:transparent;
 }
 .box {
     background-color:transparent;
-    margin-left:9px;
+    margin-left:3px;
     line-height:150%;
 }
 age {
@@ -25,8 +25,10 @@ age {
     color:gray;
     font-size:12px;
 }
+
+
 h1 {
-    font-size: 22px;
+    font-size: 20px;
     font-weight:100;
     text-align:center;
     color: #848484;
@@ -37,6 +39,18 @@ h2 {
     text-align:left;
     color: #606060;
 }
+h3 {
+    text-align:center;
+    color: #32ac97;
+}
+h4 {
+    font-size:20px;
+    font-weight:100;
+    text-align:left;
+    color: #848484;
+}
+
+
 .spacing {
     line-height:140%;
 }
@@ -50,7 +64,7 @@ h2 {
 }
 
 .navbar {
-    margin-bottom: 25px;
+    margin-bottom: 32px;
     min-width:500px;
 }
 
@@ -70,7 +84,7 @@ h2 {
 
 
 input[type=text] {
-    font-size: 19px;
+    font-size: 20px;
     font-family:inherit;
     color:inherit;
     padding-left:8px;
@@ -91,6 +105,7 @@ label{
     text-align: right;
     color: #bebebe;
     background-color:transparent;
+    font-size:20px;
 }
 input {
     width:30%;
@@ -104,9 +119,22 @@ input {
     border: 1px solid white;
     border-radius:6px;
     border-spacing:5px;
-    margin-left:23%;
+    margin-left:22%;
 }
 .inner{
+    text-align:center;
+    background-color:white;
+}
+.wish_outer{
+    background: white;
+    display: table;
+    max-width: 400px;
+    border: 1px solid white;
+    border-radius:6px;
+    border-spacing:5px;
+    margin-left:30%;
+}
+.wish_inner{
     text-align:center;
     background-color:white;
 }
@@ -124,7 +152,7 @@ td {
 }
 .review_button {
     font-family:inherit;
-    font-size:16px;
+    font-size:17px;
     text-align:center;
     float:right;
     margin-top:10px;
@@ -144,7 +172,7 @@ td {
 
 .sell_button {
     font-family:inherit;
-    font-size:inherit;
+    font-size:20px;
     text-align:center;
     float:right;
     margin-top:10px;
@@ -189,6 +217,11 @@ td {
     height: 50%;
     width:50%;
 }
+::-webkit-input-placeholder {
+    color:lightgrey;
+    text-align:left;
+}
+
 
 .faq_label{
     width:40%;

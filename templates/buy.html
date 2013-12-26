@@ -2,18 +2,13 @@
 
 {% block content %}
 
-<!--
-<div class = "age">{{age}}</div>
--->
 <form method = "post">
     
-<h1>current offers:</h1>
-
+<h4>current offers:</h4>
 {%if count == 0 %}
-it looks like every offer has been bought. check back later :)
-<br>
+<h4>it looks like every offer has been bought. check back later :)</h4>
 
-{%elif count == 1%}
+{%else%}
 <div class = "outer">
 <table class = "inner">
     <tr>
@@ -39,10 +34,8 @@ it looks like every offer has been bought. check back later :)
 <br><br>
 {%endif%}
 
-<br>
-
-don't see an offer you want? let sellers know the amount and price you are looking for
-<a href = "/newwish">here</a>
+<h4>don't see an offer you want? let sellers know the amount and price you are looking for
+<a href = "/newwish">here</a></h4>
 </form>
 
 

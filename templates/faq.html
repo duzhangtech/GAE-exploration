@@ -3,39 +3,41 @@
 {% block content %}
 
 <div class = "spacing">
-<hr>
 <h2>which meal plans can transfer meal points?</h2>    
-<div>gold, silver, bronze, apartment</div><hr>
+<div>gold, silver, bronze, apartment.</div><br>
 
 <h2>how do i buy meal points?</h2>
-<div>enter the number of the offer that you want to buy; jot down your email; both you and the seller will receive an email; arrange with the seller to sign the transfer form at dining services.</div><hr>
+<div>choose the number of the offer that you want to buy and leave your email address; both you and seller will receive an email; arrange with seller to sign transfer form at dining services.</div><br>
 
 <h2>where can i find more deets on the meal point transfer process?</h2>
-<div><a class = "text_link" href = "http://diningservices.wustl.edu/MEALPLANS/Pages/default.aspx">here!</a></div><hr>
+<div><a class = "text_link" href = "http://diningservices.wustl.edu/MEALPLANS/Pages/default.aspx">here!</a></div><br>
 
 <h2>is it free to buy or sell meal points?</h2>
-<div>WashU takes a 15 point transaction fee, 7.5 points per person.</div><hr>
+<div>WashU takes a 15 point transaction fee, 7.5 points per person.</div><br>
 
 <h2>do I have to pay to use WUMPE?</h2>
-<div>nope. this web app is totally free to use.</div><hr>
-</div>
+<div>nope. this web app is totally free to use.</div><br>
 
+
+<h2>should I leave some feedback in the box below?</h2>
+<div>no kidding. </div><br>
+</div>
 <form method="post">
-    <h1>questions/comments/feedback</h1>
+    <h3>questions/comments/feedback</h3>
 
     <label class = "faq_label">thoughts</label>
     <input type="text" name="feedback" class = "faq_input" value="{{feedback}}">
     
     <label class = "faq_label">first name</label>
-    <input type="text" name="first_name" class = "faq_input" value="{{first_name}}">
+    <input type="text" name="first_name" placeholder = "optional"class = "faq_input" value="{{first_name}}">
     
     
     <label class = "faq_label">last name</label>
-    <input type="text" name="last_name" class = "faq_input" value="{{last_name}}">
+    <input type="text" name="last_name" placeholder = "optional" class = "faq_input" value="{{last_name}}">
     
     
     <label class = "faq_label">email</label>
-    <input type="text" name="email" class = "faq_input" value="{{email}}">
+    <input type="text" name="email" placeholder = "optional" class = "faq_input" value="{{email}}">
     <div><input type="submit" class = "faq_button" value="okay"></div>
 
     <div class = "stat">{{stat}}</div>

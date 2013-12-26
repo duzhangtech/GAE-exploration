@@ -23,10 +23,9 @@ template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
                                autoescape = True)
 
-secret = "cherrytreeshark"
+secret = "asd8B*#lfiewnL#FF:OIWEfkjkdsa;fjk;;lk"
 
-def cart_key(name="default"):
-    return db.Key.from_path('cart', name)
+
 
 #basic user can sell, wish, and give feedback
 def user_key(name = "default"):
@@ -82,6 +81,9 @@ class Handler(webapp2.RequestHandler):
         username = self.read_secure_cookie('user')
         self.user = username 
 
+class PointCount(db.Model):
+    total = db.IntegerProperty()
+
 class UserModel(db.Model):
     first_name = db.StringProperty(required = True)
     last_name = db.StringProperty(required = True)
@@ -92,14 +94,10 @@ class SellModel(db.Model):
     amount = db.StringProperty(required = True)
     price = db.StringProperty(required = True)
     num = db.IntegerProperty(required = True)
+    fulfilled = db.BooleanProperty(default = False)
+
     def render(self):
         return render_str("sellmodel.html", s = self)
-
-class CartModel(db.Model):
-    user = db.ReferenceProperty(UserModel)
-    num = db.IntegerProperty(required = True)
-    def render(self):
-        return render_str("cartmodel.html", c = self)
 
 class FeedbackModel(db.Model):
     user = db.ReferenceProperty(UserModel)
@@ -164,48 +162,28 @@ class FAQ(Handler):
                 first_name = first_name, last_name = last_name, 
                 email = email, error = error)
 
-def age_set(key, val): #WRITE VALUE, KEY, AND NOWTIME TO MEMCACHE
-    save_time = datetime.utcnow()
-    memcache.set(key, (val, save_time))
-
-def age_get(key):   #GET MEMCACHE VALUE AND AGE FROM KEY
-    r = memcache.get(key)
-    if r:
-        val, save_time = r
-        age = (datetime.utcnow() - save_time).total_seconds()
-    else:
-        val, age = None, 0
-    return val, age
-    
-def age_str(age):   #TIME SINCE LAST QUERY
-    s = "queried %s seconds ago"
-    age = int(age)
-    if age == 1:
-        s = s.replace('seconds', 'second')
-    return s % age
-
 class Buy(Handler):
     def get(self):
         self.clear_cart()
-        sells, age = age_get("SELLS")
+        sells = memcache.get("SELLS")
 
         if sells is None:
             logging.error("EMPTY OFFER MC, DB QUERY")
 
-            sells = SellModel.all()
+            sells = SellModel.all().filter("fulfilled", False)
             if sells.count() == 0:
                 logging.error("EMPTY DB")
                 count = 0
             else:
                 logging.error("DB WRITE TO MC")
                 count = 1
-                age_set("SELLS", sells)
+                memcache.set("SELLS", sells)
 
         else:
             logging.error("OFFERS IN MEMCACHE")
             sells.sort(key = lambda x:x.price)
             count = 1
-        self.render("buy.html", sells = list(sells), count = count, age = age_str(age))
+        self.render("buy.html", sells = list(sells), count = count)
 
     def post(self):
         first_name = self.request.get('first_name')
@@ -254,21 +232,15 @@ class NewBuy(Handler):
             price = self.request.get("price")
             num = self.request.get("num")
 
-            if not num:
-                logging.error("NO NUM")
-            else:
-                seller = SellModel.gql("where num = :num", num = int(num)).get()
-                if not seller:
-                    logging.error("NO SELLER")
-                else:
-                    receiver = seller.user.email
+            seller = SellModel.gql("where num = :num", num = int(num)).get()
+            receiver = seller.user.email
 
             body = (
-                "Hey there, savvy meal point seller. It looks like %s %s is interested in buying your offer of %s meal points at $%s per point! \n\n" % (first_name, last_name, amount, price) 
+                "Hey hey, savvy meal point seller. It looks like %s %s is interested in buying your offer of %s meal points at $%s per point! \n\n" % (first_name, last_name, amount, price) 
 
                 + "You can reach %s %s at %s. \n \n" % (first_name, last_name, email) 
 
-                + "To complete the transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (first_name)
+                + "To complete this transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (first_name)
 
                 + "Remember that WashU is going to take a 15 point transaction fee, 7.5 points per person. \n\n" 
 
@@ -276,8 +248,10 @@ class NewBuy(Handler):
 
                 + "All right, I'm done now. You've been a real spiffy human to serve. Have an A1 Day! \n\n"
 
-                + "Mechanically yours, \n\n"
-                + "Bot")
+                + "Mechanically yours, \n"
+                + "Bot\n\n"
+
+                + "P.S. Your offer no longer appears on the 'buy' page. If you do not complete this transaction and wish to relist your offer, simply re-enter your info on the 'sell' page.")
 
             mail.send_mail(sender, receiver, subject, body)
 
@@ -285,20 +259,29 @@ class NewBuy(Handler):
             receiver = email
             subject = "MEAL POINTS"
             body = (
-                "Hey there, savvy meal point buyer. You can reach %s %s at %s regarding %s's offer of %s meal points at $%s per point. \n \n" % (seller.user.first_name, seller.user.last_name, seller.user.email, seller.user.first_name, amount, price)
+                "Hey hey, savvy meal point buyer. You can reach %s %s at %s regarding %s's offer of %s meal points at $%s per point. \n \n" % (seller.user.first_name, seller.user.last_name, seller.user.email, seller.user.first_name, amount, price)
 
-                + "To complete the transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (seller.user.first_name)
+                + "To complete this transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (seller.user.first_name)
 
                 + "Remember that WashU is going to take a 15 point transaction fee, 7.5 points per person. \n\n" 
 
                 + "If you have any questions/comments/just want to say hi, please leave them in the feedback box on the FAQ page! \n\n"
 
                 + "All right, I'm done now. You've been a real spiffy human to serve. Have an A1 Day!\n\n"
-                + "Mechanically yours, \n\n"
+                + "Mechanically yours, \n"
                 + "Bot")
 
             mail.send_mail(sender, receiver, subject, body)
 
+            seller.fulfilled = True
+            seller.put()
+            
+            sells = SellModel.all().ancestor(sell_key()).filter("fulfilled", False)
+            if sells.count() == 0:
+                memcache.set("SELLS", None)
+            else:
+                memcache.replace("SELLS", sells)
+            
             stat = "check your inbox!"
             self.render("newbuy.html", stat = stat, first_name=first_name, amount = amount, price = price, num = num)
         else:
@@ -359,44 +342,37 @@ class Sell(Handler):
                 user.put()            
 
             #assign num
-            sells, age = age_get("SELLS")
+            sells = SellModel.all()
+            total_num = sells.count
 
-            if not sells: 
-                logging.error("EMPTY NUM MEMCACHE")
-                num = 1
+            #get max sell num
+            max_num = 0
+            for sell in sells:
+                if sell.num > max_num:
+                    max_num = sell.num
 
-            else: 
-                logging.error("MEMCACHE HAS NUM")
-                total_num = len(list(sells))
+            #when nums are 1, 2, 4
+            #in this case, there will always be
+            #unassigned integer between 0 and total_num
+            num = 1
+            if max_num > total_num:
+                for x in range(1, total_num+1):
+                    findnum = SellModel.all().filter("num = ", num)
+                    if not findnum:
+                        num = x
+                        break
 
-                #get max sell num
-                max_num = 0
-                for sell in sells:
-                    if sell.num > max_num:
-                        max_num = sell.num
-
-                #when nums are 1, 2, 4
-                #in this case, there will always be
-                #unassigned integer between 0 and total_num
-                num = 1
-                if max_num > total_num:
-                    for x in range(1, total_num+1):
-                        findnum = SellModel.all().filter("num = ", num)
-                        if not findnum:
-                            num = x
-                            break
-
-                #max_num will never be smaller than total_num
-                if max_num == total_num:
-                    num = max_num + 1
+            #max_num will never be smaller than total_num
+            elif max_num == total_num:
+                num = max_num + 1
 
 
             sell = SellModel(parent = sell_key(), user = user,
-                amount = amount, price = price, num = num)
+                amount = amount, price = price, num = num, fulfilled = False)
             sell.put()                  #commit to db
 
             sells = SellModel.all().ancestor(sell_key())
-            age_set("SELLS", list(sells))      #update memcache with new sell
+            memcache.set("SELLS", list(sells))
 
             stat = "your entry has been recorded! awesomeness"
             self.render("sell.html", stat = stat)
@@ -410,7 +386,8 @@ class Sell(Handler):
 
 class Wish(Handler):
     def get(self):
-        wishes, age = age_get("WISHES")
+        wishes = memcache.get("WISHES")
+
         if wishes is None:
             logging.error("DB QUERY")
 
@@ -421,12 +398,12 @@ class Wish(Handler):
             else:
                 logging.error("DB WRITE TO MC")
                 count = 1
-                age_set("WISHES", list(wishes))
+                memcache.set("WISHES", list(wishes))
         else:
             logging.error("STUFF IN MEMCACHE")
             wishes.sort(key = lambda x:x.wish_price)
             count = 1
-        self.render("wish.html", wishes = list(wishes), count = count, age = age_str(age))
+        self.render("wish.html", wishes = list(wishes), count = count)
 
 class NewWish(Handler):
     def get(self):
@@ -442,22 +419,14 @@ class NewWish(Handler):
 
         if wish_amount and wish_price and first_name and last_name and email:
 
-            user, age = age_get("USER")   
-            if user is None:
-                u = UserModel.gql('where email = :email', email = email)          
-                user = u.get()
+            u = UserModel.gql('where email = :email', email = email)          
+            user = u.get()
+            
+            if user is None: 
+                user = UserModel(parent = user_key(), first_name = first_name, last_name = last_name, email = email)
+                user.put()
                 
-                if user is None: #db
-                    user = UserModel(parent = user_key(), first_name = first_name, last_name = last_name, email = email)
-                    user.put()
-                    logging.error("NEW USER")
-                    age_set("USER", user)
-
-                else:
-                    age_set("USER", user)
-
-
-            wishes, age = age_get("WISHES") 
+            wishes = memcache.get("WISHES") 
 
             if wishes is None:
                 wishes = WishModel.all().filter("wish_amount = ", wish_amount).filter("wish_price =", wish_price)
@@ -465,7 +434,7 @@ class NewWish(Handler):
                 if wishes.count() != 0: #db duplicate!
                     error = "looks like your wish has already been recorded. sweet"
                     logging.error("DUPLICATE DB WISH")
-                    age_set("WISHES", list(wishes))
+                    memcache.set("WISHES", list(wishes))
                     self.render("newwish.html", error = error,
                         wish_amount = wish_amount, wish_price = wish_price,
                         first_name = first_name, last_name = last_name, email = email)
@@ -474,7 +443,7 @@ class NewWish(Handler):
                     wish = WishModel(parent = wish_key(), user = user, wish_amount = wish_amount, wish_price = wish_price)
                     wish.put()
                     wishes = WishModel.all().ancestor(wish_key())
-                    age_set("WISHES", list(wishes))
+                    memcache.set("WISHES", list(wishes))
                     stat = "success! your mp wish has been recorded :D"
                     self.render("newwish.html", stat = stat)
 
@@ -495,7 +464,7 @@ class NewWish(Handler):
                     wish = WishModel(parent = wish_key(), user = user, wish_amount = wish_amount, wish_price = wish_price)
                     wish.put()
                     wishes = WishModel.all().ancestor(wish_key())
-                    age_set("WISHES", list(wishes))
+                    memcache.set("WISHES", list(wishes))
                     stat = "success! your mp wish has been recorded :D"
                     self.render("newwish.html", stat = stat)
 
