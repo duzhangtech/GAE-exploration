@@ -3,49 +3,44 @@
 {% block content %}
 
 <form method = "post">
-
-<h4 class = "center">current offers:</h4>
     
 {%if count == 0%}
 <h4>it looks like every offer has been bought. check back later :)</h4>
 
 {%else%}
-<div class = "outer">
-<table class = "inner">
+<div class = "buy_outer">
+<table class = "buy_inner">
     <tr>
     <th>offer#</th>
     <th>amount</th>  
     <th>price</th>  
     </tr>
-    {% set num = 1%}
+    {% set number = 1%}
     {% for sell in sells %}
         <tr>  
-            <td>{{num}}</td>
+            <td>{{number}}</td>
             {{ sell.render() | safe}}
         </tr>
-    {%set num = num + 1%}
+    {%set number = number + 1%}
     {% endfor %}
 </table>
 </div>
-<br>
-<label class = "buy_label">offer#</label>
-<input type="text" class = "buy_input" name="num" value="{{num}}">
 
-<label class = "buy_label">first name</label>
-<input type="text" class = "buy_input" name="first_name" value="{{first_name}}">
+<div class = "review_outer">
+<div class = "review_inner">
+<div class = "buy_mp">buy mp</div>
+<div><input type="text" class = "buy_input" placeholder = "offer#" name="num" value="{{num}}"></div>
+
+<div><input type="text" class = "buy_input" placeholder = "first name" name="first_name" value="{{first_name}}"></div>
 
 <div><input type="submit" class = "review_button" value="review order"></div>
 <div class="error">{{cart_error}}</div> 
-<div class="error">{{error}}</div> 
-<br><br>
+<div class="error">{{error}}</div>
+    
+<div><a class = "text_link" href = "/newwish">make mp wish</a></div>
+<div><a class = "text_link" href = "/newwish">edit my offer</a></div>
+</div>
+</div>
 {%endif%}
-
-<h4>don't see an offer you want? let sellers know the amount and price you are looking for
-<a href = "/newwish">here</a></h4>
 </form>
-
-
-
-
-
 {% endblock %}

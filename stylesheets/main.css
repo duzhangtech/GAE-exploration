@@ -8,10 +8,13 @@ body {
     transform-origin: 10% 10%;
     
     float:center;
-    margin-left: 31%;
+    margin-left: 26%;
     min-width:460px;
     max-width:460px;
     background-color:transparent;
+}
+.top_base {
+    background-color:white;
 }
 .box {
     background-color:transparent;
@@ -69,7 +72,7 @@ h5 {
     color:#32ac97;
     padding-top: 40px;
     padding-bottom:23px;
-    font-size: 34px;
+    font-size: 33.6px;
     min-width:500px;
 }
 
@@ -77,7 +80,6 @@ h5 {
     margin-bottom: 32px;
     min-width:500px;
 }
-
 .navlinks {
     padding-left: 17px;
     padding-right: 17px;
@@ -122,43 +124,49 @@ input {
 }
 
 
-.outer{
+.buy_outer{
     background: white;
     display: table;
     max-width: 400px;
-    border: 1px solid white;
+    border: 1px solid #e0e0e0;
     border-radius:6px;
     border-spacing:5px;
-    margin-left:22%;
+    margin-left:10px;
 }
-.inner{
-    text-align:center;
-    background-color:white;
-}
-.wish_outer{
-    background: white;
-    display: table;
-    max-width: 400px;
-    border: 1px solid white;
-    border-radius:6px;
-    border-spacing:5px;
-    margin-left:30%;
-}
-.wish_inner{
+.buy_inner{
     text-align:center;
     background-color:white;
 }
 th{
-    min-width:80px;
+    min-width:77px;
 }
 td {
     padding: 1;
 }
 
-
-
+.buy_outer, .review_order {
+    display: inline-block;
+}
+.review_outer{
+    position:relative;
+    float:right;
+    background: white;
+    max-width: 200px;
+    border: 1px solid white;
+    border-radius:6px;
+    border-spacing:5px;
+    margin-right:50px;
+}
+.review_inner{
+    text-align:center;
+    background-color:white;
+}
 .buy_input {
-    width:20%;
+    width:100px;
+}
+.buy_mp {
+    color:#606060;
+    margin-bottom:5px;
 }
 .review_button {
     font-family:inherit;
@@ -166,9 +174,8 @@ td {
     text-align:center;
     float:right;
     margin-top:10px;
-    margin-right:28%;
     
-    width:107px;
+    width:118px;
     background-color:white;
     color:#bebebe;
     border: 1px solid #bebebe;
@@ -201,6 +208,19 @@ td {
 }
 
 
+.wish_outer{
+    background: white;
+    display: table;
+    max-width: 400px;
+    border: 1px solid white;
+    border-radius:6px;
+    border-spacing:5px;
+    margin-left:30%;
+}
+.wish_inner{
+    text-align:center;
+    background-color:white;
+}
 .wish_button {
     margin-top:10px;
     margin-right:18%;
@@ -259,8 +279,6 @@ td {
     position:relative;
     text-align: left;
 }
-
-
 
 
 .error {
