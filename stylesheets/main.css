@@ -156,14 +156,17 @@ td {
 .review_inner{
     text-align:center;
     background-color:white;
-    line-height:180%;
 }
 .buy_input {
     width:100px;
 }
 .buy_mp {
-    color:#8e8e8e;
+    color:#32ac97;
+    font-size:20px;
     margin-bottom:5px;
+}
+.buy_links {
+    line-height:175%;
 }
 .review_button {
     font-family:inherit;
@@ -186,7 +189,7 @@ td {
 }
 a.text_link:link{
     font-size:inherit;
-    color: #8e8e8e;
+    color: #b2b0b0;
 }
 a.text_link:hover{
     font-size:inherit;
@@ -194,14 +197,40 @@ a.text_link:hover{
 }
 a.text_link:visited{
     font-size:inherit;
-    color: #8e8e8e;
+    color: #b2b0b0;
 }
 a.text_link:visited:hover{
     font-size:inherit;
     color: #32ac97;
 }
-
-
+.newbuy_note {
+    line-height:120
+}
+.contact_button {
+    font-family:inherit;
+    font-size:17px;
+    text-align:center;
+    float:right;
+    margin-top:8px;
+    margin-right:26%;
+    
+    width:118px;
+    background-color:white;
+    color:#bebebe;
+    border: 1px solid #bebebe;
+    border-radius:6px;
+}
+.contact_button:hover {
+    border-color: #32ac97;
+    color: #32ac97;
+    transition-duration: 400ms;
+}
+.stat {
+    position:relative;
+    color:#32ac97;
+    margin-top:45px;
+    margin-left:42%;
+}
 
 .sell_button {
     font-family:inherit;
@@ -218,6 +247,33 @@ a.text_link:visited:hover{
     border-radius:6px;
 }
 .sell_button:hover {
+    border-color: #32ac97;
+    color: #32ac97;
+    transition-duration: 400ms;
+}
+.editsell {
+    line-height:10%;
+    background-color:transparent;
+}
+.editsell_input {
+    display:block;
+    margin-left:32%;
+}
+.editsell_button {
+    margin-top:10px;
+    margin-right:34.3%;
+    font-family:inherit;
+    font-size:inherit;
+    text-align:center;
+    float:right;
+    
+    width:70px;
+    background-color:white;
+    color:#bebebe;
+    border: 1px solid #bebebe;
+    border-radius:6px;
+}
+.editsell_button:hover {
     border-color: #32ac97;
     color: #32ac97;
     transition-duration: 400ms;

@@ -28,6 +28,7 @@
 
 <div class = "review_outer">
 <div class = "review_inner">
+    
 <div class = "buy_mp">buy mp</div>
 <div><input type="text" class = "buy_input" placeholder = "offer#" name="num" value="{{num}}"></div>
 
@@ -36,10 +37,15 @@
 <div><input type="submit" class = "review_button" value="review order"></div>
 <div class="error">{{cart_error}}</div> 
 <div class="error">{{error}}</div>
+<br><br>
     
+<div class = "buy_links">
 <div><a class = "text_link" href = "/newwish">make mp wish</a></div>
-<div><a class = "text_link"href = "/newwish">edit my offer</a></div>
-<div><a class = "text_link"href = "/newwish">relist my offer</a></div>
+<div><a class = "text_link"href = "/editoffer">edit my offer</a></div>
+<div><a class = "text_link"href = "/newwish">relist my offer</a>
+</div>
+    
+</div>
 </div>
 </div>
 {%endif%}

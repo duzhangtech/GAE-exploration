@@ -355,6 +355,17 @@ class Sell(Handler):
                         first_name = first_name, last_name = last_name,
                         email = email, error=error)
 
+class EditSell(Handler):
+    def get(self):
+        self.render("editsell.html")
+
+    def post(self):
+        email = self.request.get("email")
+        email = self.request.get("email")
+        email = self.request.get("email")
+        email = self.request.get("email")
+        email = self.request.get("email")
+        
 class Wish(Handler):
     def get(self):
         wishes = WishModel.all()
@@ -437,6 +448,7 @@ application = webapp2.WSGIApplication([
                     ('/contact', NewBuy),
 
                     ('/sell', Sell),
+                    ('/editoffer', EditSell),
                     ('/wish', Wish),
                     ('/newwish', NewWish),
                     ('/faq', FAQ), 

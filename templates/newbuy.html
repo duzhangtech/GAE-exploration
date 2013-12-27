@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Hi {{first_name}}, you have selected to buy offer number {{num}}</h1>
-<h1>{{amount}} meal points for ${{price}} per meal point</h1>
 
+<h5>Hi {{first_name}}! You selected offer no. {{num}}</h5>
+<h5>{{amount}} meal points for ${{price}} per meal point</h5>
 <form method="post">
 
     <label class = "buy_label">last name</label>
@@ -12,10 +12,10 @@
     <label class = "buy_label">email</label>
     <input type="text" class = "buy_input" name="email" value="{{email}}">    
         
-    <div><input type="submit" value="notify the seller"></div>
+    <div><input type="submit" class = "contact_button" value="contact seller"></div>
 
     <div class = "stat">{{stat}}</div>
-    <div class="error">{{error}}</div> 
+    <div class="stat">{{error}}</div> 
 </form>
 
 {% endblock %}
