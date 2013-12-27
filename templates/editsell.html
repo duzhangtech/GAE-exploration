@@ -8,9 +8,9 @@
 
     <input type="text" class = "editsell_input" placeholder = "email" name="email" value="{{email}}"><br>
     
-    <input type="text" class = "editsell_input" placeholder = "current amount"name="amount" value="{{amount}}"><br>
+    <input type="text" class = "editsell_input" placeholder = "current amount"name="current_amount" value="{{current_amount}}"><br>
 
-    <input type="text" class = "editsell_input" placeholder = "current price"name="price" value="{{price}}"><br>
+    <input type="text" class = "editsell_input" placeholder = "current price"name="current_price" value="{{current_price}}"><br>
         
     <input type="text" class = "editsell_input" placeholder = "new amount"name="new_amount" value="{{new_amount}}"><br>
 
@@ -18,9 +18,8 @@
     
     <input type="submit" class = "editsell_button" value="okay">
 
-    <div class = "stat">{{stat}}</div>
-    <div class="error">{{error}}</div>
-       </div>
+    <div class="editsell_stat">{{stat}}</div>
+    </div>
 </form>
 
 {% endblock %}

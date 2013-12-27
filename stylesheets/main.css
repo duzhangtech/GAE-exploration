@@ -8,7 +8,7 @@ body {
     transform-origin: 10% 10%;
     
     float:center;
-    margin-left: 26%;
+    margin-left: 33%;
     min-width:460px;
     max-width:460px;
     background-color:transparent;
@@ -257,11 +257,11 @@ a.text_link:visited:hover{
 }
 .editsell_input {
     display:block;
-    margin-left:32%;
+    margin-left:33%;
 }
 .editsell_button {
     margin-top:10px;
-    margin-right:34.3%;
+    margin-right:33.4%;
     font-family:inherit;
     font-size:inherit;
     text-align:center;
@@ -278,7 +278,12 @@ a.text_link:visited:hover{
     color: #32ac97;
     transition-duration: 400ms;
 }
-
+.editsell_stat {
+    position:relative;
+    color:#32ac97;
+    margin-left:42%;
+    margin-top:65px;
+}
 
 .wish_outer{
     background: white;

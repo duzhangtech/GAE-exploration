@@ -361,11 +361,39 @@ class EditSell(Handler):
 
     def post(self):
         email = self.request.get("email")
-        email = self.request.get("email")
-        email = self.request.get("email")
-        email = self.request.get("email")
-        email = self.request.get("email")
-        
+        current_amount = self.request.get("current_amount")
+        current_price = self.request.get("current_price")
+        new_amount = self.request.get("new_amount")
+        new_price = self.request.get("new_price")
+
+        if email and current_amount and current_price and new_amount and new_price:
+            u = UserModel.all().filter("email", email)
+            user = u.get()
+
+            if not user:
+                stat = "you haven't sold any meal points!"
+                self.render("editsell.html", stat = stat)
+
+            else:
+                offer = SellModel.all().filter("user", user).filter("amount", current_amount).filter("price", current_price)
+                offer = offer.get()
+
+                if not offer:
+                    stat = "you haven't listed this offer!"
+                    self.render("editsell.html", stat = stat)
+
+                else:
+                    offer.amount = new_amount
+                    offer.price = new_price
+                    offer.put()
+
+                    stat = "offer successfully changed"
+                    self.render("editsell.html", stat = stat)
+
+        else:
+            stat = "fill every box"
+            self.render("editsell.html", stat = stat)
+
 class Wish(Handler):
     def get(self):
         wishes = WishModel.all()
