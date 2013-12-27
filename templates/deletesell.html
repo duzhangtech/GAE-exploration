@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>delete your offer</h1>
+
+<form method = "post">
+   <div class = "relist">
+
+    <input type="text" class = "editsell_input" placeholder = "email" name="email" value="{{email}}"><br>
+    
+    <input type="text" class = "editsell_input" placeholder = "amount" name="amount" value="{{amount}}"><br> 
+
+    <input type="text" class = "editsell_input" placeholder = "price"name="price" value="{{price}}"><br>
+    
+    <input type="submit" class = "editsell_button" value="okay">
+
+    <div class="relist_stat">{{stat}}</div>
+    </div>
+</form>
+
+{% endblock %}

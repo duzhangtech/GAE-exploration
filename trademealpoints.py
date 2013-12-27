@@ -394,9 +394,9 @@ class EditSell(Handler):
             stat = "fill every box"
             self.render("editsell.html", stat = stat)
 
-class Relist(Handler):
+class RelistSell(Handler):
     def get(self):
-        self.render("relist.html")
+        self.render("relistsell.html")
 
     def post(self):
         email = self.request.get('email')
@@ -409,7 +409,7 @@ class Relist(Handler):
 
             if not user:
                 stat = "you haven't sold any meal points yet!"
-                self.render("relist.html", stat = stat)
+                self.render("relistsell.html", stat = stat)
 
             else:
                 offer = SellModel.all().filter("user", user).filter("amount", amount).filter("price", price)
@@ -417,17 +417,52 @@ class Relist(Handler):
 
                 if not offer:
                     stat = "you haven't listed this offer!"
-                    self.render("relist.html", stat = stat)
+                    self.render("relistsell.html", stat = stat)
 
                 else:
                     offer.fulfilled = False
                     offer.put()
 
-                    stat = "offer successfully relisted"
-                    self.render("relist.html", stat = stat)
+                    stat = "offer successfully relist"
+                    self.render("relistsell.html", stat = stat)
         else:
             stat = "fill every box"
-            self.render("relist.html", stat = stat)
+            self.render("relistsell.html", stat = stat)
+
+class DeleteSell(Handler):
+    def get(self):
+        self.render("deletesell.html")
+
+    def post(self):
+        email = self.request.get('email')
+        amount = self.request.get('amount')
+        price = self.request.get('price')
+
+        if email and amount and price:
+            u = UserModel.all().filter("email", email)
+            user = u.get()
+
+            if not user:
+                stat = "you haven't sold any meal points yet!"
+                self.render("delete.html", stat = stat)
+
+            else:
+                offer = SellModel.all().filter("user", user).filter("amount", amount).filter("price", price)
+                offer = offer.get()
+
+                if not offer:
+                    stat = "you haven't listed this offer!"
+                    self.render("deletesell.html", stat = stat)
+
+                else:
+                    offer.delete()
+
+                    stat = "offer successfully deleted"
+                    self.render("deletesell.html", stat = stat)
+        else:
+            stat = "fill every box"
+            self.render("deletesell.html", stat = stat)
+
 class Wish(Handler):
     def get(self):
         wishes = WishModel.all()
@@ -511,7 +546,8 @@ application = webapp2.WSGIApplication([
 
                     ('/sell', Sell),
                     ('/editoffer', EditSell),
-                    ('/relist', Relist),
+                    ('/relistoffer', RelistSell),
+                    ('/deleteoffer', DeleteSell),
 
                     ('/wish', Wish),
                     ('/newwish', NewWish),

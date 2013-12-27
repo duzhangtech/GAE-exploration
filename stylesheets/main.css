@@ -150,7 +150,7 @@ td {
     border: 1px solid white;
     border-radius:6px;
     border-spacing:5px;
-    margin-right:50px;
+    margin-right:40px;
     margin-top:0px;
 }
 .review_inner{
@@ -299,6 +299,8 @@ a.text_link:visited:hover{
     margin-left:14%;
     margin-top:70px;
 }
+
+
 .wish_outer{
     background: white;
     display: table;
