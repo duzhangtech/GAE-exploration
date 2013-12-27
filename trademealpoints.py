@@ -18,14 +18,11 @@ from google.appengine.api import memcache
 from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
 
 
-
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),
                                autoescape = True)
 
 secret = "asd8B*#lfiewnL#FF:OIWEfkjkdsa;fjk;;lk"
-
-
 
 #basic user can sell, wish, and give feedback
 def user_key(name = "default"):
@@ -93,7 +90,6 @@ class SellModel(db.Model):
     user = db.ReferenceProperty(UserModel)
     amount = db.StringProperty(required = True)
     price = db.StringProperty(required = True)
-    num = db.IntegerProperty(required = True)
     fulfilled = db.BooleanProperty(default = False)
 
     def render(self):
@@ -165,25 +161,17 @@ class FAQ(Handler):
 class Buy(Handler):
     def get(self):
         self.clear_cart()
-        sells = memcache.get("SELLS")
-
-        if sells is None:
-            logging.error("EMPTY BUY MC, DB QUERY")
-
-            query =  SellModel.all().ancestor(sell_key()).filter("fulfilled", False)
-            if query.count() == 0:
-                logging.error("EMPTY DB")
-                count = 0
-            else:
-                logging.error("DB WRITE TO MC %s" % sells)
-                count = 1
-                memcache.set("SELLS", sells)
-
+       
+        query = SellModel.all().ancestor(sell_key()).filter("fulfilled =", False).order('price')
+        query = list(query)
+        if len(query) == 0:
+            logging.error("EMPTY DB")
+            count = 0
         else:
-            logging.error("OFFERS IN MEMCACHE")
-            sells.sort(key = lambda x:x.price)
+            logging.error("DB WRITE TO MC")
             count = 1
-        self.render("buy.html", sells = list(sells), count = count)
+
+        self.render("buy.html", sells = query, count = count)
 
     def post(self):
         first_name = self.request.get('first_name')
@@ -275,8 +263,7 @@ class NewBuy(Handler):
 
             seller.fulfilled = True
             seller.put()
-            memcache.replace("FULFILLED SELL", seller)
-            
+           
             stat = "check your inbox!"
             self.render("newbuy.html", stat = stat, first_name=first_name, amount = amount, price = price, num = num)
         else:
@@ -327,10 +314,7 @@ class Sell(Handler):
             u = UserModel.gql('where email = :email', email = email)
             user = u.get()
 
-            if user:
-                logging.error("DB HAS USER")            
-
-            else:   
+            if not user:
                 logging.error("USER DOESN'T EXIST, DB COMMIT")
                 user = UserModel(parent = user_key(), 
                     first_name = first_name, last_name = last_name, email = email)
@@ -338,35 +322,28 @@ class Sell(Handler):
 
             #assign num
             sells = SellModel.all().ancestor(sell_key())
-            total_num = sells.count
+            total_num = sells.count()
 
             max_num = 0
-            for sell in sells:
-                if sell.num > max_num:
-                    max_num = sell.num
+            for s in sells:
+                if s.num > max_num:
+                    max_num = s.num
 
-            #when nums are 1, 2, 4
-            #in this case, there will always be
-            #unassigned integer between 0 and total_num
-            num = 1
             if max_num > total_num:
                 for x in range(1, total_num+1):
-                    findnum = sells.filter("num = ", x)
+                    findnum = SellModel.all().filter("num = ", x)
                     if not findnum:
                         num = x
                         break
 
-            #max_num will never be smaller than total_num
             elif max_num == total_num:
                 num = max_num + 1
 
-
             sell = SellModel(parent = sell_key(), user = user,
                 amount = amount, price = price, num = num, fulfilled = False)
-            sell.put()                  #commit to db
 
+            sell.put()            
             sells = SellModel.all().ancestor(sell_key())
-            memcache.set("SELLS", list(sells))
 
             stat = "your entry has been recorded! awesomeness"
             self.render("sell.html", stat = stat)
@@ -380,24 +357,12 @@ class Sell(Handler):
 
 class Wish(Handler):
     def get(self):
-        wishes = memcache.get("WISHES")
-
-        if wishes is None:
-            logging.error("DB QUERY")
-
-            wishes = WishModel.all()
-            if wishes.count() == 0:
-                logging.error("EMPTY DB")
-                count = 0
-            else:
-                logging.error("DB WRITE TO MC")
-                count = 1
-                memcache.set("WISHES", list(wishes))
+        wishes = WishModel.all()
+        if wishes.count() == 0:
+            count = 0
         else:
-            logging.error("STUFF IN MEMCACHE")
-            wishes.sort(key = lambda x:x.wish_price)
             count = 1
-        self.render("wish.html", wishes = list(wishes), count = count)
+        self.render("wish.html", wishes = wishes, count = count)
 
 class NewWish(Handler):
     def get(self):
@@ -420,48 +385,22 @@ class NewWish(Handler):
                 user = UserModel(parent = user_key(), first_name = first_name, last_name = last_name, email = email)
                 user.put()
                 
-            wishes = memcache.get("WISHES") 
 
-            if wishes is None:
-                wishes = WishModel.all().filter("wish_amount = ", wish_amount).filter("wish_price =", wish_price)
+            wishes = WishModel.all().filter("wish_amount = ", wish_amount).filter("wish_price =", wish_price)
 
-                if wishes.count() != 0: #db duplicate!
-                    error = "looks like your wish has already been recorded. sweet"
-                    logging.error("DUPLICATE DB WISH")
-                    memcache.set("WISHES", list(wishes))
-                    self.render("newwish.html", error = error,
-                        wish_amount = wish_amount, wish_price = wish_price,
-                        first_name = first_name, last_name = last_name, email = email)
-                    
-                else: 
-                    wish = WishModel(parent = wish_key(), user = user, wish_amount = wish_amount, wish_price = wish_price)
-                    wish.put()
-                    wishes = WishModel.all().ancestor(wish_key())
-                    memcache.set("WISHES", list(wishes))
-                    stat = "success! your mp wish has been recorded :D"
-                    self.render("newwish.html", stat = stat)
-
-            else:
-                duplicate = False
-                for wish in wishes:
-                    if wish.wish_amount == wish_amount and wish.wish_price == wish_price:
-                        duplicate = True
-
-                if duplicate:
-                    error = "looks like your wish has already been recorded. sweet"
-                    logging.error("DUPLICATE MEMCACHE WISH")
-                    self.render("newwish.html", error = error,
-                            wish_amount = wish_amount, wish_price = wish_price,
-                            first_name = first_name, last_name = last_name, email = email)
-                else:
-                    user.put()
-                    wish = WishModel(parent = wish_key(), user = user, wish_amount = wish_amount, wish_price = wish_price)
-                    wish.put()
-                    wishes = WishModel.all().ancestor(wish_key())
-                    memcache.set("WISHES", list(wishes))
-                    stat = "success! your mp wish has been recorded :D"
-                    self.render("newwish.html", stat = stat)
-
+            if wishes.count() != 0: #db duplicate!
+                error = "looks like your wish has already been recorded. sweet"
+                logging.error("DUPLICATE DB WISH")
+                self.render("newwish.html", error = error,
+                    wish_amount = wish_amount, wish_price = wish_price,
+                    first_name = first_name, last_name = last_name, email = email)
+                
+            else: 
+                wish = WishModel(parent = wish_key(), user = user, wish_amount = wish_amount, wish_price = wish_price)
+                wish.put()
+                wishes = WishModel.all().ancestor(wish_key())
+                stat = "success! your mp wish has been recorded :D"
+                self.render("newwish.html", stat = stat)
 
         else:
             error = "fill in every box"

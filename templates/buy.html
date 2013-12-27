@@ -6,7 +6,7 @@
 
 <h4 class = "center">current offers:</h4>
     
-{%if count == 0 %}
+{%if count == 0%}
 <h4>it looks like every offer has been bought. check back later :)</h4>
 
 {%else%}
@@ -17,8 +17,13 @@
     <th>amount</th>  
     <th>price</th>  
     </tr>
+    {% set num = 1%}
     {% for sell in sells %}
-        {{ sell.render() | safe }}
+        <tr>  
+            <td>{{num}}</td>
+            {{ sell.render() | safe}}
+        </tr>
+    {%set num = num + 1%}
     {% endfor %}
 </table>
 </div>
