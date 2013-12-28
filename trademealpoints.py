@@ -517,7 +517,7 @@ class WishContact(Handler):
             amount = self.request.get("amount")
             price = self.request.get("price")
 
-            wisher = WishModel.all().filter("wish_amount", wish_amount).filter("wish_price", wish_price).get()
+            wisher = WishModel.all().filter("wish_amount", amount).filter("wish_price", price).get()
             receiver = wisher.user.email
 
             body = (
@@ -544,9 +544,9 @@ class WishContact(Handler):
             receiver = email
             subject = "MEAL POINTS"
             body = (
-                "Hey hey, savvy meal point seller. You can reach %s %s at %s regarding %s's wish of %s meal points at $%s per point. \n \n" % (seller.user.first_name, seller.user.last_name, seller.user.email, seller.user.first_name, amount, price)
+                "Hey hey, savvy meal point seller. You can reach %s %s at %s regarding %s's wish of %s meal points at $%s per point. \n \n" % (wisher.user.first_name, wisher.user.last_name, wisher.user.email, wisher.user.first_name, amount, price)
 
-                + "To complete this transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (seller.user.first_name)
+                + "To complete this transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (wisher.user.first_name)
 
                 + "Remember that WashU is going to take a 15 point transaction fee, 7.5 points per person. \n\n" 
 
