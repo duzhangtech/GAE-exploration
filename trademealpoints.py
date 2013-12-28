@@ -161,29 +161,42 @@ class FAQ(Handler):
 class Buy(Handler):
     def get(self):
         self.clear_cart()
-       
-        query = SellModel.all().ancestor(sell_key()).filter("fulfilled =", False).order('price')
-        query = list(query)
-        if len(query) == 0:
-            logging.error("EMPTY DB")
-            count = 0
+        sells = memcache.get("SELLS")
+
+        if sells is None:
+            logging.error("EMPTY MC")
+            sells = SellModel.all().ancestor(sell_key()).filter("fulfilled =", False).order('price')
+            sells = list(sells)
+
+            if len(sells) == 0:
+                logging.error("EMPTY DB")
+                count = 0
+            else:
+                logging.error("DB WRITE TO MC")
+                memcache.set("SELLS", sells)
+                count = 1
+
         else:
-            logging.error("DB WRITE TO MC")
+            logging.error("SELLS IN MC")
             count = 1
 
-        self.render("buy.html", sells = query, count = count)
+        self.render("buy.html", sells = sells, count = count)
 
     def post(self):
         first_name = self.request.get('first_name')
         num = int(self.request.get('num')) #TODO: VALIDATE NUM
 
         if first_name and num:
-            selected = SellModel.gql("where num = :num", num=num).get()
-            amount = selected.amount
-            price = selected.price
+            sells = memcache.get("SELLS")
 
-            self.new_cart(first_name) #add cookie
-            self.redirect('/contact?first_name=' + first_name + "&amount=" + amount + "&price=" + price + "&num=" + str(num))
+            for index, item in enumerate(sells):
+                if (index+1) == num:
+                    amount = item.amount
+                    price = item.price
+                    break
+            
+            self.new_cart(first_name)
+            self.redirect('/contact?first_name=' + first_name + "&amount=" + amount + "&price=" + price)
         else: 
             cart_error = "fill in all the boxes"
             self.render("buy.html", cart_error = cart_error, sells = list(sells))
@@ -193,20 +206,15 @@ class BuyContact(Handler):
         first_name = self.request.get("first_name")
         amount = self.request.get("amount")
         price = self.request.get("price")
-        num = self.request.get("num")
-
-        if not first_name:
-            logging.error("NO FIRST NAME")
 
         self.new_cart(first_name)
-        self.render("newbuy.html", first_name=first_name, amount = amount, price = price, num = num) 
+        self.render("newbuy.html", first_name=first_name, amount = amount, price = price) 
         return
 
     def post(self):
         first_name = self.request.get("first_name")
         amount = self.request.get("amount")
         price = self.request.get("price")
-        num = self.request.get("num")
 
         last_name = self.request.get('last_name')
         email = self.request.get('email')
@@ -218,9 +226,8 @@ class BuyContact(Handler):
             name = self.request.get("first_name")
             amount = self.request.get("amount")
             price = self.request.get("price")
-            num = self.request.get("num")
 
-            seller = SellModel.gql("where num = :num", num = int(num)).get()
+            seller = SellModel.all().filter("amount", amount).filter("price", price).get()
             receiver = seller.user.email
 
             body = (
@@ -263,12 +270,16 @@ class BuyContact(Handler):
 
             seller.fulfilled = True
             seller.put()
-           
+            
+            sells = SellModel.all().ancestor(sell_key()).filter("fulfilled =", False).order('price')
+            sells = list(sells)
+            memcache.set("SELLS", sells)
+
             stat = "check your inbox!"
-            self.render("newbuy.html", stat = stat, first_name=first_name, amount = amount, price = price, num = num)
+            self.render("newbuy.html", stat = stat, first_name=first_name, amount = amount, price = price)
         else:
             error = "fill in every box"
-            self.render("newbuy.html", error = error, first_name=first_name, amount = amount, price = price, num = num)
+            self.render("newbuy.html", error = error, first_name=first_name, amount = amount, price = price)
 
 class Sell(Handler):
     def get(self):
@@ -310,30 +321,14 @@ class Sell(Handler):
                     first_name = first_name, last_name = last_name, email = email)
                 user.put()            
 
-            #assign num
-            sells = SellModel.all().ancestor(sell_key())
-            total_num = sells.count()
-
-            max_num = 0
-            for s in sells:
-                if s.num > max_num:
-                    max_num = s.num
-
-            if max_num > total_num:
-                for x in range(1, total_num+1):
-                    findnum = SellModel.all().filter("num = ", x)
-                    if not findnum:
-                        num = x
-                        break
-
-            elif max_num == total_num:
-                num = max_num + 1
 
             sell = SellModel(parent = sell_key(), user = user,
                 amount = amount, price = price, num = num, fulfilled = False)
 
-            sell.put()            
+            sell.put()
+
             sells = SellModel.all().ancestor(sell_key())
+            memcache.set("SELLS", list(sells))
 
             stat = "your entry has been recorded! awesomeness"
             self.render("sell.html", stat = stat)
@@ -456,12 +451,26 @@ class DeleteSell(Handler):
 class Wish(Handler):
     def get(self):
         self.clear_cart()
+        wishes = memcache.get("WISHES")
 
-        wishes = WishModel.all().ancestor(wish_key()).filter("fulfilled =", False).order('wish_price')
-        if wishes.count() == 0:
-            count = 0
+        if wishes is None:
+            logging.error("EMPTY MC")
+
+            wishes = WishModel.all().ancestor(wish_key()).filter("fulfilled =", False).order('wish_price')
+            wishes = list(wishes)
+
+            if len(wishes) == 0:
+                logging.error("EMPTY DB")
+                count = 0
+            else:
+                logging.error("DB WRITE TO MC")
+                memcache.set("WISHES", wishes)
+                count = 1
+
         else:
+            logging.error("WISHES IN MC")
             count = 1
+
         self.render("wish.html", wishes = wishes, count = count)
 
     def post(self):
@@ -469,35 +478,33 @@ class Wish(Handler):
         num = int(self.request.get('num')) #TODO: VALIDATE NUM
 
         if first_name and num:
-            selected = WishModel.gql("where num = :num", num=num).get()
-            amount = selected.wish_amount
-            price = selected.wish_price
+            wishes = memcache.get("WISHES")
+            for index, item in enumerate(wishes):
+                if (index+1) == num:
+                    amount = item.wish_amount
+                    price = item.wish_price
+                    break
 
             self.new_cart(first_name) #add cookie
-            self.redirect('/contact?first_name=' + first_name + "&amount=" + amount + "&price=" + price + "&num=" + str(num))
+            self.redirect('/grantwish?first_name=' + first_name + "&amount=" + amount + "&price=" + price)
         else: 
-            cart_error = "fill in all the boxes"
-            self.render("buy.html", cart_error = cart_error, sells = list(sells))
+            error = "fill in all the boxes"
+            self.render("wish.html", error = error, wishes = list(wishes))
 
 class WishContact(Handler):
     def get(self):
         first_name = self.request.get("first_name")
-        amount = self.request.get("amount")
-        price = self.request.get("price")
-        num = self.request.get("num")
-
-        if not first_name:
-            logging.error("NO FIRST NAME")
+        wish_amount = self.request.get("amount")
+        wish_price = self.request.get("price")
 
         self.new_cart(first_name)
-        self.render("newbuy.html", first_name=first_name, amount = amount, price = price, num = num) 
+        self.render("wishcontact.html", first_name=first_name, wish_amount = wish_amount, wish_price = wish_price)
         return
 
     def post(self):
         first_name = self.request.get("first_name")
         amount = self.request.get("amount")
         price = self.request.get("price")
-        num = self.request.get("num")
 
         last_name = self.request.get('last_name')
         email = self.request.get('email')
@@ -509,13 +516,12 @@ class WishContact(Handler):
             name = self.request.get("first_name")
             amount = self.request.get("amount")
             price = self.request.get("price")
-            num = self.request.get("num")
 
-            seller = SellModel.gql("where num = :num", num = int(num)).get()
-            receiver = seller.user.email
+            wisher = WishModel.all().filter("wish_amount", wish_amount).filter("wish_price", wish_price).get()
+            receiver = wisher.user.email
 
             body = (
-                "Hey hey, savvy meal point seller. It looks like %s %s is interested in buying your offer of %s meal points at $%s per point! \n\n" % (first_name, last_name, amount, price) 
+                "Hey hey, it looks like %s %s wants to offer to buy %s meal points from you at $%s per point! \n\n" % (first_name, last_name, amount, price) 
 
                 + "You can reach %s %s at %s. \n \n" % (first_name, last_name, email) 
 
@@ -530,7 +536,7 @@ class WishContact(Handler):
                 + "Mechanically yours, \n"
                 + "Bot\n\n"
 
-                + "P.S. Your offer no longer appears on the 'buy' page. If you do not complete this transaction and wish to relist your offer, simply re-enter your info on the 'sell' page.")
+                + "P.S. Your wish no longer appears on the 'buy' page. If you do not complete this transaction and wish to relist your wish, simply relist your wish on the 'sell' page.")
 
             mail.send_mail(sender, receiver, subject, body)
 
@@ -538,7 +544,7 @@ class WishContact(Handler):
             receiver = email
             subject = "MEAL POINTS"
             body = (
-                "Hey hey, savvy meal point buyer. You can reach %s %s at %s regarding %s's offer of %s meal points at $%s per point. \n \n" % (seller.user.first_name, seller.user.last_name, seller.user.email, seller.user.first_name, amount, price)
+                "Hey hey, savvy meal point seller. You can reach %s %s at %s regarding %s's wish of %s meal points at $%s per point. \n \n" % (seller.user.first_name, seller.user.last_name, seller.user.email, seller.user.first_name, amount, price)
 
                 + "To complete this transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (seller.user.first_name)
 
@@ -552,14 +558,17 @@ class WishContact(Handler):
 
             mail.send_mail(sender, receiver, subject, body)
 
-            seller.fulfilled = True
-            seller.put()
-           
+            wisher.fulfilled = True
+            wisher.put()
+            
+            wishes = WishModel.all().ancestor(wish_key()).filter("fulfilled =", False).order('wish_price')
+            memcache.set("WISHES", list(wishes))
+
             stat = "check your inbox!"
-            self.render("newbuy.html", stat = stat, first_name=first_name, amount = amount, price = price, num = num)
+            self.render("newbuy.html", stat = stat, first_name=first_name, amount = amount, price = price)
         else:
             error = "fill in every box"
-            self.render("newbuy.html", error = error, first_name=first_name, amount = amount, price = price, num = num)
+            self.render("newbuy.html", error = error, first_name=first_name, amount = amount, price = price)
 
 class NewWish(Handler):
     def get(self):
@@ -595,15 +604,16 @@ class NewWish(Handler):
             else: 
                 wish = WishModel(parent = wish_key(), user = user, wish_amount = wish_amount, wish_price = wish_price)
                 wish.put()
-                wishes = WishModel.all().ancestor(wish_key())
+                wishes = WishModel.all().ancestor(wish_key()).filter("fulfilled", False)
+                memcache.set("WISHES", list(wishes))
+
                 stat = "success! your mp wish has been recorded :D"
                 self.render("newwish.html", stat = stat)
 
         else:
             error = "fill in every box"
             self.render("newwish.html", error = error,
-             wish_amount = wish_amount, wish_price = wish_price,first_name = first_name, last_name = last_name, 
-                    email = email)
+             wish_amount = wish_amount, wish_price = wish_price,first_name = first_name, last_name = last_name, email = email)
 
 class LogSenderHandler(InboundMailHandler):
     def receive(self, mail_message):
@@ -651,7 +661,7 @@ application = webapp2.WSGIApplication([
                     ('/wish', Wish),
                     ('/grantwish', WishContact),
                     ('/newwish', NewWish),
-                    
+
                     ('/faq', FAQ), 
                     LogSenderHandler.mapping()],
                     debug=True)

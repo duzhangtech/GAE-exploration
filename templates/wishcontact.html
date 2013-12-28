@@ -2,8 +2,8 @@
 
 {% block content %}
 
-<h5>Hi {{first_name}}! You selected to buy</h5>
-<h5>{{amount}} meal points for ${{price}} per meal point</h5>
+<h5>Hi {{first_name}}! You are offering to sell</h5>
+<h5>{{wish_amount}} meal points for ${{wish_price}} per meal point</h5>
 <form method="post">
 
     <label class = "buy_label">last name</label>
@@ -12,10 +12,9 @@
     <label class = "buy_label">email</label>
     <input type="text" class = "buy_input" name="email" value="{{email}}">    
         
-    <div><input type="submit" class = "contact_button" value="contact seller"></div>
+    <div><input type="submit" class = "contact_button" value="contact wisher"></div>
 
     <div class = "stat">{{stat}}</div>
-    <div class="stat">{{error}}</div> 
 </form>
 
 {% endblock %}
