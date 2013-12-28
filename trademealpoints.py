@@ -101,11 +101,11 @@ class FeedbackModel(db.Model):
     def render(self):
         return render_str("feedback.html", f = self)
 
-#TODO: ADD FREQUENCY PARAM
 class WishModel(db.Model):
     user = db.ReferenceProperty(UserModel)
     wish_amount = db.StringProperty(required = True)
     wish_price = db.StringProperty(required = True)
+    fulfilled = db.BooleanProperty(default = False)
 
     def render(self):
         return render_str("wishmodel.html", w = self)
@@ -188,7 +188,7 @@ class Buy(Handler):
             cart_error = "fill in all the boxes"
             self.render("buy.html", cart_error = cart_error, sells = list(sells))
         
-class NewBuy(Handler):
+class BuyContact(Handler):
     def get(self):
         first_name = self.request.get("first_name")
         amount = self.request.get("amount")
@@ -269,16 +269,6 @@ class NewBuy(Handler):
         else:
             error = "fill in every box"
             self.render("newbuy.html", error = error, first_name=first_name, amount = amount, price = price, num = num)
-
-class LogSenderHandler(InboundMailHandler):
-    def receive(self, mail_message):
-        logging.info("from: " + mail_message.sender)
-        plaintext = mail_message.bodies(content_type='text/plain')
-        for text in plaintext:
-            m = ""
-            m = text[1].decode()
-            logging.info("message: %s" % m)
-            self.response.out.write(m)
 
 class Sell(Handler):
     def get(self):
@@ -465,12 +455,111 @@ class DeleteSell(Handler):
 
 class Wish(Handler):
     def get(self):
-        wishes = WishModel.all()
+        self.clear_cart()
+
+        wishes = WishModel.all().ancestor(wish_key()).filter("fulfilled =", False).order('wish_price')
         if wishes.count() == 0:
             count = 0
         else:
             count = 1
         self.render("wish.html", wishes = wishes, count = count)
+
+    def post(self):
+        first_name = self.request.get('first_name')
+        num = int(self.request.get('num')) #TODO: VALIDATE NUM
+
+        if first_name and num:
+            selected = WishModel.gql("where num = :num", num=num).get()
+            amount = selected.wish_amount
+            price = selected.wish_price
+
+            self.new_cart(first_name) #add cookie
+            self.redirect('/contact?first_name=' + first_name + "&amount=" + amount + "&price=" + price + "&num=" + str(num))
+        else: 
+            cart_error = "fill in all the boxes"
+            self.render("buy.html", cart_error = cart_error, sells = list(sells))
+
+class WishContact(Handler):
+    def get(self):
+        first_name = self.request.get("first_name")
+        amount = self.request.get("amount")
+        price = self.request.get("price")
+        num = self.request.get("num")
+
+        if not first_name:
+            logging.error("NO FIRST NAME")
+
+        self.new_cart(first_name)
+        self.render("newbuy.html", first_name=first_name, amount = amount, price = price, num = num) 
+        return
+
+    def post(self):
+        first_name = self.request.get("first_name")
+        amount = self.request.get("amount")
+        price = self.request.get("price")
+        num = self.request.get("num")
+
+        last_name = self.request.get('last_name')
+        email = self.request.get('email')
+
+        if last_name and email:
+            subject = "A BUYER!"
+            sender = "bot@trademealpoints.appspotmail.com"
+            
+            name = self.request.get("first_name")
+            amount = self.request.get("amount")
+            price = self.request.get("price")
+            num = self.request.get("num")
+
+            seller = SellModel.gql("where num = :num", num = int(num)).get()
+            receiver = seller.user.email
+
+            body = (
+                "Hey hey, savvy meal point seller. It looks like %s %s is interested in buying your offer of %s meal points at $%s per point! \n\n" % (first_name, last_name, amount, price) 
+
+                + "You can reach %s %s at %s. \n \n" % (first_name, last_name, email) 
+
+                + "To complete this transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (first_name)
+
+                + "Remember that WashU is going to take a 15 point transaction fee, 7.5 points per person. \n\n" 
+
+                + "If you have any questions/comments/just want to say hi, please leave them in the feedback box on the FAQ page! \n\n"
+
+                + "All right, I'm done now. You've been a real spiffy human to serve. Have an A1 Day! \n\n"
+
+                + "Mechanically yours, \n"
+                + "Bot\n\n"
+
+                + "P.S. Your offer no longer appears on the 'buy' page. If you do not complete this transaction and wish to relist your offer, simply re-enter your info on the 'sell' page.")
+
+            mail.send_mail(sender, receiver, subject, body)
+
+
+            receiver = email
+            subject = "MEAL POINTS"
+            body = (
+                "Hey hey, savvy meal point buyer. You can reach %s %s at %s regarding %s's offer of %s meal points at $%s per point. \n \n" % (seller.user.first_name, seller.user.last_name, seller.user.email, seller.user.first_name, amount, price)
+
+                + "To complete this transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (seller.user.first_name)
+
+                + "Remember that WashU is going to take a 15 point transaction fee, 7.5 points per person. \n\n" 
+
+                + "If you have any questions/comments/just want to say hi, please leave them in the feedback box on the FAQ page! \n\n"
+
+                + "All right, I'm done now. You've been a real spiffy human to serve. Have an A1 Day!\n\n"
+                + "Mechanically yours, \n"
+                + "Bot")
+
+            mail.send_mail(sender, receiver, subject, body)
+
+            seller.fulfilled = True
+            seller.put()
+           
+            stat = "check your inbox!"
+            self.render("newbuy.html", stat = stat, first_name=first_name, amount = amount, price = price, num = num)
+        else:
+            error = "fill in every box"
+            self.render("newbuy.html", error = error, first_name=first_name, amount = amount, price = price, num = num)
 
 class NewWish(Handler):
     def get(self):
@@ -516,6 +605,16 @@ class NewWish(Handler):
              wish_amount = wish_amount, wish_price = wish_price,first_name = first_name, last_name = last_name, 
                     email = email)
 
+class LogSenderHandler(InboundMailHandler):
+    def receive(self, mail_message):
+        logging.info("from: " + mail_message.sender)
+        plaintext = mail_message.bodies(content_type='text/plain')
+        for text in plaintext:
+            m = ""
+            m = text[1].decode()
+            logging.info("message: %s" % m)
+            self.response.out.write(m)
+
 #150 mp min, 10000 mp max
 AMOUNT_RE = re.compile(r'^[1-9][0-9]{0,4}$|^10000$')
 
@@ -542,7 +641,7 @@ application = webapp2.WSGIApplication([
                     ('/', MainPage),
 
                     ('/buy', Buy),
-                    ('/contact', NewBuy),
+                    ('/contact', BuyContact),
 
                     ('/sell', Sell),
                     ('/editoffer', EditSell),
@@ -550,7 +649,9 @@ application = webapp2.WSGIApplication([
                     ('/deleteoffer', DeleteSell),
 
                     ('/wish', Wish),
+                    ('/grantwish', WishContact),
                     ('/newwish', NewWish),
+                    
                     ('/faq', FAQ), 
                     LogSenderHandler.mapping()],
                     debug=True)

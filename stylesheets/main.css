@@ -301,19 +301,11 @@ a.text_link:visited:hover{
 }
 
 
-.wish_outer{
-    background: white;
-    display: table;
-    max-width: 400px;
-    border: 1px solid white;
-    border-radius:6px;
-    border-spacing:5px;
-    margin-left:30%;
+.new_mpwish {
+    margin-top:2%;
+    margin-left:17%;
 }
-.wish_inner{
-    text-align:center;
-    background-color:white;
-}
+
 .wish_button {
     margin-top:10px;
     margin-right:18%;
@@ -333,6 +325,23 @@ a.text_link:visited:hover{
     color: #32ac97;
     transition-duration: 400ms;
 }
+.review_wish_outer{
+    position:relative;
+    float:right;
+    background: white;
+    max-width: 170px;
+    border: 1px solid white;
+    border-radius:6px;
+    border-spacing:5px;
+    margin-right:40px;
+    margin-top:0px;
+}
+.review_wish_inner{
+    text-align:center;
+    background-color:white;
+}
+
+
 
 
 

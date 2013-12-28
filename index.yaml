@@ -36,3 +36,9 @@ indexes:
   ancestor: yes
   properties:
   - name: price
+
+- kind: WishModel
+  ancestor: yes
+  properties:
+  - name: fulfilled
+  - name: wish_price
