@@ -25,7 +25,7 @@
 {% endfor %}
 </table>
 </div>
-{%endif%}
+
 
 <div class = "review_outer">
 <div class = "review_inner">
@@ -39,15 +39,17 @@
 <br><br>
     
 <div class = "buy_links">
-<div><a class = "text_link"href = "/editoffer">edit my wish</a></div>
-<div><a class = "text_link"href = "/relistoffer">relist my wish</a>
+<div><a class = "text_link"href = "/editwish">edit my wish</a></div>
+<div><a class = "text_link"href = "/relistwish">relist my wish</a>
 </div>
-<div><a class = "text_link" href = "/deleteoffer">delete my wish</a></div>
+<div><a class = "text_link" href = "/deletewish">delete my wish</a></div>
 </div>
     
 </div>
 </div>
 
 <div class = "new_mpwish"><a href = "/newwish">new mp wish</a></div>
+    
+{%endif%}
 </form>
 {% endblock %}
