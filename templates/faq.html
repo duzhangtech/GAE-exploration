@@ -2,26 +2,28 @@
 
 {% block content %}
 
+<div class = "faq_box">
 <div class = "spacing">
-<h2>which meal plans can transfer meal points?</h2>    
-<div>gold, silver, bronze, apartment.</div><br>
+<h2>Which meal plans can transfer meal points?</h2>    
+<div>Gold, Silver, Bronze, and Apartment.</div><br>
 
-<h2>how do i buy meal points?</h2>
-<div>choose offer and leave your email address; both you and the seller will receive an email; arrange with the seller to sign the transfer form at dining services.</div><br>
+<h2>How do I buy meal points?</h2>
+<div>Choose an offer and leave your email address; both you and the seller will receive an email; arrange with the seller to sign the transfer form at dining services.</div><br>
 
-<h2>where can i find more deets on the meal point transfer process?</h2>
-<div><a class = "text_link" href = "http://diningservices.wustl.edu/MEALPLANS/Pages/default.aspx">here!</a></div><br>
+<h2>Where can I find more details on the meal point transfer process?</h2>
+<div><a class = "text_link" href = "http://diningservices.wustl.edu/MEALPLANS/Pages/default.aspx">Here!</a></div><br>
 
-<h2>is it free to buy or sell meal points?</h2>
+<h2>Is it free to buy or sell meal points?</h2>
 <div>WashU takes a 15 point transaction fee, 7.5 points per person.</div><br>
 
-<h2>do I have to pay to use WUMPE?</h2>
-<div>nope. this web app is totally free to use.</div><br>
+<h2>Do I have to pay to use trademealpoints?</h2>
+<div>Nope. This web app is totally free to use.</div><br>
 
 
-<h2>should I leave some feedback in the box below?</h2>
-<div>no kidding. </div><br>
+<h2>Should I leave some feedback in the box below?</h2>
+<div>No kidding. </div><br>
 </div>
+
 <form method="post">
     <h3>questions/comments/feedback</h3>
 
@@ -39,8 +41,8 @@
     <label class = "faq_label">email</label>
     <input type="text" name="email" placeholder = "optional" class = "faq_input" value="{{email}}">
     <div><input type="submit" class = "faq_button" value="okay"></div>
-
-    <div class = "stat">{{stat}}</div>
-    <div class="error">{{error}}</div> 
+    <br>
+    <div class = "faq_stat">{{stat}}</div>
+</div>
 </form>
 {% endblock %}

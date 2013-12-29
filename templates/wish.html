@@ -4,16 +4,15 @@
 <form method = "post">
 
 {%if count == 0 %}
-<h1>no wishes for now...make <a href = "/newwish">new mp wish</a></h1>
+<h1>no wishes for now...make a <a href = "/newwish">meal point wish</a></h1>
 
 {%else%}
-
 <div class = "buy_outer">
 <table class = "buy_inner">
 <tr>
-<th>wish#</th>
-<th>amount</th>
-<th>price</th>
+<th class = "table_head">wish#</th>
+<th class = "table_head">amount</th>
+<th class = "table_head">price</th>
 </tr>
 {% set number = 1%}
 {% for wish in wishes %}
@@ -25,8 +24,7 @@
 {% endfor %}
 </table>
 </div>
-
-
+    
 <div class = "review_outer">
 <div class = "review_inner">
 <div class = "buy_mp">sell to wisher</div>
@@ -36,8 +34,7 @@
 
 <div><input type="submit" class = "review_button" value="review offer"></div>
 <div class="error">{{error}}</div>
-<br><br>
-    
+
 <div class = "buy_links">
 <div><a class = "text_link"href = "/editwish">edit my wish</a></div>
 <div><a class = "text_link"href = "/relistwish">relist my wish</a>
@@ -48,7 +45,7 @@
 </div>
 </div>
 
-<div class = "new_mpwish"><a href = "/newwish">new mp wish</a></div>
+<div  class = "new_mpwish"><a href = "/newwish">new mp wish</a></div>
     
 {%endif%}
 </form>

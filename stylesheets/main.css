@@ -21,17 +21,27 @@ body {
     margin-left:3px;
     line-height:150%;
 }
-age {
-    position:absolute;
-    bottom:0;
-    right:0;
-    color:gray;
-    font-size:12px;
+/*
+    font-family:'Quattrocento Sans', sans-serif;
+    font-size:20px;
+*/
+/*
+.about_box {
+    font-family:'Quattrocento Sans', sans-serif;
+    font-size:20px;
 }
-
+.buy_box {
+    font-family:'Quattrocento Sans', sans-serif;
+    font-size:20px;
+}
+.faq_box {
+    font-family:'Quattrocento Sans', sans-serif;
+    font-size:20px;
+}
+*/
 
 h1 {
-    font-size: 20px;
+    font-size: inherit;
     font-weight:100;
     text-align:center;
     color: #848484;
@@ -44,10 +54,11 @@ h2 {
 }
 h3 {
     text-align:center;
+    font-size:inherit;
     color: #32ac97;
 }
 h4 {
-    font-size:20px;
+    font-size:inherit;
     font-weight:100;
     text-align:left;
     color: #848484;
@@ -56,16 +67,11 @@ h4 {
     text-align:center;
 }
 h5 {
-    font-size:20px;
+    font-size:inherit;
     font-weight:100;
     text-align:center;
     color: #848484;
     line-height:30%;
-}
-
-
-.spacing {
-    line-height:140%;
 }
 
 #main_title {
@@ -85,13 +91,9 @@ h5 {
     padding-right: 17px;
     font-size: 27px;
 }
-.about_q {
-    text-align:right;
-    margin-right:15px;
-}
 
 input[type=text] {
-    font-size: 20px;
+    font-size: inherit;
     font-family:inherit;
     color:inherit;
     padding-left:8px;
@@ -112,7 +114,7 @@ label{
     text-align: right;
     color: #bebebe;
     background-color:transparent;
-    font-size:20px;
+    font-size:inherit;
 }
 input {
     width:30%;
@@ -121,23 +123,26 @@ input {
 
 .buy_outer{
     background: white;
-    display: table;
     max-width: 400px;
     border: 1px solid #e0e0e0;
+    margin-left:15px;
     border-radius:6px;
-    border-spacing:5px;
-    margin-left:10px;
 }
 .buy_inner{
     text-align:center;
     background-color:white;
+/*
+    font-family:'Quattrocento Sans', sans-serif;
+    font-size:20px;
+*/
 }
 th{
     min-width:77px;
 }
-td {
-    padding: 1;
+tr {
+    margin-top:7px;
 }
+
 
 .buy_outer, .review_order {
     display: inline-block;
@@ -148,10 +153,9 @@ td {
     background: white;
     max-width: 200px;
     border: 1px solid white;
-    border-radius:6px;
-    border-spacing:5px;
+    border-radius: 8px;
     margin-right:40px;
-    margin-top:0px;
+    margin-top:4px;
 }
 .review_inner{
     text-align:center;
@@ -162,22 +166,23 @@ td {
 }
 .buy_mp {
     color:#32ac97;
-    font-size:20px;
-    margin-bottom:5px;
+    font-size:inherit;
+    margin-bottom:7px;
 }
 .buy_links {
-    line-height:175%;
+    line-height:170%;
 }
 .review_button {
     font-family:inherit;
-    font-size:17px;
+    font-size:18px;
     text-align:center;
     float:right;
     margin-top:7px;
-    margin-bottom:10px;
     margin-right:7px;
+    margin-bottom:9px;
     
     width:118px;
+    height:30px;
     background-color:white;
     color:#bebebe;
     border: 1px solid #bebebe;
@@ -209,7 +214,7 @@ a.text_link:visited:hover{
 }
 .contact_button {
     font-family:inherit;
-    font-size:17px;
+    font-size:inherit;
     text-align:center;
     float:right;
     margin-top:8px;
@@ -237,10 +242,11 @@ a.text_link:visited:hover{
     min-width:370px;
     max-width:370px;
     margin-left:40px;
+    margin-bottom:20px;
 }
 .sell_button {
     font-family:inherit;
-    font-size:20px;
+    font-size:inherit;
     text-align:center;
     float:right;
     margin-top:10px;
@@ -303,9 +309,8 @@ a.text_link:visited:hover{
 
 .new_mpwish {
     margin-top:2%;
-    margin-left:17%;
+    margin-left:19%;
 }
-
 .wish_button {
     margin-top:10px;
     margin-right:18%;
@@ -351,7 +356,9 @@ a.text_link:visited:hover{
 }
 ::-webkit-input-placeholder {
     color:lightgrey;
-    text-align:left;
+    text-align:center;
+    padding-top:0;
+    font-size:inherit;
 }
 
 
@@ -377,12 +384,17 @@ a.text_link:visited:hover{
     color: #32ac97;
     transition-duration: 400ms;
 }
-.list {
+.faq_stat {
     position:relative;
-    text-align: left;
+    color:#32ac97;
+    padding-top:30px;
+    margin-bottom:15px;
+    margin-left:25%;
 }
 
-
+.table_head {
+    color:#484848;
+}
 .error {
     color: #a0ff00;
 }

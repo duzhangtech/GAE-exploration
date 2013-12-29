@@ -96,8 +96,10 @@ class SellModel(db.Model):
         return render_str("sellmodel.html", s = self)
 
 class FeedbackModel(db.Model):
-    user = db.ReferenceProperty(UserModel)
-    feedback = db.StringProperty(required = True)
+    first_name = db.StringProperty()
+    last_name = db.StringProperty()
+    email = db.StringProperty()
+    feedback = db.StringProperty()
     def render(self):
         return render_str("feedback.html", f = self)
 
@@ -125,38 +127,28 @@ class FAQ(Handler):
 
         feedback = self.request.get('feedback')
 
-        if first_name and last_name and email and feedback:
-            user = UserModel(parent = user_key(),
-                    first_name = first_name, last_name = last_name, 
-                    email = email)
+        if feedback:
+            f = FeedbackModel(parent = feedback_key(), feedback = feedback)
 
-            database = UserModel.all().filter("email =", email)
+            if first_name:
+                f.first_name = first_name
 
-            count = 0
-            for data in database:
-                if data.email == email:
-                    count = 1
-            #user doesn't exist
-            if count == 0:
-                user.put()
-            #user exists
-            else:
-                #make key
-                u = UserModel.gql('where email = :email', email = email)
-                user = u.get()
+            if last_name:
+                f.last_name = last_name
 
-            feedback = FeedbackModel(parent = feedback_key(),
-                user = user, feedback = feedback)
-            feedback.put()
+            if email:
+                f.first_name = first_name
 
-            stat = "gracias mucho :)"
+            f.put()
+            stat = "thanks!"
             self.render("faq.html", stat = stat)
+
         else:
-            error = "oops! try typing that again"
+            stat = "don't forget your thoughts!"
             self.render("faq.html", 
                 feedback = feedback,  
                 first_name = first_name, last_name = last_name, 
-                email = email, error = error)
+                email = email, stat = stat)
 
 class Buy(Handler):
     def get(self):
