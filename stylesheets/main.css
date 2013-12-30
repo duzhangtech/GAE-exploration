@@ -391,6 +391,9 @@ a.text_link:visited:hover{
     margin-bottom:15px;
     margin-left:25%;
 }
+.thoughts {
+    margin-right:8%;
+}
 
 .table_head {
     color:#484848;

@@ -210,6 +210,7 @@ class BuyContact(Handler):
 
         last_name = self.request.get('last_name')
         email = self.request.get('email')
+        have_error = False
 
         if last_name and email:
             subject = "A BUYER!"
@@ -291,15 +292,15 @@ class Sell(Handler):
                         email = email)
 
         if not valid_amount(amount):
-            params['error_amount'] = "that amount was not valid"
+            params['error_amount'] = "150 meal point minimum"
             have_error = True
 
-        if not valid_amount(amount):
-            params['error_price'] = "that price was not valid"
+        if not valid_price(price):
+            params['error_price'] = "0.01 to 2.00 per meal point"
             have_error = True
 
         if not valid_email(email):
-            params['error_email'] = "that email was't valid"
+            params['error_email'] = "use your wustl email"
             have_error = True
 
         if amount and price and first_name and last_name and email and (have_error == False):
@@ -315,7 +316,7 @@ class Sell(Handler):
 
 
             sell = SellModel(parent = sell_key(), user = user,
-                amount = amount, price = price, num = num, fulfilled = False)
+                amount = amount, price = price, fulfilled = False)
 
             sell.put()
 
@@ -324,6 +325,31 @@ class Sell(Handler):
 
             stat = "your entry has been recorded! awesomeness"
             self.render("sell.html", stat = stat)
+
+        elif amount and price and first_name and last_name and email and have_error == True:
+
+            if not valid_amount(amount):
+                error = "150 mp min, 4000 mp max"
+                self.render("sell.html", 
+                        amount = amount, price = price, 
+                        first_name = first_name, last_name = last_name,
+                        email = email, error=error)
+
+            elif not valid_price(price):
+                error = "0.01 to 2.00 per meal point"
+                self.render("sell.html", 
+                        amount = amount, price = price, 
+                        first_name = first_name, last_name = last_name,
+                        email = email, error=error)
+
+
+            elif not valid_email(email):
+                error = "use your wustl email"
+                self.render("sell.html", 
+                        amount = amount, price = price, 
+                        first_name = first_name, last_name = last_name,
+                        email = email, error=error)
+
 
         else:
             error = "make sure you fill out every box"
@@ -445,6 +471,7 @@ class NewWish(Handler):
         self.render("newwish.html")
 
     def post(self):
+        have_error = False
         first_name = self.request.get('first_name')
         last_name = self.request.get('last_name')
         email = self.request.get('email')
@@ -452,7 +479,16 @@ class NewWish(Handler):
         wish_amount = self.request.get("wish_amount")
         wish_price = self.request.get("wish_price")
 
-        if wish_amount and wish_price and first_name and last_name and email:
+        if not valid_amount(wish_amount):
+            have_error = True
+
+        if not valid_price(wish_price):
+            have_error = True
+
+        if not valid_email(email):
+            have_error = True
+
+        if wish_amount and wish_price and first_name and last_name and email and have_error == False:
 
             u = UserModel.gql('where email = :email', email = email)          
             user = u.get()
@@ -479,6 +515,24 @@ class NewWish(Handler):
 
                 stat = "mp wish successfully recorded"
                 self.render("newwish.html", stat = stat)
+
+        elif wish_amount and wish_price and first_name and last_name and email and have_error == True:
+
+            if not valid_amount(wish_amount):
+                error = "150 mp min, 4000 mp max"
+                self.render("newwish.html", error = error,
+             wish_amount = wish_amount, wish_price = wish_price,first_name = first_name, last_name = last_name, email = email)
+
+            elif not valid_price(wish_price):
+                error = "0.01 to 2.00 per meal point"
+                self.render("newwish.html", error = error,
+             wish_amount = wish_amount, wish_price = wish_price,first_name = first_name, last_name = last_name, email = email)
+
+
+            elif not valid_email(email):
+                error = "use your wustl email"
+                self.render("newwish.html", error = error,
+             wish_amount = wish_amount, wish_price = wish_price,first_name = first_name, last_name = last_name, email = email)
 
         else:
             error = "fill in every box"
@@ -732,14 +786,11 @@ class LogSenderHandler(InboundMailHandler):
             logging.info("message: %s" % m)
             self.response.out.write(m)
 
-#150 mp min, 10000 mp max
-AMOUNT_RE = re.compile(r'^[1-9][0-9]{0,4}$|^10000$')
+AMOUNT_RE = re.compile(r'^[1][5-9][0-9]$|^[2-9][0-9]{2}$|^[1-3][0-9]{3}$|^4000$')
 
-#min 0.01 per mp, max 2.00 per mp
-PRICE_RE = re.compile(r'^[0-1]+\.[0-9][0-9]$|^2\.00$')
+PRICE_RE = re.compile(r'^[0-1]+\.[0-9][0-9]?$|^2\.00$')
 
-#TODO: wustl.edu
-EMAIL_RE  = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
+EMAIL_RE  = re.compile(r'^[\S]+(?i)(@wustl\.edu)$')
 
 def valid_amount(amount):
     return amount and AMOUNT_RE.match(amount)
@@ -780,7 +831,7 @@ application = webapp2.WSGIApplication([
 
 
 #cool features
-    #ppl watching sells; price per point + giftcards/other payment options
+    #giftcards/other payment options
     #when wish sell matches sell: automatic email
 
     #records/stories
@@ -791,7 +842,3 @@ application = webapp2.WSGIApplication([
 
     #sell amount over time
     #sell patterns by year/class
-
-#nice to have
-    #cool data facts page
-    #cookie id to replace repeat user info input
