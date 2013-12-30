@@ -2,6 +2,11 @@
     {{s.amount}}
 </td>
 
+<script>
+var num = {{s.price}};
+var price = num.toFixed(2);
+</script>
+
 <td class = "entry" name = "entry">
-    {{s.price}}
+    <script>document.write(price);</script>
 </td>

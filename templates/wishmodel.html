@@ -2,8 +2,11 @@
     {{w.wish_amount}}
 </th>
 
-<th class = "entry_price">
-    {{w.wish_price}}
-</th>
-</tr>
+<script>
+var num = {{w.wish_price}};
+var price = num.toFixed(2);
+</script>
 
+<td class = "entry" name = "entry">
+    <script>document.write(price);</script>
+</td>

@@ -214,13 +214,13 @@ a.text_link:visited:hover{
 }
 .contact_button {
     font-family:inherit;
-    font-size:inherit;
+    font-size:18px;
     text-align:center;
     float:right;
     margin-top:8px;
-    margin-right:26%;
+    margin-right:25.5%;
     
-    width:118px;
+    width:123px;
     background-color:white;
     color:#bebebe;
     border: 1px solid #bebebe;
@@ -357,7 +357,7 @@ a.text_link:visited:hover{
 ::-webkit-input-placeholder {
     color:lightgrey;
     text-align:center;
-    padding-top:0;
+    padding-top:1px;
     font-size:inherit;
 }
 

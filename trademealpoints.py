@@ -170,6 +170,7 @@ class Buy(Handler):
 
         else:
             logging.error("SELLS IN MC")
+            sells.sort(key = lambda x:x.price)
             count = 1
 
         self.render("buy.html", sells = sells, count = count)
@@ -560,6 +561,7 @@ class Wish(Handler):
 
         else:
             logging.error("WISHES IN MC")
+            wishes.sort(key = lambda x:x.wish_price)
             count = 1
 
         self.render("wish.html", wishes = wishes, count = count)
