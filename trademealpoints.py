@@ -177,22 +177,33 @@ class Buy(Handler):
 
     def post(self):
         first_name = self.request.get('first_name')
-        num = int(self.request.get('num')) #TODO: VALIDATE NUM
+        num = self.request.get('num')
+        sells = memcache.get("SELLS")
 
-        if first_name and num:
-            sells = memcache.get("SELLS")
-
+        if first_name and valid_num(num):
+            num = int(num)
+            okay_num = False
             for index, item in enumerate(sells):
                 if (index+1) == num:
+                    okay_num = True
                     amount = item.amount
                     price = item.price
                     break
             
-            self.new_cart(first_name)
-            self.redirect('/contact?first_name=' + first_name + "&amount=" + amount + "&price=" + price)
+            if okay_num:
+                self.new_cart(first_name)
+                self.redirect('/contact?first_name=' + first_name + "&amount=" + amount + "&price=" + price)
+            else:
+                stat = "invalid offer#"
+                self.render("buy.html", stat = stat, first_name = first_name, num = num, sells = list(sells))
+
+        elif first_name and not valid_num(num):
+            stat = "invalid offer#"
+            self.render("buy.html", stat = stat, first_name = first_name, num = num, sells = list(sells))
+
         else: 
-            cart_error = "fill in all the boxes"
-            self.render("buy.html", cart_error = cart_error, sells = list(sells))
+            stat = "fill in all the boxes"
+            self.render("buy.html", stat = stat, first_name = first_name, num = num, sells = list(sells))
         
 class BuyContact(Handler):
     def get(self):
@@ -567,22 +578,35 @@ class Wish(Handler):
         self.render("wish.html", wishes = wishes, count = count)
 
     def post(self):
-        first_name = self.request.get('first_name')
-        num = int(self.request.get('num')) #TODO: VALIDATE NUM
 
-        if first_name and num:
-            wishes = memcache.get("WISHES")
+        first_name = self.request.get('first_name')
+        num = self.request.get('num')
+        wishes = memcache.get("WISHES")
+
+        if first_name and valid_num(num):
+            num = int(num)
+
+            okay_num = False
             for index, item in enumerate(wishes):
                 if (index+1) == num:
+                    okay_num = True
                     amount = item.wish_amount
                     price = item.wish_price
-                    break
 
-            self.new_cart(first_name) #add cookie
-            self.redirect('/grantwish?first_name=' + first_name + "&amount=" + amount + "&price=" + price)
+            if okay_num:
+                self.new_cart(first_name) #add cookie
+                self.redirect('/grantwish?first_name=' + first_name + "&amount=" + amount + "&price=" + price)
+            else:
+                stat = "invalid wish#"
+                self.render("wish.html", stat = stat, first_name = first_name, num = num, wishes = list(wishes))
+
+        elif first_name and not valid_num(num):
+            stat = "invalid wish#"
+            self.render("wish.html", stat = stat, first_name = first_name, num = num, wishes = list(wishes))
+
         else: 
-            error = "fill in all the boxes"
-            self.render("wish.html", error = error, wishes = list(wishes))
+            stat = "fill in all the boxes"
+            self.render("wish.html", stat = stat, first_name = first_name, num = num, wishes = list(wishes))
 
 class EditWish(Handler):
     def get(self):
@@ -794,6 +818,8 @@ PRICE_RE = re.compile(r'^[0-1]+\.[0-9][0-9]?$|^2\.00$')
 
 EMAIL_RE  = re.compile(r'^[\S]+(?i)(@wustl\.edu)$')
 
+NUM_RE = re.compile(r'^[0-9]*$')
+
 def valid_amount(amount):
     return amount and AMOUNT_RE.match(amount)
 
@@ -802,6 +828,9 @@ def valid_price(price):
 
 def valid_email(email):
     return email and EMAIL_RE.match(email)
+
+def valid_num(num):
+    return num and NUM_RE.match(str(num))
 
 def render_str(template, **params):
     t = jinja_env.get_template(template)
