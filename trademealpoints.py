@@ -78,8 +78,18 @@ class Handler(webapp2.RequestHandler):
         username = self.read_secure_cookie('user')
         self.user = username 
 
-class PointCount(db.Model):
-    total = db.IntegerProperty()
+class Stats(db.Model):
+    s_transactions_listed = db.IntegerProperty()
+    s_points_listed = db.IntegerProperty()
+
+    s_transactions_fulfilled = db.IntegerProperty()
+    s_points_fulfilled = db.IntegerProperty()
+
+    w_transactions_listed = db.IntegerProperty()
+    w_points_listed = db.IntegerProperty()
+
+    w_transactions_fulfilled = db.IntegerProperty()
+    w_points_fulfilled = db.IntegerProperty()
 
 class UserModel(db.Model):
     first_name = db.StringProperty(required = True)
@@ -91,6 +101,7 @@ class SellModel(db.Model):
     amount = db.StringProperty(required = True)
     price = db.StringProperty(required = True)
     fulfilled = db.BooleanProperty(default = False)
+    created = db.DateTimeProperty(auto_now = True)
 
     def render(self):
         return render_str("sellmodel.html", s = self)
@@ -108,6 +119,7 @@ class WishModel(db.Model):
     wish_amount = db.StringProperty(required = True)
     wish_price = db.StringProperty(required = True)
     fulfilled = db.BooleanProperty(default = False)
+    created = db.DateTimeProperty(auto_now = True)
 
     def render(self):
         return render_str("wishmodel.html", w = self)
@@ -291,7 +303,7 @@ class Sell(Handler):
         self.render("sell.html")
 
     def post(self):
-        have_error = False;
+        have_error = False
         amount = self.request.get('amount')
         price = self.request.get('price')
 
@@ -334,6 +346,7 @@ class Sell(Handler):
 
             sells = SellModel.all().ancestor(sell_key())
             memcache.set("SELLS", list(sells))
+
 
             stat = "your entry has been recorded! awesomeness"
             self.render("sell.html", stat = stat)
