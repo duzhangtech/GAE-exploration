@@ -187,7 +187,7 @@ class Buy(Handler):
 
         if sells is None:
             logging.error("EMPTY MC")
-            sells = SellModel.all().ancestor(sell_key()).filter("fulfilled =", False).order('price')
+            sells = SellModel.all().ancestor(sell_key()).filter("fulfilled", False).order('price')
             sells = list(sells)
 
             if len(sells) == 0:
@@ -254,7 +254,8 @@ class BuyContact(Handler):
         email = self.request.get('email')
         have_error = False
 
-        if last_name and email:
+
+        if last_name and valid_email(email):
             subject = "A BUYER!"
             sender = "bot@trademealpoints.appspotmail.com"
             
@@ -307,14 +308,22 @@ class BuyContact(Handler):
             seller.put()
             
             sells = SellModel.all().ancestor(sell_key()).filter("fulfilled =", False).order('price')
-            sells = list(sells)
-            memcache.set("SELLS", sells)
+            if sells.count() == 0:
+                memcache.set("SELLS", None)
+            else:
+                sells = list(sells)
+                memcache.set("SELLS", sells)
 
             stat = "check your inbox!"
-            self.render("newbuy.html", stat = stat, first_name=first_name, amount = amount, price = price)
+            self.render("newbuy.html", stat = stat, first_name=first_name, amount = amount, price = price, last_name=last_name, email = email)
+
+        elif last_name and not valid_email(email):
+            error = "use your wustl email"
+            self.render("newbuy.html", first_name=first_name, amount = amount, price = price, error = error, last_name=last_name, email = email)
+
         else:
             error = "fill in every box"
-            self.render("newbuy.html", error = error, first_name=first_name, amount = amount, price = price)
+            self.render("newbuy.html", first_name=first_name, amount = amount, price = price, error = error, last_name=last_name, email = email)
 
 class Sell(Handler):
     def get(self):
@@ -362,7 +371,7 @@ class Sell(Handler):
 
             sell.put()
 
-            sells = SellModel.all().ancestor(sell_key())
+            sells = SellModel.all().ancestor(sell_key()).filter("fulfilled", False)
             memcache.set("SELLS", list(sells))
 
             # stats = Stats.all()
