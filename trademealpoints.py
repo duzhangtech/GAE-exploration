@@ -78,18 +78,36 @@ class Handler(webapp2.RequestHandler):
         username = self.read_secure_cookie('user')
         self.user = username 
 
-class Stats(db.Model):
-    s_transactions_listed = db.IntegerProperty()
-    s_points_listed = db.IntegerProperty()
+# class SellStats(db.Model):
+#     transactions_listed = db.IntegerProperty()
+#     amount_listed = db.IntegerProperty()
+#     price_listed = db.IntegerProperty()
+#     cost_listed = db.IntegerProperty()
 
-    s_transactions_fulfilled = db.IntegerProperty()
-    s_points_fulfilled = db.IntegerProperty()
+#     transactions_fulfilled = db.IntegerProperty()
+#     amount_fulfilled = db.IntegerProperty()
+#     price_fulfilled = db.IntegerProperty()
+#     cost_fulfilled = db.IntegerProperty()
 
-    w_transactions_listed = db.IntegerProperty()
-    w_points_listed = db.IntegerProperty()
+#     average_amount = db.IntegerProperty()
+#     average_price = db.IntegerProperty()
+#     average_cost = db.IntegerProperty()
 
-    w_transactions_fulfilled = db.IntegerProperty()
-    w_points_fulfilled = db.IntegerProperty()
+
+# class WishStats(db.Model)
+#     transactions_listed = db.IntegerProperty()
+#     amount_listed = db.IntegerProperty()
+#     price_listed = db.IntegerProperty()
+#     cost_listed = db.IntegerProperty()
+
+#     transactions_fulfilled = db.IntegerProperty()
+#     amount_fulfilled = db.IntegerProperty()
+#     price_fulfilled = db.IntegerProperty()
+#     cost_fulfilled = db.IntegerProperty()
+    
+#     average_amount = db.IntegerProperty()
+#     average_price = db.IntegerProperty()
+#     average_cost = db.IntegerProperty()
 
 class UserModel(db.Model):
     first_name = db.StringProperty(required = True)
@@ -347,6 +365,13 @@ class Sell(Handler):
             sells = SellModel.all().ancestor(sell_key())
             memcache.set("SELLS", list(sells))
 
+            # stats = Stats.all()
+            # if stats.count() == 0:
+            #     stats = Stats(s_transactions_listed = 1, s_points_listed = amount)
+            #     stats.put()
+            # else:
+            #     stats = stats.get()
+            #     stats...#FIXME.
 
             stat = "your entry has been recorded! awesomeness"
             self.render("sell.html", stat = stat)
