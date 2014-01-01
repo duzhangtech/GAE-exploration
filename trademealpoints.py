@@ -134,8 +134,8 @@ class FeedbackModel(db.Model):
 
 class WishModel(db.Model):
     user = db.ReferenceProperty(UserModel)
-    wish_amount = db.StringProperty(required = True)
-    wish_price = db.StringProperty(required = True)
+    amount = db.StringProperty(required = True)
+    price = db.StringProperty(required = True)
     fulfilled = db.BooleanProperty(default = False)
     created = db.DateTimeProperty(auto_now = True)
 
@@ -311,11 +311,10 @@ class BuyContact(Handler):
             if sells.count() == 0:
                 memcache.set("SELLS", None)
             else:
-                sells = list(sells)
-                memcache.set("SELLS", sells)
+                memcache.set("SELLS", list(sells))
 
             stat = "check your inbox!"
-            self.render("newbuy.html", stat = stat, first_name=first_name, amount = amount, price = price, last_name=last_name, email = email)
+            self.render("newbuy.html", stat = stat, first_name=first_name, amount = amount, price = price)
 
         elif last_name and not valid_email(email):
             error = "use your wustl email"
@@ -380,7 +379,7 @@ class Sell(Handler):
             #     stats.put()
             # else:
             #     stats = stats.get()
-            #     stats...#FIXME.
+            #     stats...#FIXME
 
             stat = "your entry has been recorded! awesomeness"
             self.render("sell.html", stat = stat)
@@ -535,19 +534,19 @@ class NewWish(Handler):
         last_name = self.request.get('last_name')
         email = self.request.get('email')
 
-        wish_amount = self.request.get("wish_amount")
-        wish_price = self.request.get("wish_price")
+        amount = self.request.get("amount")
+        price = self.request.get("price")
 
-        if not valid_amount(wish_amount):
+        if not valid_amount(amount):
             have_error = True
 
-        if not valid_price(wish_price):
+        if not valid_price(price):
             have_error = True
 
         if not valid_email(email):
             have_error = True
 
-        if wish_amount and wish_price and first_name and last_name and email and have_error == False:
+        if amount and price and first_name and last_name and email and have_error == False:
 
             u = UserModel.gql('where email = :email', email = email)          
             user = u.get()
@@ -557,17 +556,17 @@ class NewWish(Handler):
                 user.put()
                 
 
-            wishes = WishModel.all().filter("wish_amount = ", wish_amount).filter("wish_price =", wish_price)
+            wishes = WishModel.all().filter("fulfilled", False).filter("amount = ", amount).filter("price =", price)
 
             if wishes.count() != 0: #db duplicate!
                 error = "looks like your wish has already been recorded. sweet"
                 logging.error("DUPLICATE DB WISH")
                 self.render("newwish.html", error = error,
-                    wish_amount = wish_amount, wish_price = wish_price,
+                    amount = amount, price = price,
                     first_name = first_name, last_name = last_name, email = email)
                 
             else: 
-                wish = WishModel(parent = wish_key(), user = user, wish_amount = wish_amount, wish_price = wish_price)
+                wish = WishModel(parent = wish_key(), user = user, amount = amount, price = price)
                 wish.put()
                 wishes = WishModel.all().ancestor(wish_key()).filter("fulfilled", False)
                 memcache.set("WISHES", list(wishes))
@@ -575,28 +574,28 @@ class NewWish(Handler):
                 stat = "mp wish successfully recorded"
                 self.render("newwish.html", stat = stat)
 
-        elif wish_amount and wish_price and first_name and last_name and email and have_error == True:
+        elif amount and price and first_name and last_name and email and have_error == True:
 
-            if not valid_amount(wish_amount):
+            if not valid_amount(amount):
                 error = "150 mp min, 4000 mp max"
                 self.render("newwish.html", error = error,
-             wish_amount = wish_amount, wish_price = wish_price,first_name = first_name, last_name = last_name, email = email)
+             amount = amount, price = price,first_name = first_name, last_name = last_name, email = email)
 
-            elif not valid_price(wish_price):
+            elif not valid_price(price):
                 error = "0.01 to 2.00 per meal point"
                 self.render("newwish.html", error = error,
-             wish_amount = wish_amount, wish_price = wish_price,first_name = first_name, last_name = last_name, email = email)
+             amount = amount, price = price,first_name = first_name, last_name = last_name, email = email)
 
 
             elif not valid_email(email):
                 error = "use your wustl email"
                 self.render("newwish.html", error = error,
-             wish_amount = wish_amount, wish_price = wish_price,first_name = first_name, last_name = last_name, email = email)
+             amount = amount, price = price,first_name = first_name, last_name = last_name, email = email)
 
         else:
             error = "fill in every box"
             self.render("newwish.html", error = error,
-             wish_amount = wish_amount, wish_price = wish_price,first_name = first_name, last_name = last_name, email = email)
+             amount = amount, price = price,first_name = first_name, last_name = last_name, email = email)
 
 class Wish(Handler):
     def get(self):
@@ -606,7 +605,7 @@ class Wish(Handler):
         if wishes is None:
             logging.error("EMPTY MC")
 
-            wishes = WishModel.all().ancestor(wish_key()).filter("fulfilled =", False).order('wish_price')
+            wishes = WishModel.all().ancestor(wish_key()).filter("fulfilled", False).order('price')
             wishes = list(wishes)
 
             if len(wishes) == 0:
@@ -619,7 +618,7 @@ class Wish(Handler):
 
         else:
             logging.error("WISHES IN MC")
-            wishes.sort(key = lambda x:x.wish_price)
+            wishes.sort(key = lambda x:x.price)
             count = 1
 
         self.render("wish.html", wishes = wishes, count = count)
@@ -637,8 +636,8 @@ class Wish(Handler):
             for index, item in enumerate(wishes):
                 if (index+1) == num:
                     okay_num = True
-                    amount = item.wish_amount
-                    price = item.wish_price
+                    amount = item.amount
+                    price = item.price
 
             if okay_num:
                 self.new_cart(first_name) #add cookie
@@ -675,7 +674,7 @@ class EditWish(Handler):
                 self.render("editwish.html", stat = stat)
 
             else:
-                wish = WishModel.all().filter("user", user).filter("wish_amount", current_amount).filter("wish_price", current_price)
+                wish = WishModel.all().filter("user", user).filter("amount", current_amount).filter("price", current_price)
                 wish = wish.get()
 
                 if not wish:
@@ -683,8 +682,8 @@ class EditWish(Handler):
                     self.render("editwish.html", stat = stat)
 
                 else:
-                    wish.wish_amount = new_amount
-                    wish.wish_price = new_price
+                    wish.amount = new_amount
+                    wish.price = new_price
                     wish.put()
 
                     wishes = WishModel.all().ancestor(wish_key()).filter("fulfilled", False)
@@ -695,7 +694,7 @@ class EditWish(Handler):
 
         else:
             stat = "fill every box"
-            self.render("editwish.html", stat = stat)
+            self.render("editwish.html", stat = stat, email = email, current_amount = current_amount, current_price = current_price, new_amount = new_amount, new_price = new_price)
 
 class RelistWish(Handler):
     def get(self):
@@ -715,7 +714,7 @@ class RelistWish(Handler):
                 self.render("relistwish.html", stat = stat)
 
             else:
-                wish = WishModel.all().filter("user", user).filter("wish_amount", amount).filter("wish_price", price)
+                wish = WishModel.all().filter("user", user).filter("amount", amount).filter("price", price)
                 wish = wish.get()
 
                 if not wish:
@@ -733,7 +732,7 @@ class RelistWish(Handler):
                     self.render("relistwish.html", stat = stat)
         else:
             stat = "fill every box"
-            self.render("relistwish.html", stat = stat)
+            self.render("relistwish.html", stat = stat, email = email, amount = amount, price = price)
 
 class DeleteWish(Handler):
     def get(self):
@@ -744,7 +743,7 @@ class DeleteWish(Handler):
         amount = self.request.get('amount')
         price = self.request.get('price')
 
-        if email and amount and price:
+        if valid_email(email) and amount and price:
             u = UserModel.all().filter("email", email)
             user = u.get()
 
@@ -753,7 +752,7 @@ class DeleteWish(Handler):
                 self.render("delete.html", stat = stat)
 
             else:
-                wish = WishModel.all().filter("user", user).filter("wish_amount", amount).filter("wish_price", price)
+                wish = WishModel.all().filter("user", user).filter("amount", amount).filter("price", price)
                 wish = wish.get()
 
                 if not wish:
@@ -766,18 +765,23 @@ class DeleteWish(Handler):
 
                     stat = "wish successfully deleted"
                     self.render("deletewish.html", stat = stat)
+
+        elif not valid_email(email):
+            stat = "use your wustl email"
+            self.render("deletewish.html", stat = stat, email = email, amount = amount, price = price)
+
         else:
             stat = "fill every box"
-            self.render("deletewish.html", stat = stat)
+            self.render("deletewish.html", stat = stat, email = email, amount = amount, price = price)
 
 class WishContact(Handler):
     def get(self):
         first_name = self.request.get("first_name")
-        wish_amount = self.request.get("amount")
-        wish_price = self.request.get("price")
+        amount = self.request.get("amount")
+        price = self.request.get("price")
 
         self.new_cart(first_name)
-        self.render("wishcontact.html", first_name=first_name, wish_amount = wish_amount, wish_price = wish_price)
+        self.render("wishcontact.html", first_name=first_name, amount = amount, price = price)
         return
 
     def post(self):
@@ -788,7 +792,7 @@ class WishContact(Handler):
         last_name = self.request.get('last_name')
         email = self.request.get('email')
 
-        if last_name and email:
+        if last_name and valid_email(email):
             subject = "A BUYER!"
             sender = "bot@trademealpoints.appspotmail.com"
             
@@ -796,7 +800,7 @@ class WishContact(Handler):
             amount = self.request.get("amount")
             price = self.request.get("price")
 
-            wisher = WishModel.all().filter("wish_amount", amount).filter("wish_price", price).get()
+            wisher = WishModel.all().filter("amount", amount).filter("price", price).get()
             receiver = wisher.user.email
 
             body = (
@@ -836,18 +840,25 @@ class WishContact(Handler):
                 + "Bot")
 
             mail.send_mail(sender, receiver, subject, body)
-
             wisher.fulfilled = True
             wisher.put()
             
-            wishes = WishModel.all().ancestor(wish_key()).filter("fulfilled =", False).order('wish_price')
-            memcache.set("WISHES", list(wishes))
+            wishes = WishModel.all().ancestor(wish_key()).filter("fulfilled =", False).order('price')
+            if wishes.count() == 0:
+                memcache.set("WISHES", None)
+            else:
+                memcache.set("WISHES", list(wishes))
 
             stat = "check your inbox!"
-            self.render("newbuy.html", stat = stat, first_name=first_name, amount = amount, price = price)
-        else:
-            error = "fill in every box"
-            self.render("newbuy.html", error = error, first_name=first_name, amount = amount, price = price)
+            self.render("wishcontact.html", stat = stat, first_name=first_name, amount = amount, price = price)
+
+        elif last_name and email and not valid_email(email):
+            stat = "use your wustl email"
+            self.render("wishcontact.html", stat = stat, first_name=first_name, amount = amount, price = price, last_name = last_name, email = email)
+
+        elif not last_name or not email:
+            stat = "fill in every box"
+            self.render("wishcontact.html", stat = stat, first_name=first_name, amount = amount, price = price, last_name = last_name, email = email)
 
 class LogSenderHandler(InboundMailHandler):
     def receive(self, mail_message):
