@@ -800,7 +800,7 @@ class WishContact(Handler):
             amount = self.request.get("amount")
             price = self.request.get("price")
 
-            wisher = WishModel.all().filter("amount", amount).filter("price", price).get()
+            wisher = WishModel.all().filter("fulfilled", False).filter("amount", amount).filter("price", price).get()
             receiver = wisher.user.email
 
             body = (
