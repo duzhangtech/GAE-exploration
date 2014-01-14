@@ -8,6 +8,8 @@
 <h4>it looks like every offer has been bought. check back later :)</h4>
 
 {%else%}
+<span class = "pricenote">prices shown in dollars per mp</span>
+
 <div class = "buy_outer">
 <table class = "buy_inner">
     <tr>
@@ -34,17 +36,16 @@
 
 <div><input type="text" class = "buy_input" placeholder = "first name" name="first_name" value="{{first_name}}"></div>
 
-<div><input type="submit" class = "review_button" value="review"></div>
+<div><input type="submit" class = "review_button" value="next"></div>
 <div class="stat">{{stat}}</div>
 <br>
     
 <div class = "buy_links">
 <div><a class = "text_link"href = "/editoffer">edit my offer</a></div>
-<div><a class = "text_link"href = "/relistoffer">relist my offer</a>
+<div><a class = "text_link"href = "/relistoffer">relist my offer</a></div>
+<div><a class = "text_link" href = "/deleteoffer">delete my offer</a></div> 
 </div>
-<div><a class = "text_link" href = "/deleteoffer">delete my offer</a></div>
     
-</div>
 </div>
 </div>
 {%endif%}

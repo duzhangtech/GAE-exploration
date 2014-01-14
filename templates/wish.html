@@ -4,9 +4,36 @@
 <form method = "post">
 
 {%if count == 0 %}
-<h1>no wishes for now...<a href = "/newwish">make a meal point wish</a></h1>
+<h1>no wishes for now...</h1>
+<h1>new meal point wish</h1>
 
+<form method = "post">
+   
+    <label class = "newwish_label">number of mp</label>
+    <input type="text" class = "newwish_input" name="amount" value="{{amount}}">
+    
+    <label class = "newwish_label">price per mp</label>
+    <input type="text" class = "newwish_input" name="price" value="{{price}}">
+        
+        
+    <label class = "newwish_label">first name</label>
+    <input type="text" class = "newwish_input" name="first_name" value="{{first_name}}">
+   
+    <label class = "newwish_label">last name</label>
+    <input type="text" class = "newwish_input" name="last_name" value="{{last_name}}">
+    
+    <label class = "newwish_label">email</label>
+    <input type="text" class = "newwish_input" name="email" value="{{email}}">
+    {{error_email}}
+        
+    <input type="submit" class = "wish_button" value="okay">
+
+    <div class = "stat">{{stat}}</div>
+    <div class="error">{{error}}</div> 
+</form>
+    
 {%else%}
+<span class = "pricenote">prices shown in dollars per mp</span>
 <div class = "buy_outer">
 <table class = "buy_inner">
 <tr>
@@ -34,20 +61,20 @@
 
 <div><input type="text" class = "buy_input" placeholder = "first name" name="first_name" value="{{first_name}}"></div>
 
-<div><input type="submit" class = "review_button" value="review offer"></div>
+<div><input type="submit" class = "review_button" value="next"></div>
 <div class="stat">{{stat}}</div>
 
 <div class = "buy_links">
-<div><a class = "text_link"href = "/editwish">edit my wish</a></div>
-<div><a class = "text_link"href = "/relistwish">relist my wish</a>
-</div>
+<div><a href = "/newwish" class = "text_link">new mp wish</a></div>
+<div><a class = "text_link" href = "/editwish">edit my wish</a></div>
+<div><a class = "text_link" href = "/relistwish">relist my wish</a></div>  
 <div><a class = "text_link" href = "/deletewish">delete my wish</a></div>
 </div>
     
 </div>
 </div>
 
-<div  class = "new_mpwish"><a href = "/newwish">new mp wish</a></div>
+
     
 {%endif%}
 </form>

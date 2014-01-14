@@ -8,7 +8,7 @@ body {
     transform-origin: 10% 10%;
     
     float:center;
-    margin-left: 33%;
+    margin-left: 31%;
     min-width:460px;
     max-width:460px;
     background-color:transparent;
@@ -30,10 +30,13 @@ body {
     font-family:'Quattrocento Sans', sans-serif;
     font-size:20px;
 }
+*/
+/*
 .buy_box {
-    font-family:'Quattrocento Sans', sans-serif;
-    font-size:20px;
+    font-size:27px;
 }
+*/
+/*
 .faq_box {
     font-family:'Quattrocento Sans', sans-serif;
     font-size:20px;
@@ -122,7 +125,6 @@ input {
 
 
 .buy_outer{
-    background: white;
     max-width: 400px;
     border: 1px solid #e0e0e0;
     margin-left:15px;
@@ -144,7 +146,7 @@ tr {
 }
 
 
-.buy_outer, .review_order {
+.buy_outer{
     display: inline-block;
 }
 .review_outer{
@@ -155,7 +157,7 @@ tr {
     border: 1px solid white;
     border-radius: 8px;
     margin-right:40px;
-    margin-top:4px;
+    margin-top:-28px;
 }
 .review_inner{
     text-align:center;
@@ -179,7 +181,7 @@ tr {
     float:right;
     margin-top:7px;
     margin-right:7px;
-    margin-bottom:9px;
+    margin-bottom:15px;
     
     width:118px;
     height:30px;
@@ -395,6 +397,11 @@ a.text_link:visited:hover{
     margin-right:8%;
 }
 
+.pricenote {
+    color:lightgrey;
+    font-size:16px;
+    margin-left:28px;
+}
 .table_head {
     color:#606060;
 }

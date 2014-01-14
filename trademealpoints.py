@@ -524,6 +524,154 @@ class DeleteSell(Handler):
             stat = "fill every box"
             self.render("deletesell.html", stat = stat)
 
+class Wish(Handler):
+    def get(self):
+        self.clear_cart()
+        wishes = memcache.get("WISHES")
+
+        if wishes is None:
+            logging.error("EMPTY MC")
+
+            wishes = WishModel.all().ancestor(wish_key()).filter("fulfilled", False).order('price')
+            wishes = list(wishes)
+
+            if len(wishes) == 0:
+                logging.error("EMPTY DB")
+                count = 0
+            else:
+                logging.error("DB WRITE TO MC")
+                memcache.set("WISHES", wishes)
+                count = 1
+
+        else:
+            logging.error("WISHES IN MC")
+            wishes.sort(key = lambda x:(x.price, x.amount))
+            count = 1
+
+        self.render("wish.html", wishes = wishes, count = count)
+
+    def post(self):
+        
+        wishes = memcache.get("WISHES")
+        if wishes is None:
+            logging.error("EMPTY MC")
+
+            wishes = WishModel.all().ancestor(wish_key()).filter("fulfilled", False).order('price')
+            wishes = list(wishes)
+
+            if len(wishes) == 0:
+                logging.error("EMPTY DB")
+                count = 0
+            else:
+                logging.error("DB WRITE TO MC")
+                memcache.set("WISHES", wishes)
+                count = 1
+
+        else:
+            logging.error("WISHES IN MC")
+            wishes.sort(key = lambda x:(x.price, x.amount))
+            count = 1
+
+        #IF EMPTY WISHES
+        if count == 0:
+            have_error = False
+            first_name = self.request.get('first_name')
+            last_name = self.request.get('last_name')
+            email = self.request.get('email')
+
+            amount = self.request.get("amount")
+            price = self.request.get("price")
+
+            if not valid_amount(amount):
+                have_error = True
+
+            if not valid_price(price):
+                have_error = True
+
+            if not valid_email(email):
+                have_error = True
+
+            if amount and price and first_name and last_name and email and have_error == False:
+
+                u = UserModel.gql('where email = :email', email = email)          
+                user = u.get()
+                
+                if user is None: 
+                    user = UserModel(parent = user_key(), first_name = first_name, last_name = last_name, email = email)
+                    user.put()
+                    
+
+                wishes = WishModel.all().filter("fulfilled", False).filter("amount = ", amount).filter("price =", price)
+
+                if wishes.count() != 0: #db duplicate!
+                    error = "looks like your wish has already been recorded. sweet"
+                    logging.error("DUPLICATE DB WISH")
+                    self.render("newwish.html", error = error,
+                        amount = amount, price = price,
+                        first_name = first_name, last_name = last_name, email = email)
+                    
+                else: 
+                    wish = WishModel(parent = wish_key(), user = user, amount = amount, price = price)
+                    wish.put()
+                    wishes = WishModel.all().ancestor(wish_key()).filter("fulfilled", False)
+                    memcache.set("WISHES", list(wishes))
+
+                    stat = "mp wish successfully recorded"
+                    self.render("newwish.html", stat = stat)
+
+            elif amount and price and first_name and last_name and email and have_error == True:
+
+                if not valid_amount(amount):
+                    error = "150 mp min, 4000 mp max"
+                    self.render("newwish.html", error = error,
+                 amount = amount, price = price,first_name = first_name, last_name = last_name, email = email)
+
+                elif not valid_price(price):
+                    error = "0.01 to 2.00 per meal point"
+                    self.render("newwish.html", error = error,
+                 amount = amount, price = price,first_name = first_name, last_name = last_name, email = email)
+
+
+                elif not valid_email(email):
+                    error = "use your wustl email"
+                    self.render("newwish.html", error = error,
+                 amount = amount, price = price,first_name = first_name, last_name = last_name, email = email)
+
+            else:
+                error = "fill in every box"
+                self.render("newwish.html", error = error,
+                 amount = amount, price = price,first_name = first_name, last_name = last_name, email = email)
+        #ELSE
+        else:
+            first_name = self.request.get('first_name')
+            num = self.request.get('num')
+            wishes = memcache.get("WISHES")
+
+            if first_name and valid_num(num):
+                num = int(num)
+
+                okay_num = False
+                for index, item in enumerate(wishes):
+                    if (index+1) == num:
+                        okay_num = True
+                        amount = item.amount
+                        price = item.price
+
+                if okay_num:
+                    self.new_cart(first_name) #add cookie
+                    self.redirect('/grantwish?first_name=' + first_name + "&amount=" + amount + "&price=" + price)
+                else:
+                    stat = "invalid wish#"
+                    self.render("wish.html", stat = stat, first_name = first_name, num = num, wishes = list(wishes))
+
+            elif first_name and not valid_num(num):
+                stat = "invalid wish#"
+                self.render("wish.html", stat = stat, first_name = first_name, num = num, wishes = list(wishes))
+
+            else: 
+                stat = "fill in all the boxes"
+                self.render("wish.html", stat = stat, first_name = first_name, num = num, wishes = list(wishes))
+
 class NewWish(Handler):
     def get(self):
         self.render("newwish.html")
@@ -564,7 +712,7 @@ class NewWish(Handler):
                 self.render("newwish.html", error = error,
                     amount = amount, price = price,
                     first_name = first_name, last_name = last_name, email = email)
-                
+
             else: 
                 wish = WishModel(parent = wish_key(), user = user, amount = amount, price = price)
                 wish.put()
@@ -596,64 +744,6 @@ class NewWish(Handler):
             error = "fill in every box"
             self.render("newwish.html", error = error,
              amount = amount, price = price,first_name = first_name, last_name = last_name, email = email)
-
-class Wish(Handler):
-    def get(self):
-        self.clear_cart()
-        wishes = memcache.get("WISHES")
-
-        if wishes is None:
-            logging.error("EMPTY MC")
-
-            wishes = WishModel.all().ancestor(wish_key()).filter("fulfilled", False).order('price')
-            wishes = list(wishes)
-
-            if len(wishes) == 0:
-                logging.error("EMPTY DB")
-                count = 0
-            else:
-                logging.error("DB WRITE TO MC")
-                memcache.set("WISHES", wishes)
-                count = 1
-
-        else:
-            logging.error("WISHES IN MC")
-            wishes.sort(key = lambda x:(x.price, x.amount))
-            count = 1
-
-        self.render("wish.html", wishes = wishes, count = count)
-
-    def post(self):
-
-        first_name = self.request.get('first_name')
-        num = self.request.get('num')
-        wishes = memcache.get("WISHES")
-
-        if first_name and valid_num(num):
-            num = int(num)
-
-            okay_num = False
-            for index, item in enumerate(wishes):
-                if (index+1) == num:
-                    okay_num = True
-                    amount = item.amount
-                    price = item.price
-
-            if okay_num:
-                self.new_cart(first_name) #add cookie
-                self.redirect('/grantwish?first_name=' + first_name + "&amount=" + amount + "&price=" + price)
-            else:
-                stat = "invalid wish#"
-                self.render("wish.html", stat = stat, first_name = first_name, num = num, wishes = list(wishes))
-
-        elif first_name and not valid_num(num):
-            stat = "invalid wish#"
-            self.render("wish.html", stat = stat, first_name = first_name, num = num, wishes = list(wishes))
-
-        else: 
-            stat = "fill in all the boxes"
-            self.render("wish.html", stat = stat, first_name = first_name, num = num, wishes = list(wishes))
-
 class EditWish(Handler):
     def get(self):
         self.render("editwish.html")
