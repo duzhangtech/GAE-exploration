@@ -1,4 +1,4 @@
-Washu Meal Point Exchange
+WashU Meal Point Exchange
 =======
 
 Buy and sell meal points.
