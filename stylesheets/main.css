@@ -7,8 +7,7 @@ body {
     transform: scale(1.1);
     transform-origin: 10% 10%;
     
-    float:center;
-    margin-left: 31%;
+    margin: 0 auto;
     min-width:460px;
     max-width:460px;
     background-color:transparent;
@@ -21,27 +20,6 @@ body {
     margin-left:3px;
     line-height:150%;
 }
-/*
-    font-family:'Quattrocento Sans', sans-serif;
-    font-size:20px;
-*/
-/*
-.about_box {
-    font-family:'Quattrocento Sans', sans-serif;
-    font-size:20px;
-}
-*/
-/*
-.buy_box {
-    font-size:27px;
-}
-*/
-/*
-.faq_box {
-    font-family:'Quattrocento Sans', sans-serif;
-    font-size:20px;
-}
-*/
 
 h1 {
     font-size: inherit;
@@ -63,7 +41,7 @@ h3 {
 h4 {
     font-size:inherit;
     font-weight:100;
-    text-align:left;
+    text-align:center;
     color: #848484;
 }
 .center {
