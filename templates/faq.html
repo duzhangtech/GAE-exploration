@@ -6,7 +6,7 @@
 <div>This web app facilitates the exchange of meal points for students at Washington University in St. Louis.</div><br>
 
 <h2>Buy meal points</h2>
-<div>Choose the offer that you want to buy and leave your email address; an email regarding the transaction will be sent to both you and the seller.</div><br>
+<div>Click the offer that you want to buy and leave your email address; an email regarding the transaction will be sent to both you and the seller.</div><br>
 
 <h2>Sell meal points</h2>
 <div>Enter your amount, price per point, and contact info on the "sell" page.</div><br>
@@ -26,8 +26,7 @@
 <div><a class = "text_link" target="_blank" href = "http://diningservices.wustl.edu/MEALPLANS/Pages/default.aspx">Here.</a></div><br>
 
 
-<div class = "thoughts">
-<form method="post">
+<form method="post" class = "center">
     <h3>questions/comments/feedback</h3>
 
     <input type="text" placeholder="thoughts" name="feedback" class = "faq_input" value="{{feedback}}">
@@ -38,7 +37,5 @@
     <div><input type="submit" class = "faq_button" value="okay"></div>
     <br>
     <div class = "faq_stat">{{stat}}</div>
-</div>
-</div>
 </form>
 {% endblock %}

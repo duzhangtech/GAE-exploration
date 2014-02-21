@@ -14,21 +14,42 @@
     <span>
 
     <span style = "display:inline-block;
-                                   width:70px;
-                                   background-color:white;">amount</span>
+                           width:80px;
+                           background-color:white;">amount</span>
     <span style = "display:inline-block;
-                                   width:70px;
-                                   background-color:white;">price</span>
-   </span><br>
+                           width:80px;
+                           background-color:white;">price</span>
+    <span style = "display:inline-block;
+                           width:80px;
+                           background-color:white;">cost</span>
+    </span>
+    <br>
+    
+   
     {% for sell in sells %}
 
     <a href="/contact">
     <span style = "display:inline-block;
-                                   width:70px;
-                                   background-color:white;">{{sell.amount}}</span>
+                           width:80px;
+                           background-color:white;">{{sell.amount}}</span>
+        
+    <script>var price = {{sell.price}}.toFixed(2)</script>
     <span  style = "display:inline-block;
-                                   width:70px;
-                                   background-color:white;">{{sell.price}}</span>
+                           width:80px;
+                           background-color:white;"><script>document.write(price);</script></span>
+ 
+    <script>var cost = {{sell.amount|int*sell.price|float}}.toFixed(1)</script>
+    <span  style = "display:inline-block;
+                    width:80px;
+                    background-color:white;
+                    text-align:left;">
+        <span style = "display:inline-block;
+                       width:65px;
+                       background-color:white;
+                       text-align:right;">
+            <script>document.write(cost);</script>
+        </span>
+        </span>
     </a>
     <br>
     {% endfor %}

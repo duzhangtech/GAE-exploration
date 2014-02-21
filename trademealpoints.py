@@ -428,22 +428,6 @@ class Sell(Handler):
                             first_name = first_name, last_name = last_name,
                             email = email, error=error)
 
-class Verify(Handler):
-    def get(self):
-        self.render("verify.html")
-
-    def post(self):
-
-        u = UserModel.gql('where email = :email', email = email)
-        user = u.get()
-
-        if not user:
-            logging.error("USER DOESN'T EXIST, DB COMMIT")
-            user = UserModel(parent = user_key(), 
-                first_name = first_name, last_name = last_name, email = email)
-            user.put()  
-        self.render("verify.html")
-
 class Edit(Handler):
     def get(self):
         self.render("editsell.html")
