@@ -21,7 +21,8 @@
     {% for sell in sells %}
         <tr>  
             <td>{{number}}</td>
-            {{ sell.render() | safe}}
+             <td>{{sell.amount}}</td>
+            <td> {{sell.price}}</td>
         </tr>
     {%set number = number + 1%}
     {% endfor %}
