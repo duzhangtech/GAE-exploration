@@ -73,9 +73,15 @@ input[type=text] {
     font-family:inherit;
     color:inherit;
     border: 1px solid #bebebe;
-    border-radius:6px;
+    border-radius:20px;
     text-align:center;
 }
+input:focus { 
+    outline:none;
+    border-color:#9ecaed;
+    box-shadow:0 0 10px #9ecaed;
+}
+
 .table{
     width: 300px;
     border: 1px solid #e0e0e0;
@@ -84,44 +90,6 @@ input[type=text] {
     margin: 0 auto;
 }
 
-.text_link a:link {
-    color:red;
-    line-height:170%;
-}
-a.text_link:hover {
-    color:red;
-    line-height:170%;
-}
-.text_link a:visited {
-    color:red;
-    line-height:170%;
-}
-a.text_link:active {
-    color:red;
-    line-height:170%;
-}
-
-.review_button {
-    font-family:inherit;
-    font-size:18px;
-    text-align:center;
-    float:right;
-    margin-top:7px;
-    margin-right:7px;
-    margin-bottom:15px;
-    
-    width:118px;
-    height:30px;
-    background-color:white;
-    color:#bebebe;
-    border: 1px solid #bebebe;
-    border-radius:6px;
-}
-.review_button:hover {
-    border-color: #32ac97;
-    color: #32ac97;
-    transition-duration: 400ms;
-}
 a.text_link:link{
     font-size:inherit;
     color: #b2b0b0;
@@ -138,63 +106,15 @@ a.text_link:visited:hover{
     font-size:inherit;
     color: #32ac97;
 }
-.newbuy_note {
-    line-height:120
-}
-.contact_button {
-    font-family:inherit;
-    font-size:18px;
-    text-align:center;
-    float:right;
-    margin-top:8px;
-    margin-right:25.5%;
-    
-    width:123px;
-    background-color:white;
-    color:#bebebe;
-    border: 1px solid #bebebe;
-    border-radius:6px;
-}
-.contact_button:hover {
-    border-color: #32ac97;
-    color: #32ac97;
-    transition-duration: 400ms;
-}
+
+
 .stat {
     position:relative;
     color:#32ac97;
     margin-top:45px;
-    margin-left:42%;
-}
-
-.sell_notice {
-    min-width:370px;
-    max-width:370px;
-    margin-left:40px;
-    margin-bottom:20px;
-}
-
-.editsell_stat {
-    position:relative;
-    color:#32ac97;
-    margin-left:14%;
-    margin-top:65px;
-}
-.relist {
-    line-height:10%;
-}
-.relist_stat {
-    position:relative;
-    color:#32ac97;
-    margin-left:14%;
-    margin-top:70px;
 }
 
 
-.feedback_text {
-    height: 50%;
-    width:50%;
-}
 ::-webkit-input-placeholder {
     color:lightgrey;
     text-align:center;
@@ -202,19 +122,7 @@ a.text_link:visited:hover{
     font-size:inherit;
 }
 
-.faq_stat {
-    position:relative;
-    color:#32ac97;
-    padding-top:30px;
-    margin-bottom:15px;
-    margin-left:25%;
-}
-.table_head {
-    color:#606060;
-}
-.error {
-    color: #a0ff00;
-}
+
 a:link {
     color:#606060; 
     text-decoration:none; 
@@ -226,9 +134,9 @@ a:visited {
 a:hover {
     color:#32ac97; 
     text-decoration:none; 
-    transition: all 500ms ease;
+    transition: 500ms;
 }  
 a:active {
     color:#606060; 
     text-decoration:none;
-}  /* selected */
+}  
