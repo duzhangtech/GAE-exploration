@@ -10,6 +10,10 @@ body {
     line-height:150%;
 }
 
+.center {
+    position:relative;
+    text-align:center;
+}
 
 h1 {
     font-size: inherit;
@@ -34,7 +38,6 @@ h4 {
     text-align:center;
     color: #848484;
 }
-
 h5 {
     font-size:inherit;
     font-weight:100;
@@ -42,12 +45,15 @@ h5 {
     color: #848484;
     line-height:30%;
 }
+
+
+
 .front_title {
     text-align:center;
     color:#32ac97;
     padding-top: 50px;
     padding-bottom:30px;
-    font-size: 33px;
+    font-size: 29px;
     width:100%;
 }
 .navbar {
@@ -66,81 +72,35 @@ input[type=text] {
     font-size: inherit;
     font-family:inherit;
     color:inherit;
-    padding-left:8px;
-    padding-right:8px;
     border: 1px solid #bebebe;
     border-radius:6px;
+    text-align:center;
 }
-
-label, input {
-    display: inline-block;
-}
-label + input {
-    display: inline-block;
-    margin-left: 2%;
-}
-label{
-    width: 45%;
-    text-align: right;
-    color: #bebebe;
-    background-color:transparent;
-    font-size:inherit;
-}
-input {
-    width:30%;
-}
-
-
-.buy_outer{
-    max-width: 400px;
+.table{
+    width: 300px;
     border: 1px solid #e0e0e0;
-    margin-left:15px;
     border-radius:6px;
-}
-.buy_inner{
-    text-align:center;
     background-color:white;
-/*
-    font-family:'Quattrocento Sans', sans-serif;
-    font-size:20px;
-*/
-}
-th{
-    min-width:77px;
-}
-tr {
-    margin-top:7px;
+    margin: 0 auto;
 }
 
-
-.buy_outer{
-    display: inline-block;
-}
-.review_outer{
-    position:relative;
-    float:right;
-    background: white;
-    max-width: 200px;
-    border: 1px solid white;
-    border-radius: 8px;
-    margin-right:40px;
-    margin-top:-28px;
-}
-.review_inner{
-    text-align:center;
-    background-color:white;
-}
-.buy_input {
-    width:100px;
-}
-.buy_mp {
-    color:#32ac97;
-    font-size:inherit;
-    margin-bottom:7px;
-}
-.buy_links {
+.text_link a:link {
+    color:red;
     line-height:170%;
 }
+a.text_link:hover {
+    color:red;
+    line-height:170%;
+}
+.text_link a:visited {
+    color:red;
+    line-height:170%;
+}
+a.text_link:active {
+    color:red;
+    line-height:170%;
+}
+
 .review_button {
     font-family:inherit;
     font-size:18px;
@@ -213,52 +173,7 @@ a.text_link:visited:hover{
     margin-left:40px;
     margin-bottom:20px;
 }
-.sell_button {
-    font-family:inherit;
-    font-size:inherit;
-    text-align:center;
-    float:right;
-    margin-top:10px;
-    margin-right:18%;
-    
-    width:70px;
-    background-color:white;
-    color:#bebebe;
-    border: 1px solid #bebebe;
-    border-radius:6px;
-}
-.sell_button:hover {
-    border-color: #32ac97;
-    color: #32ac97;
-    transition-duration: 400ms;
-}
-.editsell {
-    line-height:10%;
-    background-color:transparent;
-}
-.editsell_input {
-    display:block;
-    margin-left:33%;
-}
-.editsell_button {
-    margin-top:10px;
-    margin-right:33.4%;
-    font-family:inherit;
-    font-size:inherit;
-    text-align:center;
-    float:right;
-    
-    width:70px;
-    background-color:white;
-    color:#bebebe;
-    border: 1px solid #bebebe;
-    border-radius:6px;
-}
-.editsell_button:hover {
-    border-color: #32ac97;
-    color: #32ac97;
-    transition-duration: 400ms;
-}
+
 .editsell_stat {
     position:relative;
     color:#32ac97;
@@ -276,46 +191,6 @@ a.text_link:visited:hover{
 }
 
 
-.new_mpwish {
-    margin-top:2%;
-    margin-left:19%;
-}
-.wish_button {
-    margin-top:10px;
-    margin-right:18%;
-    font-family:inherit;
-    font-size:inherit;
-    text-align:center;
-    float:right;
-    
-    width:70px;
-    background-color:white;
-    color:#bebebe;
-    border: 1px solid #bebebe;
-    border-radius:6px;
-}
-.wish_button:hover {
-    border-color: #32ac97;
-    color: #32ac97;
-    transition-duration: 400ms;
-}
-.review_wish_outer{
-    position:relative;
-    float:right;
-    background: white;
-    max-width: 170px;
-    border: 1px solid white;
-    border-radius:6px;
-    border-spacing:5px;
-    margin-right:40px;
-    margin-top:0px;
-}
-.review_wish_inner{
-    text-align:center;
-    background-color:white;
-}
-
-
 .feedback_text {
     height: 50%;
     width:50%;
@@ -327,44 +202,12 @@ a.text_link:visited:hover{
     font-size:inherit;
 }
 
-
-.faq_label{
-    width:40%;
-}
-.faq_button {
-    font-family:inherit;
-    font-size:inherit;
-    text-align:center;
-    float:right;
-    margin-top:10px;
-    margin-right:23%;
-    
-    width:70px;
-    background-color:white;
-    color:#bebebe;
-    border: 1px solid #bebebe;
-    border-radius:6px;
-}
-.faq_button:hover {
-    border-color: #32ac97;
-    color: #32ac97;
-    transition-duration: 400ms;
-}
 .faq_stat {
     position:relative;
     color:#32ac97;
     padding-top:30px;
     margin-bottom:15px;
     margin-left:25%;
-}
-.thoughts {
-    margin-right:8%;
-}
-
-.pricenote {
-    color:lightgrey;
-    font-size:16px;
-    margin-left:28px;
 }
 .table_head {
     color:#606060;

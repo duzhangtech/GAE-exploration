@@ -30,19 +30,11 @@
 <form method="post">
     <h3>questions/comments/feedback</h3>
 
-    <label class = "faq_label">thoughts</label>
-    <input type="text" name="feedback" class = "faq_input" value="{{feedback}}">
-    
-    <label class = "faq_label">first name</label>
-    <input type="text" name="first_name" placeholder = "optional"class = "faq_input" value="{{first_name}}">
-    
-    
-    <label class = "faq_label">last name</label>
-    <input type="text" name="last_name" placeholder = "optional" class = "faq_input" value="{{last_name}}">
-    
-    
-    <label class = "faq_label">email</label>
-    <input type="text" name="email" placeholder = "optional" class = "faq_input" value="{{email}}">
+    <input type="text" placeholder="thoughts" name="feedback" class = "faq_input" value="{{feedback}}">
+    <input type="text" placeholder = "first name" name="first_name" placeholder = "optional"class = "faq_input" value="{{first_name}}">
+    <input type="text" placeholder = "last name"  name="last_name" placeholder = "optional" class = "faq_input" value="{{last_name}}">
+    <input type="text" name="email" placeholder = "email" class = "faq_input" value="{{email}}">
+   
     <div><input type="submit" class = "faq_button" value="okay"></div>
     <br>
     <div class = "faq_stat">{{stat}}</div>

@@ -2,54 +2,44 @@
 
 {% block content %}
 
-<form method = "post">
-<div class = "buy_box">
+<form method = "post" class = "center">
 {%if count == 0%}
 <h4>It looks like every offer has been bought. <br>Check back later. :)</h4>
 
 {%else%}
 <span class = "pricenote">prices shown in dollars per mp</span>
+    
+<div class = "table">
+    
+    <span>
 
-<div class = "buy_outer">
-<table class = "buy_inner">
-    <tr>
-    <th class = "table_head">offer#</th>
-    <th class = "table_head">amount</th>  
-    <th class = "table_head">price</th>  
-    </tr>
-    {% set number = 1%}
+    <span style = "display:inline-block;
+                                   width:70px;
+                                   background-color:white;">amount</span>
+    <span style = "display:inline-block;
+                                   width:70px;
+                                   background-color:white;">price</span>
+   </span><br>
     {% for sell in sells %}
-        <tr>  
-            <td>{{number}}</td>
-             <td>{{sell.amount}}</td>
-            <td> {{sell.price}}</td>
-        </tr>
-    {%set number = number + 1%}
+
+    <a href="/contact">
+    <span style = "display:inline-block;
+                                   width:70px;
+                                   background-color:white;">{{sell.amount}}</span>
+    <span  style = "display:inline-block;
+                                   width:70px;
+                                   background-color:white;">{{sell.price}}</span>
+    </a>
+    <br>
     {% endfor %}
-</table>
 </div>
-
-<div class = "review_outer">
-<div class = "review_inner">
     
-<div class = "buy_mp">buy mp</div>
-<div><input type="text" class = "buy_input" placeholder = "offer#" name="num" value="{{num}}"></div>
-
-<div><input type="text" class = "buy_input" placeholder = "first name" name="first_name" value="{{first_name}}"></div>
-
-<div><input type="submit" class = "review_button" value="next"></div>
-<div class="stat">{{stat}}</div>
-<br>
-    
-<div class = "buy_links">
-<div><a class = "text_link"href = "/editoffer">edit my offer</a></div>
-<div><a class = "text_link"href = "/relistoffer">relist my offer</a></div>
+<!--
+<div><span class = "text_link"><a class = "text_link" href = "/editoffer">edit my offer</a></span></div>
+<div><a class = "text_link" href = "/relistoffer">relist my offer</a></div>
 <div><a class = "text_link" href = "/deleteoffer">delete my offer</a></div> 
-</div>
     
-</div>
-</div>
+-->
 {%endif%}
-</div>
 </form>
 {% endblock %}

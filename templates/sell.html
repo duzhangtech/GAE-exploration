@@ -3,34 +3,31 @@
 {% block content %}
 
 <div class = "sell_notice"><h1>*Only gold, silver, bronze, and apartment plans can transfer meal points*</h1></div>
-<div class = "apple">
-<form method="post">
+<form method="post" class = "center">
 
-        <label class = "sell_label">number of mp</label>
-        <input type="text" class = "sell_input" name="amount" value="{{amount}}">
+        <input type="text" placeholder = "number of mp" class = "sell_input" name="amount" value="{{amount}}">
         {{error_amount}}
         
         
-        <label class = "sell_label">price per mp</label>
-        <input type="text" class = "sell_input" name="price" value="{{price}}">
+        <input type="text" placeholder = "price per mp" class = "sell_input" name="price" value="{{price}}">
         {{error_price}}
         
-        
-        <label class = "sell_label">first name</label>
-        <input type="text" class = "sell_input" name="first_name" value="{{first_name}}">
+        <input type="text" placeholder = "first name" class = "sell_input" name="first_name" value="{{first_name}}">
    
-        
-        <label class = "sell_label">last name</label>
-        <input type="text" class = "sell_input" name="last_name" value="{{last_name}}">
+        <input type="text" placeholder = "last name" class = "sell_input" name="last_name" value="{{last_name}}">
     
-        
-        <label class = "sell_label">email</label>
-        <input type="text" class = "sell_input" name="email" value="{{email}}">
+        <input type="text" placeholder = "wustl email" class = "sell_input" name="email" value="{{email}}">
         {{error_email}}
-        
+    
+        {%if need_code%} 
+        <input type="text" placeholder = "verification code"class = "sell_input" name="code" value="{{code}}">
+        <input type="submit" class = "sell_button" value = "resend code">
+        {%endif%}
+    
+        <br>
         <input type="submit" class = "sell_button" value = "okay">  
+    
     <div class = "stat">{{stat}}</div>
     <div class="error">{{error}}</div> 
 </form>
-</div>
 {% endblock %}
