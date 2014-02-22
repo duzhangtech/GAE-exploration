@@ -74,21 +74,6 @@ class Handler(webapp2.RequestHandler):
         webapp2.RequestHandler.initialize(self, *a, **kw)
         self.user = self.read_secure_cookie('user')
 
-# class SellStats(db.Model):
-#     transactions_listed = db.IntegerProperty()
-#     amount_listed = db.IntegerProperty()
-#     price_listed = db.IntegerProperty()
-#     cost_listed = db.IntegerProperty()
-
-#     transactions_fulfilled = db.IntegerProperty()
-#     amount_fulfilled = db.IntegerProperty()
-#     price_fulfilled = db.IntegerProperty()
-#     cost_fulfilled = db.IntegerProperty()
-
-#     average_amount = db.IntegerProperty()
-#     average_price = db.IntegerProperty()
-#     average_cost = db.IntegerProperty()
-
 class UserModel(db.Model):
     first_name = db.StringProperty(required = True)
     last_name = db.StringProperty(required = True)
@@ -168,8 +153,7 @@ class Buy(Handler):
             count = 1
 
         self.render("buy.html", sells = sells, count = count)
-
-        
+       
 class BuyContact(Handler):
     def get(self):
         amount = self.request.get("amount")
@@ -265,6 +249,8 @@ class Sell(Handler):
 
     def post(self):
         have_error = False
+        submit_button = self.request.get("submit_button")
+        resend_button = self.request.get("resend_button")
 
         amount = self.request.get('amount')
         price = self.request.get('price')
@@ -275,8 +261,6 @@ class Sell(Handler):
         email = self.request.get('email')
         user = UserModel.all().ancestor(user_key()).filter("email", email).get()
 
-        submit_button = self.request.get("submit_button")
-        resend_button = self.request.get("resend_button")
         code = self.request.get('code')
 
         params = dict(amount = amount, 
@@ -295,114 +279,119 @@ class Sell(Handler):
             params['error_email'] = "use your wustl email"
             have_error = True
 
-        if amount and price and first_name and last_name and email and (have_error == False):
+        if submit_button:
+            if amount and price and first_name and last_name and email and (have_error == False):
+                if not code:
+                    user = UserModel.all().ancestor(user_key()).filter("email", email).get()
 
-            if not code:
-                user = UserModel.all().ancestor(user_key()).filter("email", email).get()
+                    if not user:
+                        waiting_for_verify = VerifyModel.all().filter("email", email).get()
 
-                if not user:
-                    waiting_for_verify = VerifyModel.all().filter("email", email).get()
+                        if not waiting_for_verify: #NEW USER, PUT IN LIMBO
+                            code = self.make_salt()
+                            VerifyModel(parent = verify_key(), 
+                                            email = email, 
+                                            code = code).put()
 
-                    if not waiting_for_verify: #NEW USER, PUT IN LIMBO
-                        code = self.make_salt()
-                        VerifyModel(parent = verify_key(), 
-                                        email = email, 
-                                        code = code).put()
+                            sender = "bot@trademealpoints.appspotmail.com"
+                            receiver = email
+                            subject = "MEAL POINTS VERIFICATION"
+                            body =  ("Hello! Your verification code is" + code)
+                            mail.send_mail(sender, receiver, subject, body)
 
-                        sender = "bot@trademealpoints.appspotmail.com"
-                        receiver = email
-                        subject = "MEAL POINTS VERIFICATION"
-                        body =  ("Hello! Your verification code is" + code)
-                        mail.send_mail(sender, receiver, subject, body)
+                            self.render("sell.html", 
+                                amount = amount, price = price, 
+                                first_name = first_name, last_name = last_name,
+                                email = email, need_code = True)
 
+                        else: #ASK FOR CODE
+                            self.render("sell.html", 
+                                amount = amount, price = price, 
+                                first_name = first_name, last_name = last_name,
+                                email = email, need_code = True)
+
+                    elif user: #VERIFIED, CAN PROCEED WITH SELL
+                        sell = SellModel(parent = sell_key(), user = user,
+                        amount = amount, price = price, fulfilled = False)
+
+                        sell.put()
+
+                        sells = SellModel.all().ancestor(sell_key()).filter("fulfilled", False)
+                        memcache.set("SELLS", list(sells))
+
+                        self.redirect('/buy')
+
+                elif code:
+                    check_code = VerifyModel.all().filter("email", email).get()
+
+                    if check_code: #DELETE CODE, COMMIT USER & OFFER
+                        check_code.delete()
+
+                        user = UserModel(parent = user_key(),
+                                    first_name = first_name, 
+                                    last_name = last_name,
+                                    email = email)
+                        user.put()
+
+                        SellModel(parent = sell_key(),
+                                    user = user, 
+                                    amount = amount,
+                                    price = price).put()
+                        self.redirect("/buy")
+
+                    elif not check_code: #OH SNAP
+                        stat = "invalid code"
                         self.render("sell.html", 
-                            amount = amount, price = price, 
-                            first_name = first_name, last_name = last_name,
-                            email = email, need_code = True)
+                                amount = amount, price = price, 
+                                first_name = first_name, last_name = last_name,
+                                email = email, need_code = True, stat = stat)
 
-                    else: #ASK FOR CODE
-                        self.render("sell.html", 
-                            amount = amount, price = price, 
-                            first_name = first_name, last_name = last_name,
-                            email = email, need_code = True)
 
-                elif user: #VERIFIED, CAN PROCEED WITH SELL
-                    sell = SellModel(parent = sell_key(), user = user,
-                    amount = amount, price = price, fulfilled = False)
+            #BASIC INPUT ERROR
+            elif amount and price and first_name and last_name and email and have_error == True:
 
-                    sell.put()
-
-                    sells = SellModel.all().ancestor(sell_key()).filter("fulfilled", False)
-                    memcache.set("SELLS", list(sells))
-
-                # stats = Stats.all()
-                # if stats.count() == 0:
-                #     stats = Stats(s_transactions_listed = 1, s_points_listed = amount)
-                #     stats.put()
-                # else:
-                #     stats = stats.get()
-                #     stats...#FIXME
-
-                    self.redirect('/buy')
-
-            elif code:
-                check_code = VerifyModel.all().filter("email", email).get()
-
-                if check_code: #DELETE CODE, COMMIT USER & OFFER
-                    check_code.delete()
-
-                    user = UserModel(parent = user_key(),
-                                first_name = first_name, 
-                                last_name = last_name,
-                                email = email)
-                    user.put()
-
-                    SellModel(parent = sell_key(),
-                                user = user, 
-                                amount = amount,
-                                price = price).put()
-                    self.redirect("/buy")
-
-                elif not check_code: #OH SNAP
-                    stat = "invalid code"
+                if not valid_amount(amount):
+                    error = "150 mp min, 4000 mp max"
                     self.render("sell.html", 
-                            amount = amount, price = price, 
-                            first_name = first_name, last_name = last_name,
-                            email = email, need_code = True, stat = stat)
-
-
-        #BASIC INPUT ERROR
-        elif amount and price and first_name and last_name and email and have_error == True:
-
-            if not valid_amount(amount):
-                error = "150 mp min, 4000 mp max"
-                self.render("sell.html", 
-                        amount = amount, price = price, 
-                        first_name = first_name, last_name = last_name,
-                        email = email, error=error)
-
-            elif not valid_price(price):
-                error = "0.01 to 2.00 per meal point"
-                self.render("sell.html", 
-                        amount = amount, price = price, 
-                        first_name = first_name, last_name = last_name,
-                        email = email, error=error)
-
-
-            elif not valid_email(email):
-                error = "use your wustl email"
-                self.render("sell.html", 
-                        amount = amount, price = price, 
-                        first_name = first_name, last_name = last_name,
-                        email = email, error=error)
-
-            else:
-                error = "Fill every box"
-                self.render("sell.html", 
                             amount = amount, price = price, 
                             first_name = first_name, last_name = last_name,
                             email = email, error=error)
 
+                elif not valid_price(price):
+                    error = "0.01 to 2.00 per meal point"
+                    self.render("sell.html", 
+                            amount = amount, price = price, 
+                            first_name = first_name, last_name = last_name,
+                            email = email, error=error)
+
+
+                elif not valid_email(email):
+                    error = "use your wustl email"
+                    self.render("sell.html", 
+                            amount = amount, price = price, 
+                            first_name = first_name, last_name = last_name,
+                            email = email, error=error)
+
+                else:
+                    error = "Fill every box"
+                    self.render("sell.html", 
+                                amount = amount, price = price, 
+                                first_name = first_name, last_name = last_name,
+                                email = email, error=error)
+
+        elif resend_button:
+            code = VerifyModel.all().ancestor(verify_key()).filter("email", email).get().code
+
+            sender = "bot@trademealpoints.appspotmail.com"
+            receiver = email
+            subject = "MEAL POINTS VERIFICATION"
+            body =  ("Hello! Your verification code is" + code)
+            mail.send_mail(sender, receiver, subject, body)
+
+            self.render("sell.html", 
+                amount = amount, price = price, 
+                first_name = first_name, last_name = last_name,
+                email = email, need_code = True)
 class Edit(Handler):
     def get(self):
         self.render("editsell.html")

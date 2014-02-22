@@ -95,13 +95,13 @@ input:focus {
     width:150px;
     height:37px;
     background-color:white;
-    color:#bebebe;
-    border: 1px solid #bebebe;
+    color:#32ac97;
+    border: 1px solid #32ac97;
     border-radius:6px;
 }
 .button:hover {
-     border-color: #32ac97;
-    color: #32ac97;
+     border-color: #10917b;
+    color: #10917b;
     transition-duration: 400ms;
 }
 .table{
