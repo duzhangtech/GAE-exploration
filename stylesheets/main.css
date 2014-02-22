@@ -171,3 +171,16 @@ a:active {
     color:#606060; 
     text-decoration:none;
 }  
+
+a.lighter:link{
+    color: #afafaf;
+}
+a.lighter:hover{
+    color: #afafaf;
+}
+a.lighter:visited{
+    color: #afafaf;
+}
+a.lighter:visited:hover{
+    color: #afafaf;
+}

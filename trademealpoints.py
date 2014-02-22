@@ -144,7 +144,7 @@ class Buy(Handler):
 
         else:
             logging.error("SELLS IN MC")
-            sells.sort(key = lambda x:(x.price, x.amount))
+            sells.sort(key = lambda x:((float)(x.price), (int)(x.amount)))
             count = 1
 
         self.render("buy.html", sells = sells, count = count)
