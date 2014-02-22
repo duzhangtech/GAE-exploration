@@ -8,6 +8,7 @@ body {
     margin: 0 auto;
     width:460px;
     line-height:170%;
+    margin-top:50px;
     margin-bottom:100px;
 }
 
@@ -28,7 +29,6 @@ h2 {
 .front_title {
     text-align:center;
     color:#32ac97;
-    padding-top: 50px;
     padding-bottom:30px;
     font-size: 29px;
     width:100%;
@@ -96,9 +96,12 @@ input:focus {
     border: 1px solid #e0e0e0;
     border-radius:6px;
     background-color:white;
+    
     margin: 0 auto;
     margin-bottom:15px;
-    line-height:205%;
+    padding-top:10px;
+    padding-bottom:10px;
+    line-height:210%;
 }
 
 a.text_link:link{

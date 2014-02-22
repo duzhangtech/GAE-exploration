@@ -10,21 +10,15 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
-- kind: CartModel
-  ancestor: yes
-  properties:
-  - name: cart_price
-
 - kind: SellModel
   properties:
-  - name: checked
+  - name: fulfilled
   - name: price
 
 - kind: SellModel
   ancestor: yes
   properties:
-  - name: checked
-  - name: price
+  - name: fulfilled
 
 - kind: SellModel
   ancestor: yes
@@ -36,15 +30,3 @@ indexes:
   ancestor: yes
   properties:
   - name: price
-
-- kind: WishModel
-  ancestor: yes
-  properties:
-  - name: fulfilled
-  - name: price
-
-- kind: WishModel
-  ancestor: yes
-  properties:
-  - name: fulfilled
-  - name: wish_price

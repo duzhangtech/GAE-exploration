@@ -87,8 +87,7 @@ class SellModel(db.Model):
     created = db.DateTimeProperty(auto_now = True)
 
 class FeedbackModel(db.Model):
-    first_name = db.StringProperty()
-    last_name = db.StringProperty()
+    name = db.StringProperty()
     email = db.StringProperty()
     feedback = db.StringProperty()
 
@@ -101,8 +100,7 @@ class FAQ(Handler):
         self.render("faq.html")
 
     def post(self):
-        first_name = self.request.get('first_name')
-        last_name = self.request.get('last_name')
+        name = self.request.get('name')
         email = self.request.get('email')
 
         feedback = self.request.get('feedback')
@@ -110,24 +108,21 @@ class FAQ(Handler):
         if feedback:
             f = FeedbackModel(parent = feedback_key(), feedback = feedback)
 
-            if first_name:
-                f.first_name = first_name
-
-            if last_name:
-                f.last_name = last_name
+            if name:
+                f.name = name
 
             if email:
-                f.first_name = first_name
+                f.email = email
 
             f.put()
             stat = "thanks!"
             self.render("faq.html", stat = stat)
 
         else:
-            stat = "don't forget your thoughts!"
+            stat = "What do you think about this web app?"
             self.render("faq.html", 
                 feedback = feedback,  
-                first_name = first_name, last_name = last_name, 
+                name = name,
                 email = email, stat = stat)
 
 class Buy(Handler):
@@ -136,7 +131,7 @@ class Buy(Handler):
 
         if sells is None:
             logging.error("EMPTY MC")
-            sells = SellModel.all().ancestor(sell_key()).filter("fulfilled", False).order('price')
+            sells = SellModel.all().filter("fulfilled", False).order('price')
             sells = list(sells)
 
             if len(sells) == 0:
@@ -400,7 +395,7 @@ class Sell(Handler):
                             sender = "bot@trademealpoints.appspotmail.com"
                             receiver = email
                             subject = "MEAL POINTS VERIFICATION"
-                            body =  ("Hello! Your verification code is" + code)
+                            body =  ("Hello! Your verification code is " + code)
                             mail.send_mail(sender, receiver, subject, body)
 
                             self.render("sell.html", 
