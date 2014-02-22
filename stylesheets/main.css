@@ -2,12 +2,13 @@ body {
     font-family:Futura, “Trebuchet MS”, Verdana, sans-serif;
     font-weight: 100;
     text-align:left;
-    font-size: 19px;
+    font-size: 18px;
     color: #8e8e8e;
 
     margin: 0 auto;
     width:460px;
-    line-height:150%;
+    line-height:170%;
+    margin-bottom:100px;
 }
 
 .center {
@@ -69,19 +70,40 @@ h5 {
 }
 
 input[type=text] {
+    line-height:130%;
     font-size: inherit;
     font-family:inherit;
     color:inherit;
+    margin-bottom:7px;
+    
+    width:200px;
+    height:35px;
     border: 1px solid #bebebe;
-    border-radius:20px;
+    border-radius:8px;
     text-align:center;
 }
 input:focus { 
     outline:none;
-    border-color:#9ecaed;
-    box-shadow:0 0 10px #9ecaed;
+    border-color:#32ac97;
+    box-shadow:0 0 5px #32ac97;
 }
-
+.button {
+    font-family:inherit;
+    font-size:18px;
+    margin-top:10px;
+    
+    width:150px;
+    height:37px;
+    background-color:white;
+    color:#bebebe;
+    border: 1px solid #bebebe;
+    border-radius:6px;
+}
+.button:hover {
+     border-color: #32ac97;
+    color: #32ac97;
+    transition-duration: 400ms;
+}
 .table{
     width: 300px;
     border: 1px solid #e0e0e0;

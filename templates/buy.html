@@ -15,20 +15,20 @@
 
     <span style = "display:inline-block;
                            width:80px;
-                           background-color:white;">amount</span>
+                           background-color:white;">AMOUNT</span>
     <span style = "display:inline-block;
                            width:80px;
-                           background-color:white;">price</span>
+                           background-color:white;">PRICE</span>
     <span style = "display:inline-block;
                            width:80px;
-                           background-color:white;">cost</span>
+                           background-color:white;">COST</span>
     </span>
     <br>
     
    
     {% for sell in sells %}
 
-    <a href="/contact">
+    <a href="/contact?amount={{sell.amount}}&price={{sell.price}}">
     <span style = "display:inline-block;
                            width:80px;
                            background-color:white;">{{sell.amount}}</span>

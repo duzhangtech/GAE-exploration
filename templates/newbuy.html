@@ -2,17 +2,18 @@
 
 {% block content %}
 
-<h5>Hi {{first_name}}! You selected to buy</h5>
-<h5>{{amount}} meal points for ${{price}} per meal point</h5>
-<form method="post">
+<form method="post" class = "center">
+    <div>BUY <span style = "color:#32ac97;">{{amount}}</span> MEAL POINTS</div>
+    <div>AT <span style = "color:#32ac97;">${{price}}</span> PER POINT</div>
+    <script>var cost = {{amount|int*price|float}}.toFixed(1)</script>
+    <div style = "margin-bottom:15px;">FOR <span style = "color:#32ac97;">$<script>document.write(cost);</script></span></div>
 
-    <label class = "buy_label">last name</label>
-    <input type="text" class = "buy_input" name="last_name" value="{{last_name}}">
-
-    <label class = "buy_label">email</label>
-    <input type="text" class = "buy_input" name="email" value="{{email}}">    
+    
+    <div><input type="text" placeholder = "first name" name="first_name" value="{{first_name}}"></div>
+    <div><input type="text" placeholder = "last name" name="last_name" value="{{last_name}}"></div>
+    <div><input type="text" placeholder = "email" name="email" value="{{email}}"></div>  
         
-    <div><input type="submit" class = "contact_button" value="contact seller"></div>
+    <div><input type="submit" class = "button" value="contact seller"></div>
 
     <div class = "stat">{{stat}}</div>
     <div class="stat">{{error}}</div> 

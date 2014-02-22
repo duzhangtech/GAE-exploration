@@ -169,44 +169,16 @@ class Buy(Handler):
 
         self.render("buy.html", sells = sells, count = count)
 
-    def post(self):
-        first_name = self.request.get('first_name')
-        num = self.request.get('num')
-        sells = memcache.get("SELLS")
-
-        if first_name and valid_num(num):
-            num = int(num)
-            okay_num = False
-            for index, item in enumerate(sells):
-                if (index+1) == num:
-                    okay_num = True
-                    amount = item.amount
-                    price = item.price
-                    break
-            
-            if okay_num:
-                self.new_cart(first_name)
-                self.redirect('/contact?first_name=' + first_name + "&amount=" + amount + "&price=" + price)
-            else:
-                stat = "invalid offer#"
-                self.render("buy.html", stat = stat, first_name = first_name, num = num, sells = list(sells))
-
-        elif first_name and not valid_num(num):
-            stat = "invalid offer#"
-            self.render("buy.html", stat = stat, first_name = first_name, num = num, sells = list(sells))
-
-        else: 
-            stat = "fill in all the boxes"
-            self.render("buy.html", stat = stat, first_name = first_name, num = num, sells = list(sells))
         
 class BuyContact(Handler):
     def get(self):
-        first_name = self.request.get("first_name")
         amount = self.request.get("amount")
         price = self.request.get("price")
 
-        self.render("newbuy.html", first_name=first_name, amount = amount, price = price) 
-        return
+        if not amount or not price:
+            self.redirect("/buy")
+        else:
+            self.render("newbuy.html", amount = amount, price = price) 
 
     def post(self):
         first_name = self.request.get("first_name")
@@ -293,15 +265,18 @@ class Sell(Handler):
 
     def post(self):
         have_error = False
+
         amount = self.request.get('amount')
         price = self.request.get('price')
 
         first_name = self.request.get('first_name')
         last_name = self.request.get('last_name')
-        email = self.request.get('email')
 
+        email = self.request.get('email')
         user = UserModel.all().ancestor(user_key()).filter("email", email).get()
 
+        submit_button = self.request.get("submit_button")
+        resend_button = self.request.get("resend_button")
         code = self.request.get('code')
 
         params = dict(amount = amount, 

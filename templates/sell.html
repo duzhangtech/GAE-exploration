@@ -2,30 +2,28 @@
 
 {% block content %}
 
-<div class = "sell_notice"><h1>*Only gold, silver, bronze, and apartment plans can transfer meal points*</h1></div>
 <form method="post" class = "center">
 
-        <input type="text" placeholder = "number of mp" class = "sell_input" name="amount" value="{{amount}}">
+        <div><input type="text" placeholder = "number of mp"  name="amount" value="{{amount}}"></div>
         {{error_amount}}
         
         
-        <input type="text" placeholder = "price per mp" class = "sell_input" name="price" value="{{price}}">
+        <div><input type="text" placeholder = "price per mp"  name="price" value="{{price}}"></div>
         {{error_price}}
         
-        <input type="text" placeholder = "first name" class = "sell_input" name="first_name" value="{{first_name}}">
+        <div><input type="text" placeholder = "first name"  name="first_name" value="{{first_name}}"></div>
    
-        <input type="text" placeholder = "last name" class = "sell_input" name="last_name" value="{{last_name}}">
+        <div><input type="text" placeholder = "last name"  name="last_name" value="{{last_name}}"></div>
     
-        <input type="text" placeholder = "wustl email" class = "sell_input" name="email" value="{{email}}">
+        <div><input type="text" placeholder = "wustl email" name="email" value="{{email}}"></div>
         {{error_email}}
     
         {%if need_code%} 
         <input type="text" placeholder = "verification code"class = "sell_input" name="code" value="{{code}}">
-        <input type="submit" class = "sell_button" value = "resend code">
+        <input type="submit" name = "resend_button" class = "button" value = "resend code">
         {%endif%}
-    
-        <br>
-        <input type="submit" class = "sell_button" value = "okay">  
+
+        <input type="submit" name = "submit_button" class = "button" value = "okay">  
     
     <div class = "stat">{{stat}}</div>
     <div class="error">{{error}}</div> 
