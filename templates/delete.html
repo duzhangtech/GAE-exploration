@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class = "navbar">
+    <a class = "current_link" href = "/buy"><div style = "display:inline-block;width:100px;">BUY</div></a>
+    <a class = "navlinks" href = "/sell"><div style = "display:inline-block;width:100px;">SELL</div></a>
+    <a class = "navlinks" href = "/faq"><div style = "display:inline-block;width:110px;">F.A.Q</div></a>
+</div>
+
+<form method = "post" >
+<h2 style = "text-align:center;font-size:21px;">DELETE OFFER</h2>
+    
+   <div class = "relist">
+
+    <input type="text" placeholder = "email" name="email" value="{{email}}"><br>
+    
+    <input type="text" placeholder = "amount" name="amount" value="{{amount}}"><br> 
+
+    <input type="text"  placeholder = "price"name="price" value="{{price}}"><br>
+    
+    <input type="submit" class = "button" value="okay">
+
+    <div class="relist_stat">{{stat}}</div>
+    </div>
+</form>
+
+{% endblock %}

@@ -153,8 +153,67 @@ class Buy(Handler):
             count = 1
 
         self.render("buy.html", sells = sells, count = count)
-       
+
 class BuyContact(Handler):
+    def contact_seller(self, amount, price, myemail):
+        subject = "A BUYER!"
+        sender = "bot@trademealpoints.appspotmail.com"
+        
+        seller = SellModel.all().ancestor(sell_key()).filter("amount", amount).filter("price", price).get()
+        logging.error("AMOUNT: " + amount + "PRICE" + price)
+        buyer = UserModel.all().ancestor(user_key()).filter("email", myemail).get()
+
+        receiver = seller.user.email
+
+        body = (
+            "Hey hey, savvy meal point seller. It looks like %s %s is interested in buying your offer of %s meal points at $%s per point! \n\n" % (buyer.first_name, buyer.last_name, amount, price) 
+
+            + "You can reach %s %s at %s. \n \n" % (buyer.first_name, buyer.last_name, myemail) 
+
+            + "To complete this transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (buyer.first_name)
+
+            + "Remember that WashU is going to take a 15 point transaction fee, 7.5 points per person. \n\n" 
+
+            + "If you have any questions/comments/just want to say hi, please leave them in the feedback box on the FAQ page! \n\n"
+
+            + "All right, I'm done now. You've been a real spiffy human to serve. Have an A1 Day! \n\n"
+
+            + "Mechanically yours, \n"
+            + "Bot\n\n"
+
+            + "P.S. Your offer no longer appears on the 'buy' page. If you do not complete this transaction and wish to relist your offer, simply re-enter your info on the 'sell' page.")
+
+        mail.send_mail(sender, receiver, subject, body)
+
+        receiver = myemail
+        subject = "MEAL POINTS"
+        body = (
+            "Hey hey, savvy meal point buyer. You can reach %s %s at %s regarding %s's offer of %s meal points at $%s per point. \n \n" % (seller.user.first_name, seller.user.last_name, seller.user.email, seller.user.first_name, amount, price)
+
+            + "To complete this transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (seller.user.first_name)
+
+            + "Remember that WashU is going to take a 15 point transaction fee, 7.5 points per person. \n\n" 
+
+            + "If you have any questions/comments/just want to say hi, please leave them in the feedback box on the FAQ page! \n\n"
+
+            + "All right, I'm done now. You've been a real spiffy human to serve. Have an A1 Day!\n\n"
+            + "Mechanically yours, \n"
+            + "Bot")
+
+        mail.send_mail(sender, receiver, subject, body)
+
+        seller.fulfilled = True
+        seller.put()
+        
+        sells = SellModel.all().ancestor(sell_key()).filter("fulfilled =", False).order('price')
+        if sells.count() == 0:
+            memcache.set("SELLS", None)
+        else:
+            memcache.set("SELLS", list(sells))
+
+        stat = "check your inbox!"
+        self.render("newbuy.html", stat = stat, amount = amount, price = price)
+
     def get(self):
         amount = self.request.get("amount")
         price = self.request.get("price")
@@ -165,90 +224,132 @@ class BuyContact(Handler):
             self.render("newbuy.html", amount = amount, price = price) 
 
     def post(self):
-        first_name = self.request.get("first_name")
+        logging.error("SUBMIT BUTTON")
+        submit_button = self.request.get("submit_button")
+        resend_button = self.request.get("resend_button")
+        code = self.request.get("code")
+
         amount = self.request.get("amount")
         price = self.request.get("price")
 
+        first_name = self.request.get('first_name')
         last_name = self.request.get('last_name')
         email = self.request.get('email')
-        have_error = False
 
+        if submit_button:
+            logging.error("SUBMIT BUTTON")
 
-        if last_name and valid_email(email):
-            subject = "A BUYER!"
+            if valid_email(email):
+                if not code:
+                    logging.error("NOT CODE")
+                    user = UserModel.all().ancestor(user_key()).filter("email", email).get()
+
+                    if not user:
+                        logging.error("NOT USER")
+                        waiting_for_verify = VerifyModel.all().filter("email", email).get()
+
+                        if not waiting_for_verify: #NEW USER, PUT IN LIMBO
+                            code = self.make_salt()
+                            VerifyModel(parent = verify_key(), 
+                                            email = email, 
+                                            code = code).put()
+
+                            sender = "bot@trademealpoints.appspotmail.com"
+                            receiver = email
+                            subject = "MEAL POINTS VERIFICATION"
+                            body =  ("Hello! Your verification code is" + code)
+                            mail.send_mail(sender, receiver, subject, body)
+
+                            self.render("newbuy.html", 
+                                amount = amount, price = price, 
+                                first_name = first_name, last_name = last_name,
+                                email = email, need_code = True)
+
+                        elif waiting_for_verify: #ASK FOR CODE
+                            self.render("newbuy.html", 
+                                amount = amount, price = price, 
+                                first_name = first_name, last_name = last_name,
+                                email = email, need_code = True)
+
+                    elif user: #VERIFIED, CAN CONTACT SELLER
+                        self.contact_seller(amount, price, email)
+
+                elif code and first_name and last_name:
+                    logging.error("CODE")
+                    check_code = VerifyModel.all().filter("code", code).get()
+
+                    if check_code: #DELETE CODE, COMMIT USER & SEND EMAIL
+                        logging.error("CHECK CODE")
+                        check_code.delete()
+
+                        user = UserModel(parent = user_key(),
+                                    first_name = first_name, 
+                                    last_name = last_name,
+                                    email = email)
+                        user.put()
+
+                        self.contact_seller(amount, price, email)
+
+                    elif not check_code: #OH SNAP
+                        stat = "invalid code"
+                        self.render("newbuy.html", 
+                                amount = amount, price = price, 
+                                first_name = first_name, last_name = last_name,
+                                email = email, need_code = True, stat = stat)
+
+                elif code and not first_name or not last_name:
+                    error = "fill in every box"
+                    self.render("newbuy.html", 
+                        first_name=first_name, 
+                        amount = amount, 
+                        price = price, 
+                        error = error, 
+                        need_code = True,
+                        last_name=last_name, 
+                        email = email,
+                        code = code)
+
+            elif first_name and last_name and not valid_email(email):
+                stat = "use your wustl email"
+                self.render("newbuy.html", 
+                            amount = amount, 
+                            price = price, 
+                            need_code = True,
+                            first_name = first_name, 
+                            last_name = last_name,
+                            email = email, 
+                            stat = stat)
+
+            elif not email or not valid_email(email):
+                error = "use your wustl email"
+                self.render("newbuy.html", 
+                    first_name=first_name, 
+                    amount = amount, 
+                    price = price, 
+                    error = error, 
+                    last_name=last_name, 
+                    email = email)
+
+        elif resend_button:
+            code = VerifyModel.all().ancestor(verify_key()).filter("email", email).get().code
+
             sender = "bot@trademealpoints.appspotmail.com"
-            
-            name = self.request.get("first_name")
-            amount = self.request.get("amount")
-            price = self.request.get("price")
-
-            seller = SellModel.all().filter("amount", amount).filter("price", price).get()
-            receiver = seller.user.email
-
-            body = (
-                "Hey hey, savvy meal point seller. It looks like %s %s is interested in buying your offer of %s meal points at $%s per point! \n\n" % (first_name, last_name, amount, price) 
-
-                + "You can reach %s %s at %s. \n \n" % (first_name, last_name, email) 
-
-                + "To complete this transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (first_name)
-
-                + "Remember that WashU is going to take a 15 point transaction fee, 7.5 points per person. \n\n" 
-
-                + "If you have any questions/comments/just want to say hi, please leave them in the feedback box on the FAQ page! \n\n"
-
-                + "All right, I'm done now. You've been a real spiffy human to serve. Have an A1 Day! \n\n"
-
-                + "Mechanically yours, \n"
-                + "Bot\n\n"
-
-                + "P.S. Your offer no longer appears on the 'buy' page. If you do not complete this transaction and wish to relist your offer, simply re-enter your info on the 'sell' page.")
-
-            mail.send_mail(sender, receiver, subject, body)
-
-
             receiver = email
-            subject = "MEAL POINTS"
-            body = (
-                "Hey hey, savvy meal point buyer. You can reach %s %s at %s regarding %s's offer of %s meal points at $%s per point. \n \n" % (seller.user.first_name, seller.user.last_name, seller.user.email, seller.user.first_name, amount, price)
-
-                + "To complete this transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (seller.user.first_name)
-
-                + "Remember that WashU is going to take a 15 point transaction fee, 7.5 points per person. \n\n" 
-
-                + "If you have any questions/comments/just want to say hi, please leave them in the feedback box on the FAQ page! \n\n"
-
-                + "All right, I'm done now. You've been a real spiffy human to serve. Have an A1 Day!\n\n"
-                + "Mechanically yours, \n"
-                + "Bot")
-
+            subject = "MEAL POINTS VERIFICATION"
+            body =  ("Hello! Your verification code is " + code)
             mail.send_mail(sender, receiver, subject, body)
 
-            seller.fulfilled = True
-            seller.put()
-            
-            sells = SellModel.all().ancestor(sell_key()).filter("fulfilled =", False).order('price')
-            if sells.count() == 0:
-                memcache.set("SELLS", None)
-            else:
-                memcache.set("SELLS", list(sells))
-
-            stat = "check your inbox!"
-            self.render("newbuy.html", stat = stat, first_name=first_name, amount = amount, price = price)
-
-        elif last_name and not valid_email(email):
-            error = "use your wustl email"
-            self.render("newbuy.html", first_name=first_name, amount = amount, price = price, error = error, last_name=last_name, email = email)
-
-        else:
-            error = "fill in every box"
-            self.render("newbuy.html", first_name=first_name, amount = amount, price = price, error = error, last_name=last_name, email = email)
+            self.render("newbuy.html", 
+                amount = amount, price = price, 
+                first_name = first_name, last_name = last_name,
+                email = email, need_code = True)
 
 class Sell(Handler):
     def get(self):
         self.render("sell.html")
 
     def post(self):
-        have_error = False
+        something_wrong = False
         submit_button = self.request.get("submit_button")
         resend_button = self.request.get("resend_button")
 
@@ -269,19 +370,22 @@ class Sell(Handler):
 
         if not valid_amount(amount):
             params['error_amount'] = "150 meal point minimum"
-            have_error = True
+            something_wrong = True
 
         if not valid_price(price):
             params['error_price'] = "0.01 to 2.00 per meal point"
-            have_error = True
+            something_wrong = True
 
         if not valid_email(email):
             params['error_email'] = "use your wustl email"
-            have_error = True
+            something_wrong = True
 
         if submit_button:
-            if amount and price and first_name and last_name and email and (have_error == False):
+            logging.error("SUBMIT")
+            if amount and price and email and (something_wrong == False):
+                
                 if not code:
+                    logging.error("NOT CODE")
                     user = UserModel.all().ancestor(user_key()).filter("email", email).get()
 
                     if not user:
@@ -321,8 +425,9 @@ class Sell(Handler):
 
                         self.redirect('/buy')
 
-                elif code:
-                    check_code = VerifyModel.all().filter("email", email).get()
+                elif first_name and last_name and code:
+                    logging.error("CODE")
+                    check_code = VerifyModel.all().filter("code", code).get()
 
                     if check_code: #DELETE CODE, COMMIT USER & OFFER
                         check_code.delete()
@@ -337,6 +442,10 @@ class Sell(Handler):
                                     user = user, 
                                     amount = amount,
                                     price = price).put()
+
+                        sells = SellModel.all().ancestor(sell_key()).filter("fulfilled", False)
+                        memcache.set("SELLS", list(sells))
+
                         self.redirect("/buy")
 
                     elif not check_code: #OH SNAP
@@ -348,7 +457,7 @@ class Sell(Handler):
 
 
             #BASIC INPUT ERROR
-            elif amount and price and first_name and last_name and email and have_error == True:
+            elif amount and price  and email and something_wrong == True:
 
                 if not valid_amount(amount):
                     error = "150 mp min, 4000 mp max"
@@ -372,12 +481,12 @@ class Sell(Handler):
                             first_name = first_name, last_name = last_name,
                             email = email, error=error)
 
-                else:
-                    error = "Fill every box"
-                    self.render("sell.html", 
-                                amount = amount, price = price, 
-                                first_name = first_name, last_name = last_name,
-                                email = email, error=error)
+            else:
+                error = "Fill every box"
+                self.render("sell.html", 
+                            amount = amount, price = price, 
+                            first_name = first_name, last_name = last_name,
+                            email = email, error=error)
 
         elif resend_button:
             code = VerifyModel.all().ancestor(verify_key()).filter("email", email).get().code
@@ -392,9 +501,10 @@ class Sell(Handler):
                 amount = amount, price = price, 
                 first_name = first_name, last_name = last_name,
                 email = email, need_code = True)
+
 class Edit(Handler):
     def get(self):
-        self.render("editsell.html")
+        self.render("edit.html")
 
     def post(self):
         email = self.request.get("email")
@@ -409,7 +519,7 @@ class Edit(Handler):
 
             if not user:
                 stat = "you haven't sold any meal points yet!"
-                self.render("editsell.html", stat = stat)
+                self.render("edit.html", stat = stat)
 
             else:
                 offer = SellModel.all().filter("user", user).filter("amount", current_amount).filter("price", current_price)
@@ -417,7 +527,7 @@ class Edit(Handler):
 
                 if not offer:
                     stat = "you haven't listed this offer!"
-                    self.render("editsell.html", stat = stat)
+                    self.render("edit.html", stat = stat)
 
                 else:
                     offer.amount = new_amount
@@ -425,15 +535,15 @@ class Edit(Handler):
                     offer.put()
 
                     stat = "offer successfully changed"
-                    self.render("editsell.html", stat = stat)
+                    self.render("edit.html", stat = stat)
 
         else:
             stat = "fill every box"
-            self.render("editsell.html", stat = stat)
+            self.render("edit.html", stat = stat)
 
 class Relist(Handler):
     def get(self):
-        self.render("relistsell.html")
+        self.render("relist.html")
 
     def post(self):
         email = self.request.get('email')
@@ -446,7 +556,7 @@ class Relist(Handler):
 
             if not user:
                 stat = "you haven't sold any meal points yet!"
-                self.render("relistsell.html", stat = stat)
+                self.render("relist.html", stat = stat)
 
             else:
                 offer = SellModel.all().filter("user", user).filter("amount", amount).filter("price", price)
@@ -454,21 +564,21 @@ class Relist(Handler):
 
                 if not offer:
                     stat = "you haven't listed this offer!"
-                    self.render("relistsell.html", stat = stat)
+                    self.render("relist.html", stat = stat)
 
                 else:
                     offer.fulfilled = False
                     offer.put()
 
                     stat = "offer successfully relisted"
-                    self.render("relistsell.html", stat = stat)
+                    self.render("relist.html", stat = stat)
         else:
             stat = "fill every box"
-            self.render("relistsell.html", stat = stat)
+            self.render("relist.html", stat = stat)
 
 class Delete(Handler):
     def get(self):
-        self.render("deletesell.html")
+        self.render("delete.html")
 
     def post(self):
         email = self.request.get('email')
@@ -489,16 +599,16 @@ class Delete(Handler):
 
                 if not offer:
                     stat = "you haven't listed this offer!"
-                    self.render("deletesell.html", stat = stat)
+                    self.render("delete.html", stat = stat)
 
                 else:
                     offer.delete()
 
                     stat = "offer successfully deleted"
-                    self.render("deletesell.html", stat = stat)
+                    self.render("delete.html", stat = stat)
         else:
             stat = "fill every box"
-            self.render("deletesell.html", stat = stat)
+            self.render("delete.html", stat = stat)
 
 class LogSenderHandler(InboundMailHandler):
     def receive(self, mail_message):

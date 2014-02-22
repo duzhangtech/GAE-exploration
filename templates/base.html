@@ -13,35 +13,6 @@
         <!--<div class = "front_title">WashU Meal Point Exchange</div>-->
         </a>
         
-        
-        <div class = "navbar">
-            <a class = "navlinks" href = "/buy">BUY</a>
-            <a class = "navlinks" href = "/sell">SELL</a>
-            <a class = "navlinks" href = "/faq">ABOUT</a>
-        </div>
-    
-        <script type="text/javascript">
-        
-        function getCurrentLinkFrom(links){
-        
-        var current_url = document.URL;
-        current_url = current_url.substr(current_url.lastIndexOf("/"));
-        
-        links.each(function(){
-        var link_url = $(this).attr("href"); 
-        link_url = link_url.substr(link_url.lastIndexOf("/"));
-        if (current_url == link){
-            return $(this);
-        }
-        });
-        };
-        
-        $(document).ready(function(){
-        var current_link = getCurrentLinkFrom($("navbar"));
-        current_link.addClass("link_border_bottom") ;
-        });
-        </script>
-        
     {% block content %}
     {% endblock %}
 	</body>

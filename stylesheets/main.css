@@ -16,35 +16,11 @@ body {
     text-align:center;
 }
 
-h1 {
-    font-size: inherit;
-    font-weight:100;
-    text-align:center;
-    color: #848484;
-}
 h2 {
     font-size:inherit;
     font-weight:100;
     text-align:left;
     color: #606060;
-}
-h3 {
-    text-align:center;
-    font-size:inherit;
-    color: #32ac97;
-}
-h4 {
-    font-size:inherit;
-    font-weight:100;
-    text-align:center;
-    color: #848484;
-}
-h5 {
-    font-size:inherit;
-    font-weight:100;
-    text-align:center;
-    color: #848484;
-    line-height:30%;
 }
 
 
@@ -58,15 +34,14 @@ h5 {
     width:100%;
 }
 .navbar {
-    margin-bottom: 32px;
+    margin-bottom: 26px;
     width:100%;
     text-align:center;
 }
 .navlinks {
-    padding-left: 20px;
-    padding-right: 20px;
     font-size: 23px;
-    width: 33%;
+    background-color:white;
+    width:100px;
 }
 
 input[type=text] {
@@ -100,32 +75,63 @@ input:focus {
     border-radius:6px;
 }
 .button:hover {
-     border-color: #10917b;
-    color: #10917b;
+     border-color: #0a7663;
+    color: #0a7663;
     transition-duration: 400ms;
 }
+
+.resend_button {
+    color:#bebebe;
+    border: 1px solid #bebebe;
+    border-radius:6px;
+}
+.resend_button:hover {
+    border-color: #606060;
+    color: #606060;
+    transition-duration: 400ms;
+}
+
 .table{
-    width: 300px;
+    width: 330px;
     border: 1px solid #e0e0e0;
     border-radius:6px;
     background-color:white;
     margin: 0 auto;
+    margin-bottom:15px;
+    line-height:205%;
 }
 
 a.text_link:link{
-    font-size:inherit;
-    color: #b2b0b0;
+    font-size:17px;
+    color: #c7c7c7;
 }
 a.text_link:hover{
-    font-size:inherit;
+    font-size:17px;
     color: #32ac97;
 }
 a.text_link:visited{
-    font-size:inherit;
-    color: #b2b0b0;
+    font-size:17px;
+    color: #c7c7c7;
 }
 a.text_link:visited:hover{
-    font-size:inherit;
+    font-size:17px;
+    color: #32ac97;
+}
+
+a.current_link:link{
+    font-size:23px;
+    color: #32ac97;
+}
+a.current_link:hover{
+    font-size:23px;
+    color: #32ac97;
+}
+a.current_link:visited{
+    font-size:23px;
+    color: #32ac97;
+}
+a.current_link:visited:hover{
+    font-size:23px;
     color: #32ac97;
 }
 
@@ -133,7 +139,7 @@ a.text_link:visited:hover{
 .stat {
     position:relative;
     color:#32ac97;
-    margin-top:45px;
+    margin-top:20px;
 }
 
 

@@ -2,18 +2,27 @@
 
 {% block content %}
 
+<div class = "navbar">
+    <a class = "current_link" href = "/buy"><div style = "display:inline-block;width:100px;">BUY</div></a>
+    <a class = "navlinks" href = "/sell"><div style = "display:inline-block;width:100px;">SELL</div></a>
+    <a class = "navlinks" href = "/faq"><div style = "display:inline-block;width:110px;">F.A.Q</div></a>
+</div>
+
 <form method="post" class = "center">
     <div>BUY <span style = "color:#32ac97;">{{amount}}</span> MEAL POINTS</div>
     <div>AT <span style = "color:#32ac97;">${{price}}</span> PER POINT</div>
     <script>var cost = {{amount|int*price|float}}.toFixed(1)</script>
     <div style = "margin-bottom:15px;">FOR <span style = "color:#32ac97;">$<script>document.write(cost);</script></span></div>
-
-    
-    <div><input type="text" placeholder = "first name" name="first_name" value="{{first_name}}"></div>
-    <div><input type="text" placeholder = "last name" name="last_name" value="{{last_name}}"></div>
     <div><input type="text" placeholder = "email" name="email" value="{{email}}"></div>  
-        
-    <div><input type="submit" class = "button" value="contact seller"></div>
+    
+    {%if need_code%} 
+        <div><input type="text" placeholder = "first name" name="first_name" value="{{first_name}}"></div>
+        <div><input type="text" placeholder = "last name" name="last_name" value="{{last_name}}"></div>
+        <input type="text" placeholder = "verification code" name="code" value="{{code}}"><br>
+        <button type="submit" name = "resend_button" class = "button resend_button" value = "resend code">resend code</button>
+        {%endif%}
+    
+    <button type="submit"  name = "submit_button" class = "button" value="contact seller">contact seller</button>
 
     <div class = "stat">{{stat}}</div>
     <div class="stat">{{error}}</div> 

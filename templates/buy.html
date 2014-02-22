@@ -1,27 +1,38 @@
 {% extends "base.html" %}
 
 {% block content %}
+     
+<div class = "navbar">
+    <a class = "current_link" href = "/buy"><div style = "display:inline-block;width:100px;">BUY</div></a>
+    <a class = "navlinks" href = "/sell"><div style = "display:inline-block;width:100px;">SELL</div></a>
+    <a class = "navlinks" href = "/faq"><div style = "display:inline-block;width:110px;">F.A.Q</div></a>
+</div>
 
 <form method = "post" class = "center">
 {%if count == 0%}
 <h4>It looks like every offer has been bought. <br>Check back later. :)</h4>
 
-{%else%}
-<span class = "pricenote">prices shown in dollars per mp</span>
-    
+{%else%}    
 <div class = "table">
     
     <span>
-
     <span style = "display:inline-block;
-                           width:80px;
-                           background-color:white;">AMOUNT</span>
+                           width:85px;
+                            color:#32ac97;
+                           background-color:white;">MP</span>
     <span style = "display:inline-block;
-                           width:80px;
+                           width:85px;
+                            color:#32ac97;
                            background-color:white;">PRICE</span>
     <span style = "display:inline-block;
-                           width:80px;
-                           background-color:white;">COST</span>
+                           width:85px;
+                            color:#32ac97;
+                           background-color:white;
+                            text-align:left;">
+        <span style = "display:inline-block;
+                       width:65px;
+                       background-color:white;
+                       text-align:right;">COST</span></span>
     </span>
     <br>
     
@@ -30,17 +41,17 @@
 
     <a href="/contact?amount={{sell.amount}}&price={{sell.price}}">
     <span style = "display:inline-block;
-                           width:80px;
+                           width:85px;
                            background-color:white;">{{sell.amount}}</span>
         
     <script>var price = {{sell.price}}.toFixed(2)</script>
     <span  style = "display:inline-block;
-                           width:80px;
+                           width:85px;
                            background-color:white;"><script>document.write(price);</script></span>
  
     <script>var cost = {{sell.amount|int*sell.price|float}}.toFixed(1)</script>
     <span  style = "display:inline-block;
-                    width:80px;
+                    width:85px;
                     background-color:white;
                     text-align:left;">
         <span style = "display:inline-block;
@@ -55,12 +66,10 @@
     {% endfor %}
 </div>
     
-<!--
-<div><span class = "text_link"><a class = "text_link" href = "/editoffer">edit my offer</a></span></div>
-<div><a class = "text_link" href = "/relistoffer">relist my offer</a></div>
-<div><a class = "text_link" href = "/deleteoffer">delete my offer</a></div> 
+<span><a class = "text_link" href = "/editoffer">edit </a></span><span style = "color:#c7c7c7;">|</span>
+<span><a class = "text_link" href = "/relistoffer">relist </a></span><span style = "color:#c7c7c7;">|</span>
+<span><a class = "text_link" href = "/deleteoffer">delete offer</a></span>
     
--->
 {%endif%}
 </form>
 {% endblock %}
