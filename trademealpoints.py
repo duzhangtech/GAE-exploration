@@ -97,7 +97,7 @@ class VerifyModel(db.Model):
 
 class FAQ(Handler):
     def get(self):
-        self.render("faq.html")
+        self.render("faq.html", thanks = False)
 
     def post(self):
         name = self.request.get('name')
@@ -107,16 +107,13 @@ class FAQ(Handler):
 
         if feedback:
             f = FeedbackModel(parent = feedback_key(), feedback = feedback)
-
             if name:
                 f.name = name
-
             if email:
                 f.email = email
 
             f.put()
-            stat = "thanks!"
-            self.render("faq.html", stat = stat)
+            self.render("faq.html", thanks = True)
 
         else:
             stat = "What do you think about this web app?"
@@ -124,6 +121,7 @@ class FAQ(Handler):
                 feedback = feedback,  
                 name = name,
                 email = email, stat = stat)
+    
 
 class Buy(Handler):
     def get(self):
@@ -415,7 +413,7 @@ class Sell(Handler):
 
                         sell.put()
 
-                        sells = SellModel.all().ancestor(sell_key()).filter("fulfilled", False)
+                        sells = SellModel.all().ancestor(sell_key()).filter("fulfilled =", False).order('price')
                         memcache.set("SELLS", list(sells))
 
                         self.redirect('/buy')

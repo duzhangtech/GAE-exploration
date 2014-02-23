@@ -15,7 +15,7 @@
 {%else%}    
 <div class = "table">
     
-    <span>
+    <span class = "theader">
     <span style = "display:inline-block;
                            width:85px;
                             color:#32ac97;
@@ -30,17 +30,14 @@
                            background-color:white;
                             text-align:left;">
         <span style = "display:inline-block;
-                       width:65px;
+                       width:69px;
                        background-color:white;
                        text-align:right;">COST</span></span>
     </span>
     <br>
-    
-    {% set alt = False %}
-    
+        
     {% for sell in sells %}
     
-    {% if alt == False %}
     <a href="/contact?amount={{sell.amount}}&price={{sell.price}}">
     <span style = "display:inline-block;
                            width:85px;
@@ -65,35 +62,6 @@
         </span>
     </a>
     <br>
-    {%set alt = True%}
-    
-    {%else%}
-    <a class = "lighter" href="/contact?amount={{sell.amount}}&price={{sell.price}}">
-    <span style = "display:inline-block;
-                           width:85px;
-                           background-color:white;">{{sell.amount}}</span>
-        
-    <script>var price = {{sell.price}}.toFixed(2)</script>
-    <span  style = "display:inline-block;
-                           width:85px;
-                           background-color:white;"><script>document.write(price);</script></span>
- 
-    <script>var cost = {{sell.amount|int*sell.price|float}}.toFixed(1)</script>
-    <span  style = "display:inline-block;
-                    width:85px;
-                    background-color:white;
-                    text-align:left;">
-        <span style = "display:inline-block;
-                       width:65px;
-                       background-color:white;
-                       text-align:right;">
-            <script>document.write(cost);</script>
-        </span>
-        </span>
-    </a>
-    <br>
-    {%set alt = False%}
-    {%endif%}
     
     {% endfor %}
 </div>

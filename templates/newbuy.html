@@ -12,8 +12,8 @@
     <div>BUY <span style = "color:#32ac97;">{{amount}}</span> MEAL POINTS</div>
     <div>AT <span style = "color:#32ac97;">${{price}}</span> PER POINT</div>
     <script>var cost = {{amount|int*price|float}}.toFixed(1)</script>
-    <div style = "margin-bottom:15px;">FOR <span style = "color:#32ac97;">$<script>document.write(cost);</script></span></div>
-    <div><input type="text" placeholder = "email" name="email" value="{{email}}"></div>  
+    <div style = "margin-bottom:20px;">FOR <span style = "color:#32ac97;">$<script>document.write(cost);</script></span></div>
+    <div><input type="text" placeholder = "wustl email" name="email" value="{{email}}"></div>  
     
     {%if need_code%} 
         <div><input type="text" placeholder = "first name" name="first_name" value="{{first_name}}"></div>

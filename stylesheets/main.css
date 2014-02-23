@@ -3,7 +3,7 @@ body {
     font-weight: 100;
     text-align:left;
     font-size: 18px;
-    color: #8e8e8e;
+    color: #a7a7a7;
 
     margin: 0 auto;
     width:460px;
@@ -21,7 +21,7 @@ h2 {
     font-size:inherit;
     font-weight:100;
     text-align:left;
-    color: #606060;
+    color: #7b7b7b;
 }
 
 
@@ -30,7 +30,7 @@ h2 {
     text-align:center;
     color:#32ac97;
     padding-bottom:30px;
-    font-size: 29px;
+    font-size: 28px;
     width:100%;
 }
 .navbar {
@@ -49,11 +49,11 @@ input[type=text] {
     font-size: inherit;
     font-family:inherit;
     color:inherit;
-    margin-bottom:7px;
+    margin-bottom:10px;
     
     width:200px;
     height:35px;
-    border: 1px solid #bebebe;
+    border: 1px solid #bcbcbc;
     border-radius:8px;
     text-align:center;
 }
@@ -65,7 +65,7 @@ input:focus {
 .button {
     font-family:inherit;
     font-size:18px;
-    margin-top:10px;
+    margin-top:15px;
     
     width:150px;
     height:37px;
@@ -98,10 +98,14 @@ input:focus {
     background-color:white;
     
     margin: 0 auto;
-    margin-bottom:15px;
-    padding-top:10px;
-    padding-bottom:10px;
+    margin-top:-7px;
+    margin-bottom:18px;
+    padding-top:13px;
+    padding-bottom:13px;
     line-height:210%;
+}
+.theader {
+    font-size:20px;
 }
 
 a.text_link:link{
@@ -122,19 +126,19 @@ a.text_link:visited:hover{
 }
 
 a.current_link:link{
-    font-size:23px;
+    font-size: 23px;
     color: #32ac97;
 }
 a.current_link:hover{
-    font-size:23px;
+    font-size: 23px;
     color: #32ac97;
 }
 a.current_link:visited{
-    font-size:23px;
+    font-size: 23px;
     color: #32ac97;
 }
 a.current_link:visited:hover{
-    font-size:23px;
+    font-size: 23px;
     color: #32ac97;
 }
 
@@ -147,7 +151,7 @@ a.current_link:visited:hover{
 
 
 ::-webkit-input-placeholder {
-    color:lightgrey;
+    color:#c4c4c4;
     text-align:center;
     padding-top:1px;
     font-size:inherit;
@@ -155,11 +159,11 @@ a.current_link:visited:hover{
 
 
 a:link {
-    color:#606060; 
+    color:#656565; 
     text-decoration:none; 
 }      
 a:visited {
-    color:#606060; 
+    color:#656565; 
     text-decoration:none; 
 }
 a:hover {
@@ -167,20 +171,3 @@ a:hover {
     text-decoration:none; 
     transition: 500ms;
 }  
-a:active {
-    color:#606060; 
-    text-decoration:none;
-}  
-
-a.lighter:link{
-    color: #afafaf;
-}
-a.lighter:hover{
-    color: #afafaf;
-}
-a.lighter:visited{
-    color: #afafaf;
-}
-a.lighter:visited:hover{
-    color: #afafaf;
-}
