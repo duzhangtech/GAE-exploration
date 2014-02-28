@@ -39,7 +39,7 @@ h2 {
     text-align:center;
 }
 .navlinks {
-    font-size: 23px;
+    font-size: 24px;
     background-color:white;
     width:100px;
 }
@@ -52,7 +52,7 @@ input[type=text] {
     margin-bottom:10px;
     
     width:200px;
-    height:35px;
+    height:45px;
     border: 1px solid #bcbcbc;
     border-radius:8px;
     text-align:center;
@@ -67,15 +67,15 @@ input:focus {
     font-size:18px;
     margin-top:15px;
     
-    width:150px;
-    height:37px;
+    width:200px;
+    height:45px;
     background-color:white;
     color:#32ac97;
     border: 1px solid #32ac97;
     border-radius:6px;
 }
 .button:hover {
-     border-color: #0a7663;
+    border-color: #0a7663;
     color: #0a7663;
     transition-duration: 400ms;
 }
@@ -102,7 +102,7 @@ input:focus {
     margin-bottom:18px;
     padding-top:13px;
     padding-bottom:13px;
-    line-height:210%;
+    line-height:212%;
 }
 .theader {
     font-size:20px;
@@ -126,19 +126,19 @@ a.text_link:visited:hover{
 }
 
 a.current_link:link{
-    font-size: 23px;
+    font-size: 24px;
     color: #32ac97;
 }
 a.current_link:hover{
-    font-size: 23px;
+    font-size: 24px;
     color: #32ac97;
 }
 a.current_link:visited{
-    font-size: 23px;
+    font-size: 24px;
     color: #32ac97;
 }
 a.current_link:visited:hover{
-    font-size: 23px;
+    font-size: 24px;
     color: #32ac97;
 }
 

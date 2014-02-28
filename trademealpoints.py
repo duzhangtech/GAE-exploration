@@ -137,7 +137,7 @@ class Buy(Handler):
                 count = 0
             else:
                 logging.error("DB WRITE TO MC")
-                memcache.set("SELLS", sells)
+                memcache.set("SELLS", sells.sort(key = lambda x:((float)(x.price), (int)(x.amount))))
                 count = 1
 
         else:
@@ -414,6 +414,7 @@ class Sell(Handler):
                         sell.put()
 
                         sells = SellModel.all().ancestor(sell_key()).filter("fulfilled =", False).order('price')
+                        memcache.delete("SELLS")
                         memcache.set("SELLS", list(sells))
 
                         self.redirect('/buy')
