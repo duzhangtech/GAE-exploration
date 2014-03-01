@@ -113,14 +113,14 @@ class FAQ(Handler):
                 f.email = email
 
             f.put()
-            self.render("faq.html", thanks = True)
+            #self.render("faq.html", thanks = True)
 
-        else:
-            stat = "What do you think about this web app?"
-            self.render("faq.html", 
-                feedback = feedback,  
-                name = name,
-                email = email, stat = stat)
+        # else:
+        #     stat = "What do you think about this web app?"
+        #     self.render("faq.html", 
+        #         feedback = feedback,  
+        #         name = name,
+        #         email = email, stat = stat)
     
 
 class Buy(Handler):

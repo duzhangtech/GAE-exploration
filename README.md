@@ -1,4 +1,4 @@
-WashU Meal Point Exchange
+wustl meal point exchange
 =======
 
 Buy and sell meal points.
