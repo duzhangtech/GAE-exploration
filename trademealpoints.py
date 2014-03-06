@@ -97,7 +97,7 @@ class VerifyModel(db.Model):
 
 class FAQ(Handler):
     def get(self):
-        self.render("faq.html", thanks = False)
+        self.render("faq.html")
 
     def post(self):
         name = self.request.get('name')
@@ -113,14 +113,6 @@ class FAQ(Handler):
                 f.email = email
 
             f.put()
-            #self.render("faq.html", thanks = True)
-
-        # else:
-        #     stat = "What do you think about this web app?"
-        #     self.render("faq.html", 
-        #         feedback = feedback,  
-        #         name = name,
-        #         email = email, stat = stat)
     
 
 class Buy(Handler):
@@ -138,12 +130,12 @@ class Buy(Handler):
             else:
                 logging.error("DB WRITE TO MC")
                 memcache.set("SELLS", sells.sort(key = lambda x:((float)(x.price), (int)(x.amount))))
-                count = 1
+                count = len(sells)
 
         else:
             logging.error("SELLS IN MC")
             sells.sort(key = lambda x:((float)(x.price), (int)(x.amount)))
-            count = 1
+            count = len(sells)
 
         self.render("buy.html", sells = sells, count = count)
 

@@ -3,7 +3,7 @@ body {
     font-weight: 100;
     text-align:left;
     font-size: 18px;
-    color: #a7a7a7;
+    color: #a0a0a0;
 
     margin: 0 auto;
     width:460px;
@@ -21,7 +21,7 @@ h2 {
     font-size:inherit;
     font-weight:100;
     text-align:left;
-    color: #7b7b7b;
+    color: #727272;
 }
 
 
@@ -48,12 +48,12 @@ input[type=text] {
     line-height:130%;
     font-size: inherit;
     font-family:inherit;
-    color:inherit;
+    color:#8b8b8b;
     margin-bottom:10px;
     
     width:200px;
     height:45px;
-    border: 1px solid #bcbcbc;
+    border: 2px solid #bcbcbc;
     border-radius:8px;
     text-align:center;
 }
@@ -62,19 +62,25 @@ input:focus {
     border-color:#32ac97;
     box-shadow:0 0 5px #32ac97;
 }
+
+
 textarea {
     line-height:130%;
     font-size: inherit;
     font-family:inherit;
-    color:inherit;
+    color:#8b8b8b;
     margin-bottom:10px;
     padding: 10px;
     width:185px;
     height:100px;
-    border: 1px solid #bcbcbc;
+    border: 2px solid #bcbcbc;
     border-radius:8px;
     text-align:left;
 }
+textarea, input { outline: none; }
+
+
+
 .button {
     font-family:inherit;
     font-size:18px;
@@ -84,7 +90,7 @@ textarea {
     height:45px;
     background-color:white;
     color:#32ac97;
-    border: 1px solid #32ac97;
+    border: 2px solid #32ac97;
     border-radius:6px;
 }
 .button:hover {
@@ -106,6 +112,7 @@ textarea {
 
 .table{
     width: 330px;
+    font-size:18px;
     border: 1px solid #e0e0e0;
     border-radius:6px;
     background-color:white;

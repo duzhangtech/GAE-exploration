@@ -35,35 +35,40 @@
                        text-align:right;">COST</span></span>
     </span>
     <br>
-        
-    {% for sell in sells %}
+       
+    {% for x in range(0, count) %}
     
-    <a href="/contact?amount={{sell.amount}}&price={{sell.price}}">
-    <span style = "display:inline-block;
-                           width:85px;
-                           background-color:white;">{{sell.amount}}</span>
-        
-    <script>var price = {{sell.price}}.toFixed(2)</script>
-    <span  style = "display:inline-block;
-                           width:85px;
-                           background-color:white;"><script>document.write(price);</script></span>
- 
-    <script>var cost = {{sell.amount|int*sell.price|float}}.toFixed(1)</script>
-    <span  style = "display:inline-block;
-                    width:85px;
-                    background-color:white;
-                    text-align:left;">
-        <span style = "display:inline-block;
-                       width:65px;
-                       background-color:white;
-                       text-align:right;">
-            <script>document.write(cost);</script>
-        </span>
-        </span>
-    </a>
-    <br>
+            <a href="/contact?amount={{sells[x].amount}}&price={{sells[x].price}}">
+                <span style = "display:inline-block;
+                                       width:85px;
+                                       background-color:white;">{{sells[x].amount}}</span>
+                    
+                <script>var price = {{sells[x].price}}.toFixed(2)</script>
+                <span  style = "display:inline-block;
+                                       width:85px;
+                                       background-color:white;"><script>document.write(price);</script></span>
+             
+                <script>var cost = {{sells[x].amount|int*sells[x].price|float}}.toFixed(1)</script>
+                <span  style = "display:inline-block;
+                                width:85px;
+                                background-color:white;
+                                text-align:left;">
+                    <span style = "display:inline-block;
+                                   width:65px;
+                                   background-color:white;
+                                   text-align:right;">
+                        <script>document.write(cost);</script>
+                    </span>
+                    </span>
+                </a>
+                <br>
+    
+            {% if count > 10 and (x+1) % 5 == 0 and x != count-1 and x != count-2 %}
+                <div style = "margin-bottom:10px;"></div>
+                {% endif %}
     
     {% endfor %}
+    
 </div>
     
 <span><a class = "text_link" href = "/editoffer">edit </a></span><span style = "color:#c7c7c7;">|</span>
