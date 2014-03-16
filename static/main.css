@@ -1,20 +1,79 @@
 body {
-    font-family:Futura, “Trebuchet MS”, Verdana, sans-serif;
+    font-family: 'Josefin Sans', sans-serif;
     font-weight: 100;
-    text-align:left;
-    font-size: 18px;
-    color: #a0a0a0;
-
+    text-align:center;
     margin: 0 auto;
-    width:460px;
-    line-height:170%;
+    overflow:hidden;
+}
+.box {
+    background-color:white;
+    margin:0 auto;
     margin-top:50px;
-    margin-bottom:100px;
 }
 
-.center {
-    position:relative;
-    text-align:center;
+#title {
+    float:left;
+    position:absolute;
+    font:15px;
+    
+    left:60%;
+    
+    color:#a8a8a8;
+    background-color:white;
+    top:13px;
+    margin-left:45px;
+}
+#navbar {
+    position:absolute;
+    left:60%;
+    background-color:white;
+
+    color:#6a6a6a;
+    top:40px;
+    margin-left:48px;
+}
+
+
+.table{
+    width: 400px;
+    max-height:90%;
+    font-size:18px;
+    background-color:white;
+    
+    margin: 0 auto;
+    line-height:240%;
+}
+.theader span {
+    font-size:38px;
+    font-weight:bold;
+    color:black;
+    display:inline-block;
+    width:110px;
+    background-color:white;
+    margin-bottom:10px;
+}
+.entry {
+    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+    font-weight: 300;
+    font-size:22px;
+    display:inline-block;
+    width:110px;
+    background-color:white;
+}
+
+.navlinks {
+    font-size: 16px;
+    background-color:white;
+    width:100px;
+}
+#buy {
+    display:show;
+}
+#sell {
+    display:none;
+}
+#faq {
+    display:none;
 }
 
 h2 {
@@ -33,38 +92,21 @@ h2 {
     font-size: 28px;
     width:100%;
 }
-.navbar {
-    margin-bottom: 26px;
-    width:100%;
-    text-align:center;
-}
-.navlinks {
-    font-size: 24px;
-    background-color:white;
-    width:100px;
-}
+
 
 input[type=text] {
-    line-height:130%;
-    font-size: inherit;
-    font-family:inherit;
-    color:#8b8b8b;
-    margin-bottom:10px;
-    
-    width:200px;
-    height:45px;
-    border: 2px solid #bcbcbc;
-    border-radius:8px;
-    text-align:center;
 }
 input:focus { 
+/*
     outline:none;
     border-color:#32ac97;
     box-shadow:0 0 5px #32ac97;
+*/
 }
 
 
 textarea {
+/*
     line-height:130%;
     font-size: inherit;
     font-family:inherit;
@@ -76,10 +118,11 @@ textarea {
     border: 2px solid #bcbcbc;
     border-radius:8px;
     text-align:left;
+*/
 }
-textarea, input { outline: none; }
-
-
+textarea, input{ 
+    outline: none; 
+}
 
 .button {
     font-family:inherit;
@@ -110,23 +153,7 @@ textarea, input { outline: none; }
     transition-duration: 400ms;
 }
 
-.table{
-    width: 330px;
-    font-size:18px;
-    border: 1px solid #e0e0e0;
-    border-radius:6px;
-    background-color:white;
-    
-    margin: 0 auto;
-    margin-top:-7px;
-    margin-bottom:18px;
-    padding-top:13px;
-    padding-bottom:13px;
-    line-height:212%;
-}
-.theader {
-    font-size:20px;
-}
+
 
 a.text_link:link{
     font-size:17px;
@@ -144,6 +171,8 @@ a.text_link:visited:hover{
     font-size:17px;
     color: #32ac97;
 }
+
+
 
 a.current_link:link{
     font-size: 24px;
@@ -163,6 +192,7 @@ a.current_link:visited:hover{
 }
 
 
+
 .stat {
     position:relative;
     color:#32ac97;
@@ -179,15 +209,16 @@ a.current_link:visited:hover{
 
 
 a:link {
-    color:#656565; 
+    font:17px;
+    color:#7e7e7e; 
     text-decoration:none; 
 }      
 a:visited {
-    color:#656565; 
+    color:#7e7e7e; 
     text-decoration:none; 
 }
 a:hover {
-    color:#32ac97; 
+    color:black; 
     text-decoration:none; 
     transition: 500ms;
 }  

@@ -2,13 +2,7 @@
 
 {% block content %}
 
-<div class = "navbar">
-    <a class = "navlinks" href = "/buy"><div style = "display:inline-block;width:100px;">BUY</div></a>
-    <a class = "current_link" href = "/sell"><div style = "display:inline-block;width:100px;">SELL</div></a>
-    <a class = "navlinks" href = "/faq"><div style = "display:inline-block;width:110px;">F.A.Q</div></a>
-</div>
-
-<form method="post" class = "center">
+<form method = "post" class = "center">
 
         <div><input type="text" placeholder = "number of mp"  name="amount" value="{{amount}}"></div>
         {{error_amount}}
@@ -30,5 +24,7 @@
     
     <div class = "stat">{{stat}}</div>
     <div class="stat">{{error}}</div> 
+    
 </form>
+
 {% endblock %}
