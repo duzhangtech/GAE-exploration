@@ -1,10 +1,26 @@
 $(document).ready(function(){
     
+//BUY
+$('#buy-link').click(function () {
+    $('#buy').slideDown();
+    $('#faq').hide();
+    $('#sell').hide();
+});
+    
 //SELL
 $('#sell-link').click(function () {
-    $('#buy').slideUp();
-    $('#sell').show();
+    $('#buy').hide();
+    $('#faq').hide();
+    $('#sell').slideDown();
 });
+    
+//FAQ
+$('#faq-link').click(function () {
+    $('#buy').hide();
+    $('#sell').hide();
+    $('#faq').slideDown();
+});
+    
     
 //FEEDBACK
 $("#submit").click(function() {

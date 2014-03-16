@@ -18,13 +18,15 @@
 <body>
     
     
+
     
-    
-<div id = "title">WUSTL MEAL POINT EXCHANGE</div>
+<div id = "header">WUSTL MEAL POINT EXCHANGE</div>
 
 <div id = "navbar">
-    <span id = "sell-link"class = "navlinks" href = "/#sell">SELL</span>
-    <span class = "navlinks" style = "padding-left:10px;"href = "/#faq">F.A.Q</span>
+    <span id = "buy-link" class = "navlinks" >BUY</span>
+    <span id = "sell-link" class = "navlinks" style = "padding-left:10px;">SELL</span>
+    <span id = "faq-link" class = "navlinks" style = "padding-left:10px;">FAQ</span>
+
     </div>    
 
     
@@ -78,15 +80,15 @@
 
 <div id = "sell" class = "box center">
 
-        <div><input type="text" placeholder = "number of mp"  name="amount" value="{{amount}}"></div>
-        {{error_amount}}
-        
-        <div><input type="text" placeholder = "price per mp"  name="price" value="{{price}}"></div>
-        {{error_price}}
-        
-        <div><input type="text" placeholder = "wustl email" name="email" value="{{email}}"></div>
-        {{error_email}}
+        <div class = "inputbox"><input type="text" placeholder = "amount"></div>
     
+        <div class = "inputbox"><input type="text" placeholder = "$/mp"></div>
+    
+        <div class = "inputbox"><input type="text" placeholder = "email"></div>
+        
+        
+        
+
         {%if need_code%} 
         <div><input type="text" placeholder = "first name"  name="first_name" value="{{first_name}}"></div>
         <div><input type="text" placeholder = "last name"  name="last_name" value="{{last_name}}"></div>
