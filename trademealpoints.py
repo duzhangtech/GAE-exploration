@@ -1,21 +1,23 @@
 import webapp2
-import logging
 import jinja2
+import logging
 import random
 import json
 import re
 
 from string import letters
-from datetime import datetime, timedelta
 
 from google.appengine.ext import db
 from google.appengine.api import mail
 from google.appengine.api import memcache
+from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
 
-jinja = jinja2.Environment(loader = jinja2.FileSystemLoader('templates'), autoescape = True)
+
+jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader('templates'), autoescape = True) 
 
 secret = "asd8B*#lfiewnL#FF:OIWEfkjkdsa;fjk;;lk"
 
+#basic user can sell, wish, and give feedback
 def user_key():
     return db.Key.from_path('user_kind', 'user_id')
 
@@ -37,15 +39,15 @@ def check_secure_val(secure_val):
         return val
 
 class Handler(webapp2.RequestHandler):
-    def write(self, *tuple, **dict):
-        self.response.out.write(*tuple, **dict)
+    def write(self, *a, **kw):
+        self.response.out.write(*a, **kw)
 
-    def render_params(self, template, **dict):
-        temp = jinja.get_template(template)
-        return temp.render(dict)
+    def render_str(self, template, **params):
+        t = jinja_env.get_template(template)
+        return t.render(params)
 
-    def render(self, template, **dict): 
-        self.write(self.render_params(template, **dict))
+    def render(self, template, **kw):
+        self.write(self.render_str(template, **kw))
 
     def set_secure_cookie(self, user, val):
         cookie_val = make_secure_val(val)
@@ -128,7 +130,59 @@ class Buy(Handler):
             sells.sort(key = lambda x:((float)(x.price), (int)(x.amount)))
             count = len(sells)
 
-        self.render("home.html", sells = sells, count = count)
+        self.render("buy.html", sells = sells, count = count)
+
+
+class BuyOnMP(Handler):
+    def get(self):
+        sells = memcache.get("SELLS")
+
+        if sells is None:
+            logging.error("EMPTY MC")
+            sells = SellModel.all().filter("fulfilled", False).order('price')
+            sells = list(sells)
+
+            if len(sells) == 0:
+                logging.error("EMPTY DB")
+                count = 0
+            else:
+                logging.error("DB WRITE TO MC")
+                memcache.set("SELLS", sells.sort(key = lambda x:((float)(x.price), (int)(x.amount))))
+                count = len(sells)
+
+        else:
+            logging.error("SELLS IN MC")
+            sells.sort(key = lambda x:((float)(x.price), (int)(x.amount)))
+            count = len(sells)
+
+        self.render("buy.html", sells = sells, count = count)
+
+
+class BuyOnPrice(Handler):
+    def get(self):
+        sells = memcache.get("SELLS")
+
+        if sells is None:
+            logging.error("EMPTY MC")
+            sells = SellModel.all().filter("fulfilled", False).order('price')
+            sells = list(sells)
+
+            if len(sells) == 0:
+                logging.error("EMPTY DB")
+                count = 0
+            else:
+                logging.error("DB WRITE TO MC")
+                memcache.set("SELLS", sells.sort(key = lambda x:((float)(x.price), (int)(x.amount))))
+                count = len(sells)
+
+        else:
+            logging.error("SELLS IN MC")
+            sells.sort(key = lambda x:((float)(x.price), (int)(x.amount)))
+            count = len(sells)
+
+        self.render("buy.html", sells = sells, count = count)
+
+
 
 class BuyContact(Handler):
     def contact_seller(self, amount, price, myemail):
@@ -586,7 +640,16 @@ class Delete(Handler):
         else:
             stat = "fill every box"
             self.render("delete.html", stat = stat)
-            
+
+class LogSenderHandler(InboundMailHandler):
+    def receive(self, mail_message):
+        logging.info("from: " + mail_message.sender)
+        plaintext = mail_message.bodies(content_type='text/plain')
+        for text in plaintext:
+            m = ""
+            m = text[1].decode()
+            logging.info("message: %s" % m)
+            self.response.out.write(m)
 
 AMOUNT_RE = re.compile(r'^[1][5-9][0-9]$|^[2-9][0-9]{2}$|^[1-3][0-9]{3}$|^4000$')
 
@@ -614,8 +677,10 @@ def render_str(template, **params):
 
 application = webapp2.WSGIApplication([
                     ('/', Buy),
-
                     ('/buy', Buy),
+                    ('/buyonprice', BuyOnPrice),
+                    ('/buyonmp', BuyOnMP),
+
                     ('/contact', BuyContact),
 
                     ('/sell', Sell),
@@ -623,6 +688,6 @@ application = webapp2.WSGIApplication([
                     ('/relistoffer', Relist),
                     ('/deleteoffer', Delete),
 
-                    ('/faq', FAQ),
-                    ],
+                    ('/faq', FAQ), 
+                    LogSenderHandler.mapping()],
                     debug=True)

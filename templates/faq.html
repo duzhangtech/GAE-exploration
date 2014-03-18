@@ -1,12 +1,55 @@
 {% extends "base.html" %}
 
 {% block content %}
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" type="text/javascript" charset="utf-8">
+</script>
 
-   <div id = "feed" class = "center">
+<div class = "navbar">
+    <a class = "navlinks" href = "/buy"><div style = "display:inline-block;width:100px;">BUY</div></a>
+    <a class = "navlinks" href = "/sell"><div style = "display:inline-block;width:100px;">SELL</div></a>
+    <a class = "current_link" href = "/faq"><div style = "display:inline-block;width:110px;">F.A.Q</div></a>
+</div>
 
-    <div id = "feedback_title" style = "font-size:24px;color: #32ac97;margin-bottom:25px;margin-top:5px;">COMMENTS</div>
+<div class = "spacing center">
+<div>This web app facilitates the exchange of meal points for students at Washington University in St. Louis.</div><br>
 
-    <div><textarea type="text" id = "feedback" cols="40" rows="5" placeholder="thoughts" name="feedback" value="{{feedback}}"></textarea></div>
+<h2>Buy meal points</h2>
+<div>Click the offer that you want to buy and leave your email address. 
+    When you verify your email address, an email regarding the transaction will automatically be sent to both you and the seller.</div><br>
+
+<h2>Sell meal points</h2>
+<div>Enter your offer details. 
+    When you verify your email address, your offer will instantly appear on the buy list.</div><br>
+    
+<h2 style = "font-size:23px;color:#727272;text-align:center; margin-bottom:40px;">F.A.Q</h2>    
+
+<h2>Do I have to pay to use trademealpoints?</h2>
+<div>No. This web app is totally free to use.</div><br>
+    
+<h2>Which meal plans can transfer meal points?</h2>    
+<div>Gold, silver, bronze, and apartment.</div><br>
+
+<h2>Is it free to transfer meal points?</h2>
+<div>WashU takes a 15 point transaction fee, 7.5 points per person.</div><br>
+
+<h2>Why do I have to verify my email address?</h2>    
+<div>So the tmp bot doesn't get emails like asdf@wustl.edu.</div>
+    <div>:p</div><br>
+    
+<h2>How come I didn't get my verification email?</h2>    
+<div>If you use a different primary email, it takes a few minutes for wustl emails to forward. Try checking your wustl account directly.</div><br>
+    
+<h2>What if I want to split up and sell my meal points?</h2>    
+<div>Post twice. You don't have to verify your email again.</div><br>
+    
+<h2>Where can I find more details on the meal point transfer process?</h2>
+<div><a class = "text_link" target="_blank" href = "http://diningservices.wustl.edu/MEALPLANS/Pages/default.aspx">Here.</a></div><br>
+
+    <div id = "feed">
+
+    <div id = "feedback_title" style = "font-size:24px;color: #32ac97;margin-bottom:25px;margin-top:5px;">SAY HI</div>
+
+    <div><textarea type="text" id = "feedback" cols="40" rows="5"  name="feedback" value="{{feedback}}"></textarea></div>
     <div><input type="text" id = "name" placeholder = "name (optional)" name="name" value="{{name}}"></div>
     <div><input type="text" id = "email" name="email" placeholder = "email (optional)" value="{{email}}"></div>
    
@@ -14,5 +57,5 @@
     <div class = "stat">{{stat}}</div>
         
     </div>
-     
+</div>
 {% endblock %}
