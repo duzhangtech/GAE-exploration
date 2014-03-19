@@ -17,8 +17,8 @@
         
         <div class = "theader">
             <span>MP</span>
-            <span>$/MP</span>
             <span>$</span>
+            <span>$/MP</span>
         </div>
            
         {% for x in range(0, count) %}
@@ -31,10 +31,11 @@
                 <a href="/contact?amount={{sells[x].amount}}&price={{sells[x].price}}">
                     
                     <span class = "entry">{{sells[x].amount}}</span>
+                    
+                    <span class = "entry"><script>document.write(cost);</script></span>
                         
                     <span class = "entry"><script>document.write(price);</script></span>
                  
-                    <span class = "entry"><script>document.write(cost);</script>
                 </a>
                 <br>
     

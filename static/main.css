@@ -29,26 +29,22 @@ body {
     font-size: 24px;
     background-color:white;
     display:inline-block;
-    width:70px;
-    padding-top:10px;
-    height:20px;
-    margin-left:10px;
-    margin-right:10px;
+    width:55px;
+    margin-left:25px;
+    margin-right:25px;
     
 }
 .current_link {
     font-size: 24px;
     background-color:white;
     display:inline-block;
-    width:70px;
-    margin-left:10px;
-    margin-right:10px;
-    padding-top:10px;
-    height:20px;
+    width:55px;
+    margin-left:25px;
+    margin-right:25px;
 }
 a.current_link:link{
     font-size: 24px;
-    border-top:3px solid #32ac97;
+    border-bottom:3px solid #32ac97;
 }
 a.current_link:hover{
     font-size: 24px;
