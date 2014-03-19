@@ -10,15 +10,15 @@ body {
 
 #front-title {
     position:relative;
-    top:35px;
+    top:25px;
     font-family: 'Nunito', sans-serif;
-    font-size: 25px;
+    font-size: 22px;
     color:black;    
 }
 
 .navbar {
     position:relative;
-    top:50px;
+    top:40px;
     font-family: 'Nunito', sans-serif;
     margin:0 auto;
     text-align:center;
@@ -26,7 +26,7 @@ body {
     
 }
 .navlinks {
-    font-size: 24px;
+    font-size:21px;
     background-color:white;
     display:inline-block;
     width:55px;
@@ -35,7 +35,7 @@ body {
     
 }
 .current_link {
-    font-size: 24px;
+    font-size:21px;
     background-color:white;
     display:inline-block;
     width:55px;
@@ -43,26 +43,20 @@ body {
     margin-right:25px;
 }
 a.current_link:link{
-    font-size: 24px;
     border-bottom:3px solid #32ac97;
 }
 a.current_link:hover{
-    font-size: 24px;
 }
 a.current_link:visited{
-    font-size: 24px;
 }
 a.current_link:visited:hover{
-    font-size: 24px;
 }
 
 
 .center {
     position:relative;
     top:70px;
-    display:block;
     margin:0 auto;
-    width:500px;
     background-color:white;
 }
 
@@ -133,31 +127,33 @@ textarea, input { outline: none; }
     transition-duration: 400ms;
 }
 
-.table{
-    width: 400px;
-    max-height:90%;
+.tafble{
+    position:relative;
+    top:-10px;
     font-size:18px;
-    background-color:white;
+    background-color:red;
     
     margin: 0 auto;
     line-height:240%;
 }
+.theadefr {
+    position:relative;
+
+}
 .theader span {
-    /*    font-family: 'Josefin Sans', sans-serif;*/
-    font-weight: 100;
-    font-size:24px;
-    color:black;
+    font-size:21px;
     display:inline-block;
-    width:110px;
     background-color:white;
     margin-bottom:10px;
+    width:55px;
+    margin-left:25px;
+    margin-right:25px;
 }
 .entry {
 /*    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; */
-    font-weight: 300;
-    font-size:22px;
+    font-size:21px;
     display:inline-block;
-    width:110px;
+    width:100px;
     background-color:white;
 }
 

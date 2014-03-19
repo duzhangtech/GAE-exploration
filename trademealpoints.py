@@ -133,7 +133,7 @@ class Buy(Handler):
         self.render("buy.html", sells = sells, count = count)
 
 
-class BuyOnMP(Handler):
+class BuySortMP(Handler):
     def get(self):
         sells = memcache.get("SELLS")
 
@@ -147,18 +147,18 @@ class BuyOnMP(Handler):
                 count = 0
             else:
                 logging.error("DB WRITE TO MC")
-                memcache.set("SELLS", sells.sort(key = lambda x:((float)(x.price), (int)(x.amount))))
+                memcache.set("SELLS", sells.sort(key = lambda x:((int)(x.amount), (float)(x.price))))
                 count = len(sells)
 
         else:
             logging.error("SELLS IN MC")
-            sells.sort(key = lambda x:((float)(x.price), (int)(x.amount)))
+            sells.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
             count = len(sells)
 
         self.render("buy.html", sells = sells, count = count)
 
 
-class BuyOnPrice(Handler):
+class BuySortPrice(Handler):
     def get(self):
         sells = memcache.get("SELLS")
 
@@ -678,8 +678,8 @@ def render_str(template, **params):
 application = webapp2.WSGIApplication([
                     ('/', Buy),
                     ('/buy', Buy),
-                    ('/buyonprice', BuyOnPrice),
-                    ('/buyonmp', BuyOnMP),
+                    ('/buysortprice', BuySortPrice),
+                    ('/buysortmp', BuySortMP),
 
                     ('/contact', BuyContact),
 
