@@ -14,7 +14,7 @@
         <div>AT <span style = "color:#32ac97;">${{price}}</span> PER POINT</div>
         <script>var cost = {{amount|int*price|float}}.toFixed(1)</script>
         <div class = "tenbelow">FOR <span style = "color:#32ac97;">$<script>document.write(cost);</script></span></div>
-        <div><input type="text" placeholder = "wustl email" class = "tenbelow" name="email" value="{{email}}"></div>  
+        <div><input type="text" placeholder = "wustl email" class = "tenbelow spaceup" name="email" value="{{email}}"></div>  
     
     
     {%if need_code%} 
