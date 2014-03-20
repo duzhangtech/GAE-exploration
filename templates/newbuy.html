@@ -9,21 +9,23 @@
 </div>
 
 <form method="post" class = "center">
-    <div>BUY <span style = "color:#32ac97;">{{amount}}</span> MEAL POINTS</div>
-    <div>AT <span style = "color:#32ac97;">${{price}}</span> PER POINT</div>
-    <script>var cost = {{amount|int*price|float}}.toFixed(1)</script>
-    <div style = "margin-bottom:20px;">FOR <span style = "color:#32ac97;">$<script>document.write(cost);</script></span></div>
-    <div><input type="text" placeholder = "wustl email" name="email" value="{{email}}"></div>  
+    <div style = "font-size:19px;">
+        <div class = "spaceup">BUY <span style = "color:#32ac97;">{{amount}}</span> MEAL POINTS</div>
+        <div>AT <span style = "color:#32ac97;">${{price}}</span> PER POINT</div>
+        <script>var cost = {{amount|int*price|float}}.toFixed(1)</script>
+        <div class = "tenbelow">FOR <span style = "color:#32ac97;">$<script>document.write(cost);</script></span></div>
+        <div><input type="text" placeholder = "wustl email" class = "tenbelow" name="email" value="{{email}}"></div>  
+    
     
     {%if need_code%} 
-        <div><input type="text" placeholder = "first name" name="first_name" value="{{first_name}}"></div>
-        <div><input type="text" placeholder = "last name" name="last_name" value="{{last_name}}"></div>
-        <input type="text" placeholder = "verification code" name="code" value="{{code}}"><br>
-        <button type="submit" name = "resend_button" class = "button resend_button" value = "resend code">resend code</button>
+        <div><input type="text" placeholder = "first name" class = "tenbelow" name="first_name" value="{{first_name}}"></div>
+        <div><input type="text" placeholder = "last name" name="last_name" class = "tenbelow" value="{{last_name}}"></div>
+        <div><input type="text" placeholder = "verification code" name="code" class = "tenbelow" value="{{code}}"></div>
+        <button type="submit" name = "resend_button" class = "button spaceup resend_button" value = "resend code">resend code</button>
         {%endif%}
     
-    <button type="submit"  name = "submit_button" class = "button" value="contact seller">contact seller</button>
-
+    <button type="submit"  name = "submit_button" class = "button spaceup" value="contact seller">contact seller</button>
+</div>
     <div class = "stat">{{stat}}</div>
     <div class="stat">{{error}}</div> 
 </form>

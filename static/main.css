@@ -64,21 +64,21 @@ a.current_link:visited:hover{
 
 input[type=text] {
     line-height:130%;
-    font-size: inherit;
+    font-size: 19px;
     font-family:inherit;
-    color:#8b8b8b;
-    margin-bottom:10px;
+    color:inherit;
     
-    width:200px;
+    width:180px;
     height:45px;
-    border: 2px solid white;
-    border-radius:8px;
+    margin-bottom:10px;
+    border: 2px solid #bcbcbc;
+    border-radius:5px;
     text-align:center;
 }
 input:focus { 
     outline:none;
-    border-color:#32ac97;
-    box-shadow:0 0 5px #32ac97;
+    border: 2px solid #20bca1;
+    box-shadow:0 0 3px #32ac97;
 }
 
 
@@ -89,7 +89,7 @@ textarea {
     color:#8b8b8b;
     margin-bottom:10px;
     padding: 10px;
-    width:185px;
+    width:160px;
     height:100px;
     border: 2px solid #bcbcbc;
     border-radius:8px;
@@ -102,41 +102,45 @@ textarea, input { outline: none; }
 .button {
     font-family:inherit;
     font-size:18px;
-    margin-top:15px;
     
-    width:200px;
+    width:180px;
     height:45px;
     background-color:white;
-    color:#32ac97;
-    border: 2px solid #32ac97;
+    color:grey;
+    border: 2px solid grey;
     border-radius:6px;
 }
 .button:hover {
     border-color: #0a7663;
-    color: #0a7663;
+    background-color:#32ac97;
+    color: white;
     transition-duration: 400ms;
 }
 
 .resend_button {
-    color:#bebebe;
-    border: 1px solid #bebebe;
-    border-radius:6px;
-}
-.resend_button:hover {
-    border-color: #606060;
-    color: #606060;
-    transition-duration: 400ms;
+    width:130px;
 }
 
+.tenbelow {
+    margin-bottom:10px;
+}
 .spacing {
+    line-height:170%;
+}
+.spacing200 {
     line-height:200%;
 }
+.spaceup {
+    margin-top:10px;
+}
+
 .theader span {
     font-size:21px;
     display:inline-block;
     background-color:white;
     margin-bottom:10px;
     width:100px;
+    color:black;
 }
 .entry {
 /*    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; */
@@ -147,27 +151,28 @@ textarea, input { outline: none; }
 }
 
 a.text_link:link{
-    font-size:17px;
-    color: #c7c7c7;
+    font-size:16px;
+    color: grey;
 }
 a.text_link:hover{
-    font-size:17px;
+    font-size:16px;
     color: #32ac97;
 }
 a.text_link:visited{
-    font-size:17px;
-    color: #c7c7c7;
+    font-size:16px;
+    color: grey;
 }
 a.text_link:visited:hover{
-    font-size:17px;
+    font-size:16px;
     color: #32ac97;
 }
 
 
 
 h2 {
-    font-size:18px;
-    color:#4b4b4b;
+    font-size:17px;
+    color:black;
+    font-weight:100;
 }
 .left {
     text-align:left;

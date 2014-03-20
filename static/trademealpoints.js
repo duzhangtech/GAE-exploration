@@ -19,7 +19,7 @@ $(document).ready(function(){
             data: 'feedback=' + feedback + "&name=" + name + "&email=" + email,
             success: function() {
             
-            $("#feedback_title").replaceWith("<div id = 'feedback_title' style = 'font-size:24px;color: #32ac97;margin-bottom:25px;margin-top:5px;'>THANKS!</div>");
+            $("#feedback_title").replaceWith("<div id = 'feedback_title' style = 'font-size:24px;color: #32ac97;margin-bottom:200px;margin-top:5px;'>THANKS!</div>");
             $("#feedback").remove();
             $("#name").remove();
             $("#email").remove();

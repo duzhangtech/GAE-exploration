@@ -10,7 +10,7 @@
 
 <form method="post" class = "center">
 
-        <div><input type="text" placeholder = "number of mp"  name="amount" value="{{amount}}"></div>
+        <div><input type="text" placeholder = "number of mp" class = "spaceup" name="amount" value="{{amount}}"></div>
         {{error_amount}}
         
         <div><input type="text" placeholder = "price per mp"  name="price" value="{{price}}"></div>
@@ -20,13 +20,15 @@
         {{error_email}}
     
         {%if need_code%} 
-        <div><input type="text" placeholder = "first name"  name="first_name" value="{{first_name}}"></div>
-        <div><input type="text" placeholder = "last name"  name="last_name" value="{{last_name}}"></div>
-        <input type="text" placeholder = "verification code" name="code" value="{{code}}"><br>
-        <button type="submit" name = "resend_button" class = "button resend_button" value = "resend code">resend code</button>
+        <div><input type="text" placeholder = "first name" name="first_name" value="{{first_name}}"></div>
+        <div><input type="text" placeholder = "last name"   name="last_name" value="{{last_name}}"></div>
+        <input type="text" placeholder = "verification code"  name="code" value="{{code}}"><br>
+        <button type="submit" name = "resend_button" class = "button resend_button spaceup" value = "resend code">resend code</button>
         {%endif%}
 
-        <button type="submit" name = "submit_button" class = "button" value = "okay">submit</button>
+        <button type="submit" name = "submit_button" class = "button spaceup tenbelow" value = "okay">submit</button><br>
+        <a class = "text_link " href = "/editoffer">edit </a></span><span style = "color:#c7c7c7;">|
+    <a class = "text_link " href = "/deleteoffer">delete offer</a>
     
     <div class = "stat">{{stat}}</div>
     <div class="stat">{{error}}</div> 
