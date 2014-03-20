@@ -160,27 +160,26 @@ class BuySortMP(Handler):
 
 class BuySortPrice(Handler):
     def get(self):
-        sells = memcache.get("SELLS")
+        sells = SellModel.all().filter("fulfilled", False).order('price')
+        sells = list(sells)
+        logging.error("PRICESORT")
 
-        if sells is None:
-            logging.error("EMPTY MC")
-            sells = SellModel.all().filter("fulfilled", False).order('price')
-            sells = list(sells)
-
-            if len(sells) == 0:
-                logging.error("EMPTY DB")
-                count = 0
-            else:
-                logging.error("DB WRITE TO MC")
-                memcache.set("SELLS", sells.sort(key = lambda x:((float)(x.price), (int)(x.amount))))
-                count = len(sells)
-
+        if len(sells) == 0:
+            count = 0
         else:
-            logging.error("SELLS IN MC")
-            sells.sort(key = lambda x:((float)(x.price), (int)(x.amount)))
             count = len(sells)
 
-        self.render("buy.html", sells = sells, count = count)
+            db = sells
+            sells = []
+
+            for s in db:
+                cost = (float)(s.price) * (int)(s.amount)
+
+                sells.append((s, cost))
+
+            sells.sort(key=lambda x: x[1])
+
+        self.render("buy.html", sells = sells, count = count, pricesort = True)
 
 
 

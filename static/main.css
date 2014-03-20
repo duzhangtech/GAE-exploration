@@ -2,7 +2,8 @@ body {
 /*    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; */
     font-family: 'Nunito', sans-serif;
     font-weight: 300;
-    font-size:20px;
+    font-size:16px;
+    color:grey;
     text-align:center;
     margin: 0 auto;
     overflow:scroll;
@@ -55,8 +56,8 @@ a.current_link:visited:hover{
 
 .center {
     position:relative;
-    top:70px;
     margin:0 auto;
+    top:50px;
     background-color:white;
 }
 
@@ -70,7 +71,7 @@ input[type=text] {
     
     width:200px;
     height:45px;
-    border: 2px solid #bcbcbc;
+    border: 2px solid white;
     border-radius:8px;
     text-align:center;
 }
@@ -127,31 +128,19 @@ textarea, input { outline: none; }
     transition-duration: 400ms;
 }
 
-.tafble{
-    position:relative;
-    top:-10px;
-    font-size:18px;
-    background-color:red;
-    
-    margin: 0 auto;
-    line-height:240%;
-}
-.theadefr {
-    position:relative;
-
+.spacing {
+    line-height:200%;
 }
 .theader span {
     font-size:21px;
     display:inline-block;
     background-color:white;
     margin-bottom:10px;
-    width:55px;
-    margin-left:25px;
-    margin-right:25px;
+    width:100px;
 }
 .entry {
 /*    font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; */
-    font-size:21px;
+    font-size:19px;
     display:inline-block;
     width:100px;
     background-color:white;
@@ -177,7 +166,8 @@ a.text_link:visited:hover{
 
 
 h2 {
-    font-size:10px;
+    font-size:18px;
+    color:#4b4b4b;
 }
 .left {
     text-align:left;
