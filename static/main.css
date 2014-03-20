@@ -9,7 +9,7 @@ body {
     overflow:scroll;
 }
 ::-webkit-scrollbar { 
-    display: none; 
+    display: show; 
 }
 .white {
     position:fixed;
@@ -92,10 +92,11 @@ input[type=text] {
     border-radius:5px;
     text-align:center;
 }
-input:focus { 
+input:focus, textarea:focus { 
     outline:none;
     border: 2px solid #20bca1;
     box-shadow:0 0 3px #32ac97;
+    font-size: 19px !important;
 }
 .adjust {
     margin-top:-40px;
@@ -153,6 +154,13 @@ textarea, input { outline: none; }
     margin-top:10px;
 }
 
+
+body::-webkit-scrollbar { 
+    display: none; 
+}
+#table::-webkit-scrollbar { 
+    display: show; 
+}
 .theader {
     position:fixed;
     width:100%;

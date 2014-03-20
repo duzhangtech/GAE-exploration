@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class = "white"></div>
 <div class = "navbar">
     <a class = "current_link"  href = "/buy">BUY</a>
     <a class = "navlinks" href = "/sell">SELL</a>
@@ -19,7 +18,7 @@
         <a href = "/buy"><span>$/MP</span></a>
         </div>
     
-    <div id = "entries" class = "spacing200 tenbelow" style="overflow-y: scroll; height:400px;">
+    <div id = "table" class = "spacing200 tenbelow" style="overflow-y: scroll; height:400px;">
         
            
         {% if pricesort %} 
