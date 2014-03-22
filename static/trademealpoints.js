@@ -8,8 +8,7 @@ $(document).ready(function(){
         var email = $("#email").val();
         
         if (feedback.length == 0) {
-            $("#error").remove();
-            $("#feed").append("<div id = 'error' style = 'height:50px;'>What do you think about this app?</div>");
+            $("#error").show();
         }
         
         else {
@@ -21,10 +20,10 @@ $(document).ready(function(){
             
             $("#feedback_title").replaceWith("<div id = 'feedback_title' style = 'font-size:24px;color: #32ac97;margin-bottom:200px;margin-top:5px;'>THANKS!</div>");
             $("#feedback").remove();
+            $("#error").remove();
             $("#name").remove();
             $("#email").remove();
             $("#submit").remove();
-            $("#error").remove();
          }
         });
         }

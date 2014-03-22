@@ -182,7 +182,6 @@ class BuySortPrice(Handler):
         self.render("buy.html", sells = sells, count = count, pricesort = True)
 
 
-
 class BuyContact(Handler):
     def contact_seller(self, amount, price, myemail):
         subject = "A BUYER!"
@@ -373,6 +372,7 @@ class BuyContact(Handler):
                 first_name = first_name, last_name = last_name,
                 email = email, need_code = True)
 
+
 class Sell(Handler):
     def get(self):
         self.render("sell.html")
@@ -532,113 +532,87 @@ class Sell(Handler):
                 first_name = first_name, last_name = last_name,
                 email = email, need_code = True)
 
+
 class Edit(Handler):
     def get(self):
         self.render("edit.html")
 
     def post(self):
         email = self.request.get("email")
-        current_amount = self.request.get("current_amount")
-        current_price = self.request.get("current_price")
+
+        if email:
+            user = UserModel.all().filter("email", email).get()
+            sell = SellModel.all().filter("user", user).get()
+
+            if sell:
+                code = self.make_salt()
+                VerifyModel(parent = verify_key(), 
+                                    email = email, 
+                                    code = code).put()
+
+                sender = "bot@trademealpoints.appspotmail.com"
+                receiver = email
+                subject = "EDIT MEAL POINT OFFER"
+                body =  (
+                        "Hello! You can click on this link to edit or (gasp) delete your offer. \n\n" 
+                        + "trademealpoints.appspot.com/change?e=" + email 
+                        + "&v=" + code+ "\n\n"
+                        + "Have a good one, \n\n"
+                        + "Bot"
+                        )
+
+                mail.send_mail(sender, receiver, subject, body)
+
+                self.render("sell.html", email = email)
+
+            else:
+                stat = "you don't have any offer on the market"
+                self.render("edit.html", stat = stat)
+
+        else:
+            stat = "(you used your wustl email)"
+            self.render("edit.html", stat = stat)
+
+
+class EditFinish(Handler):
+    def get(self):
+        email = self.request.get('e')
+        code = self.request.get('v')
+
+        okaycode = VerifyModel.all().ancestor(verify_key()).filter('email', email).filter('code', code).get()
+
+        if okaycode:
+            self.render("editfinish.html")
+
+        else:
+            self.render('edit.html', stat = "that link looked fishy. resend?")
+
+    def post(self):
+        email = self.request.get("email")
+       
         new_amount = self.request.get("new_amount")
         new_price = self.request.get("new_price")
 
-        if email and current_amount and current_price and new_amount and new_price:
+        if new_amount and new_price:
             u = UserModel.all().filter("email", email)
             user = u.get()
 
-            if not user:
-                stat = "you haven't sold any meal points yet!"
-                self.render("edit.html", stat = stat)
+            
+            offer = SellModel.all().filter("user", user).filter("amount", current_amount).filter("price", current_price)
+            offer = offer.get()
 
-            else:
-                offer = SellModel.all().filter("user", user).filter("amount", current_amount).filter("price", current_price)
-                offer = offer.get()
+               
+            offer.amount = new_amount
+            offer.price = new_price
+            offer.put()
 
-                if not offer:
-                    stat = "you haven't listed this offer!"
-                    self.render("edit.html", stat = stat)
-
-                else:
-                    offer.amount = new_amount
-                    offer.price = new_price
-                    offer.put()
-
-                    stat = "offer successfully changed"
-                    self.render("edit.html", stat = stat)
+            stat = "offer successfully changed"
+            self.render("edit.html", stat = stat)
 
         else:
             stat = "fill every box"
             self.render("edit.html", stat = stat)
 
-class Relist(Handler):
-    def get(self):
-        self.render("relist.html")
-
-    def post(self):
-        email = self.request.get('email')
-        amount = self.request.get('amount')
-        price = self.request.get('price')
-
-        if email and amount and price:
-            u = UserModel.all().filter("email", email)
-            user = u.get()
-
-            if not user:
-                stat = "you haven't sold any meal points yet!"
-                self.render("relist.html", stat = stat)
-
-            else:
-                offer = SellModel.all().filter("user", user).filter("amount", amount).filter("price", price)
-                offer = offer.get()
-
-                if not offer:
-                    stat = "you haven't listed this offer!"
-                    self.render("relist.html", stat = stat)
-
-                else:
-                    offer.fulfilled = False
-                    offer.put()
-
-                    stat = "offer successfully relisted"
-                    self.render("relist.html", stat = stat)
-        else:
-            stat = "fill every box"
-            self.render("relist.html", stat = stat)
-
-class Delete(Handler):
-    def get(self):
-        self.render("delete.html")
-
-    def post(self):
-        email = self.request.get('email')
-        amount = self.request.get('amount')
-        price = self.request.get('price')
-
-        if email and amount and price:
-            u = UserModel.all().filter("email", email)
-            user = u.get()
-
-            if not user:
-                stat = "you haven't sold any meal points yet!"
-                self.render("delete.html", stat = stat)
-
-            else:
-                offer = SellModel.all().filter("user", user).filter("amount", amount).filter("price", price)
-                offer = offer.get()
-
-                if not offer:
-                    stat = "you haven't listed this offer!"
-                    self.render("delete.html", stat = stat)
-
-                else:
-                    offer.delete()
-
-                    stat = "offer successfully deleted"
-                    self.render("delete.html", stat = stat)
-        else:
-            stat = "fill every box"
-            self.render("delete.html", stat = stat)
 
 class LogSenderHandler(InboundMailHandler):
     def receive(self, mail_message):
@@ -683,9 +657,10 @@ application = webapp2.WSGIApplication([
                     ('/contact', BuyContact),
 
                     ('/sell', Sell),
-                    ('/editoffer', Edit),
-                    ('/relistoffer', Relist),
-                    ('/deleteoffer', Delete),
+
+                    ('/changeoffer', Edit),
+                    ('/change', EditFinish),
+
 
                     ('/faq', FAQ), 
                     LogSenderHandler.mapping()],
