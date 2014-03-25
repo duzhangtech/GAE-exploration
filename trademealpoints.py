@@ -532,6 +532,9 @@ class Sell(Handler):
                 first_name = first_name, last_name = last_name,
                 email = email, need_code = True)
 
+class PasswordModel(db.Model):
+    email = db.StringProperty()
+    code = db.StringProperty()
 
 class Edit(Handler):
     def get(self):
@@ -546,7 +549,7 @@ class Edit(Handler):
 
             if sell:
                 code = self.make_salt()
-                VerifyModel(parent = verify_key(), 
+                PasswordModel(parent = verify_key(), 
                                     email = email, 
                                     code = code).put()
 
@@ -563,10 +566,10 @@ class Edit(Handler):
 
                 mail.send_mail(sender, receiver, subject, body)
 
-                self.render("sell.html", email = email)
+                self.render("edit.html", stat = 'check your email!')
 
             else:
-                stat = "you don't have any offer on the market"
+                stat = "you don't have any offers on the market"
                 self.render("edit.html", stat = stat)
 
         else:
@@ -582,18 +585,22 @@ class EditFinish(Handler):
         okaycode = VerifyModel.all().ancestor(verify_key()).filter('email', email).filter('code', code).get()
 
         if okaycode:
-            self.render("editfinish.html")
+            offer = SellModel.all().filter('user', user).get()
+            self.render("editfinish.html", offer = offer)
 
         else:
-            self.render('edit.html', stat = "that link looked fishy. resend?")
+            self.redirect('/changeoffer')
 
     def post(self):
-        email = self.request.get("email")
-       
-        new_amount = self.request.get("new_amount")
-        new_price = self.request.get("new_price")
+        edit_button = self.request.get('edit_button')
+        delete_button = self.request.get('delete_button')
 
-        if new_amount and new_price:
+        if edit_button:
+            email = self.request.get("email")
+       
+            new_amount = self.request.get("new_amount")
+            new_price = self.request.get("new_price")
+
             u = UserModel.all().filter("email", email)
             user = u.get()
 
@@ -609,7 +616,11 @@ class EditFinish(Handler):
             stat = "offer successfully changed"
             self.render("edit.html", stat = stat)
 
-        else:
+        elif delete_button:
+
+            delete_amount = self.request.get("delete_amount")
+            delete_price = self.request.get("delete_price")
+            
             stat = "fill every box"
             self.render("edit.html", stat = stat)
 
