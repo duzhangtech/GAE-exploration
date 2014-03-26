@@ -41,16 +41,28 @@
                         var price = {{sells[x].price}}.toFixed(2)
                         var cost = {{sells[x].amount|int*sells[x].price|float}}.toFixed(1)
                     </script>
-            
-                    <a href="/contact?amount={{sells[x].amount}}&price={{sells[x].price}}">
-                        
-                        <span class = "entry">{{sells[x].amount}}</span>
-                        
-                        <span class = "entry"><script>document.write(cost);</script></span>
+                    
+                    {% if sells[x].user.email == email %}
+                        <a class = "mylink" href="/contact?amount={{sells[x].amount}}&price={{sells[x].price}}">
                             
-                        <span class = "entry"><script>document.write(price);</script></span>
-                     
-                    </a>
+                            <span class = "entry">{{sells[x].amount}}</span>
+                            
+                            <span class = "entry"><script>document.write(cost);</script></span>
+                                
+                            <span class = "entry"><script>document.write(price);</script></span>
+                         
+                        </a>
+                    {%else%}
+                        <a href="/contact?amount={{sells[x].amount}}&price={{sells[x].price}}">
+                            
+                            <span class = "entry">{{sells[x].amount}}</span>
+                            
+                            <span class = "entry"><script>document.write(cost);</script></span>
+                                
+                            <span class = "entry"><script>document.write(price);</script></span>
+                         
+                        </a>
+                    {%endif%}
                     <br>
             
                 {% endfor %}

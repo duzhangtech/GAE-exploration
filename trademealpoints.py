@@ -117,7 +117,9 @@ class Buy(Handler):
             sells.sort(key = lambda x:((float)(x.price), (int)(x.amount)))
             count = len(sells)
 
-        self.render("buy.html", sells = sells, count = count)
+        email = self.request.get("e")
+        logging.error(email)
+        self.render("buy.html", sells = sells, count = count, email = email)
 
 
 class BuySortMP(Handler):
@@ -435,6 +437,26 @@ class Sell(Handler):
                         amount = amount, price = price, fulfilled = False)
 
                         sell.put()
+                        sender = "bot@trademealpoints.appspotmail.com"
+                        receiver = email
+                        subject = "YOUR MEAL POINTS: LINKS AND STUFF!"
+                        
+                        #FIXME
+                        body =  (
+                                "Hello!"
+                                + "This link highlights your offer on the buy page: \n\n"
+                                + "trademealpoints.appspot.com/buy?e=" + email
+                                + "\n\n You can edit or (gasp) delete your offer here: \n\n" 
+                                + "trademealpoints.appspot.com/change?e=" + email 
+                                + "&v=" + code.code + "\n\n"
+                                + "You can comment/ask for features/say hi here:\n\n"
+                                + "trademealpoints.appspot.com/faq#feed\n\n"
+                                + "Have a good one, \n\n"
+                                + "Bot"
+                                )
+
+                        mail.send_mail(sender, receiver, subject, body)
+
 
                         sells = SellModel.all().ancestor(sell_key()).filter("fulfilled =", False).order('price')
                         memcache.delete("SELLS")
@@ -535,13 +557,14 @@ class Edit(Handler):
                 if not code:
                     code = VerifyModel(parent = verify_key(), 
                                             email = email, 
-                                            code = code)
+                                            code = self.make_salt())
 
                     code.put()
 
                 sender = "bot@trademealpoints.appspotmail.com"
                 receiver = email
                 subject = "EDIT MEAL POINT OFFER"
+                
                 body =  (
                         "Hello! You can click on this link to edit or (gasp) delete your offer. \n\n" 
                         + "trademealpoints.appspot.com/change?e=" + email 

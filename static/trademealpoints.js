@@ -28,7 +28,17 @@ $("#submit").click(function() {
         });
     }
 });    
+   
     
-        
+$(".navlinks").on({
+    mouseenter: function () {
+        $(this).css("border-bottom", "3px solid #11b99c");
+    },
+    mouseleave: function () {
+        $(this).css("border-bottom", "0px");
+    }
+});
+    
+
         
 });
