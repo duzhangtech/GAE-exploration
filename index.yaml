@@ -16,6 +16,11 @@ indexes:
   - name: price
 
 - kind: SellModel
+  properties:
+  - name: user
+  - name: amount
+
+- kind: SellModel
   ancestor: yes
   properties:
   - name: fulfilled

@@ -7,7 +7,7 @@
     <a class = "navlinks" href = "/faq">F.A.Q</a>
 </div>
 
-<div class = "center">
+<form method="post" class = "center">
 <h2 style = "text-align:center;font-size:20px;margin-bottom:10px;">EDIT OFFER</h2>
     
     {% for offer in offer%}
@@ -16,17 +16,17 @@
     {% endfor %}
     
     <input type="submit" id = "edit_button" class = "button spaceup" value="update" name = "edit_button">
-
-    <div id="editstat"></div><br><br>
+    <br>
+    <div id="editstat" class = "spaceup">{{editstat}}</div><br><br>
     
 <h2 style = "text-align:center;font-size:20px;margin-bottom:10px;">DANGER ZONE</h2>
 <div>Type in the offer you want off the market.</div><br>
     
 <input type="text" id = "deleteamount" placeholder = "amount" name="delete_amount">
 <input type="text" id = "deleteprice" placeholder = "price" name="delete_price"><br>
-<input type="submit" id = "delete_button" class = "button spaceup delete bottomspace" name = "delete_button" value="be gone!">
-<div id="deletestat"></div><br><br>
+<input type="submit" id = "delete_button" class = "button spaceup delete" name = "delete_button" value="be gone!">
+<div id="deletestat" class = "spaceup bottomspace">{{deletestat}}</div><br><br>
 
-</div>
+</form>
 
 {% endblock %}

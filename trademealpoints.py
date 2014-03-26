@@ -80,8 +80,6 @@ class SellModel(db.Model):
     created = db.DateTimeProperty(auto_now = True)
 
 class FeedbackModel(db.Model):
-    name = db.StringProperty()
-    email = db.StringProperty()
     feedback = db.StringProperty()
 
 class VerifyModel(db.Model):
@@ -93,19 +91,8 @@ class FAQ(Handler):
         self.render("faq.html")
 
     def post(self):
-        name = self.request.get('name')
-        email = self.request.get('email')
-
         feedback = self.request.get('feedback')
-
-        if feedback:
-            f = FeedbackModel(parent = feedback_key(), feedback = feedback)
-            if name:
-                f.name = name
-            if email:
-                f.email = email
-
-            f.put()
+        FeedbackModel(parent = feedback_key(), feedback = feedback).put()
     
 
 class Buy(Handler):
@@ -585,7 +572,8 @@ class EditFinish(Handler):
 
         if okaycode:
             u = UserModel.all().filter("email", email).get()
-            offer = SellModel.all().filter('user', u)
+            offer = list(SellModel.all().filter('user', u))
+            offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
             self.render("editfinish.html", offer = offer)
 
         else:
@@ -601,23 +589,71 @@ class EditFinish(Handler):
         if edit_button:
             logging.error("EDIT")
             
-            offers = SellModel.all().filter("user", user)
+            offers = list(SellModel.all().filter("user", user).order('amount'))
             amount = self.request.get_all("amount")
             price = self.request.get_all("price")
 
-            for x in range(1, len(amount)):
-                offers[x].amount, offers[x].price = amount[x], price[x]
-                offers[x].put()
+            if (len(offers) == len(amount) and len(offers) == len(price)):
+
+                offers.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
+
+                for x in range(1, len(offers)):
+
+                    change = False
+                    if offers[x].amount != amount[x]:
+                        offers[x].amount = amount[x]
+                        change = True
+                        logging.error("CHANGE")
+
+
+                    if offers[x].price != price[x]:
+
+                        offers[x].price = price[x]
+                        logging.error("CHANGE")
+
+                        change = True
+                    
+                    if change == True:
+                        offers[x].put()
+
+
+                u = UserModel.all().filter("email", email).get()
+                offer = list(SellModel.all().ancestor(sell_key()).filter('user', u))
+                offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
+                self.render("editfinish.html", offer = offer, editstat = "Updated successfully!")
+
+            else:
+                offer = list(SellModel.all().ancestor(sell_key()).filter('user', u))
+                offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
+                self.render("editfinish.html", offer = offer, editstat = "Fill each box")
 
         elif delete_button:
-            logging.error("EDIT")
+            logging.error("DEL")
 
             delete_amount = self.request.get("delete_amount")
             delete_price = self.request.get("delete_price")
             
-            derp = SellModel.all().filter("user", user).filter('amount', delete_amount).filter('price', delete_price).get()
+            if delete_amount and delete_price:
+                derp = SellModel.all().ancestor(sell_key()).filter("user", user).filter('amount', delete_amount).filter('price', delete_price).get()
 
-            derp.delete()
+                if derp:
+                    derp.delete()
+
+                    u = UserModel.all().filter("email", email).get()
+                    offer = list(SellModel.all().ancestor(sell_key()).filter('user', u))
+                    offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
+                    self.render("editfinish.html", offer = offer, deletestat = "Offer deleted.")
+
+                elif not derp:
+                    u = UserModel.all().filter("email", email).get()
+                    offer = list(SellModel.all().ancestor(sell_key()).filter('user', u))
+                    offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
+                    self.render("editfinish.html", offer = offer, deletestat = "You don't have this offer on market.")
+
+            else:
+                offer = list(SellModel.all().ancestor(sell_key()).filter('user', u))
+                offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
+                self.render("editfinish.html", offer = offer, deletestat = "Fill each box")
 
 
 class LogSenderHandler(InboundMailHandler):
