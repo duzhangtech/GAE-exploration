@@ -126,6 +126,9 @@ textarea, input { outline: none; }
 .tenbelow {
     margin-bottom:10px;
 }
+.bottomspace {
+    margin-bottom:70px;
+}
 .spacing {
     line-height:170%;
 }

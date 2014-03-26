@@ -459,8 +459,7 @@ class Sell(Handler):
                     logging.error("CODE")
                     check_code = VerifyModel.all().filter("code", code).get()
 
-                    if check_code: #DELETE CODE, COMMIT USER & OFFER
-                        check_code.delete()
+                    if check_code: #COMMIT USER & OFFER
 
                         user = UserModel(parent = user_key(),
                                     first_name = first_name, 
@@ -487,7 +486,7 @@ class Sell(Handler):
 
 
             #BASIC INPUT ERROR
-            elif amount and price  and email and something_wrong == True:
+            elif amount and price and email and something_wrong == True:
 
                 if not valid_amount(amount):
                     error = "150 mp min, 4000 mp max"
@@ -532,10 +531,6 @@ class Sell(Handler):
                 first_name = first_name, last_name = last_name,
                 email = email, need_code = True)
 
-class PasswordModel(db.Model):
-    email = db.StringProperty()
-    code = db.StringProperty()
-
 class Edit(Handler):
     def get(self):
         self.render("edit.html")
@@ -548,10 +543,14 @@ class Edit(Handler):
             sell = SellModel.all().filter("user", user).get()
 
             if sell:
-                code = self.make_salt()
-                PasswordModel(parent = verify_key(), 
-                                    email = email, 
-                                    code = code).put()
+                code = VerifyModel.all().filter('email', email).get()
+
+                if not code:
+                    code = VerifyModel(parent = verify_key(), 
+                                            email = email, 
+                                            code = code)
+
+                    code.put()
 
                 sender = "bot@trademealpoints.appspotmail.com"
                 receiver = email
@@ -559,7 +558,7 @@ class Edit(Handler):
                 body =  (
                         "Hello! You can click on this link to edit or (gasp) delete your offer. \n\n" 
                         + "trademealpoints.appspot.com/change?e=" + email 
-                        + "&v=" + code+ "\n\n"
+                        + "&v=" + code.code + "\n\n"
                         + "Have a good one, \n\n"
                         + "Bot"
                         )
@@ -585,7 +584,8 @@ class EditFinish(Handler):
         okaycode = VerifyModel.all().ancestor(verify_key()).filter('email', email).filter('code', code).get()
 
         if okaycode:
-            offer = SellModel.all().filter('user', user).get()
+            u = UserModel.all().filter("email", email).get()
+            offer = SellModel.all().filter('user', u)
             self.render("editfinish.html", offer = offer)
 
         else:
@@ -595,34 +595,29 @@ class EditFinish(Handler):
         edit_button = self.request.get('edit_button')
         delete_button = self.request.get('delete_button')
 
+        email = self.request.get("e")
+        user = UserModel.all().filter("email", email).get()
+
         if edit_button:
-            email = self.request.get("email")
-       
-            new_amount = self.request.get("new_amount")
-            new_price = self.request.get("new_price")
-
-            u = UserModel.all().filter("email", email)
-            user = u.get()
-
+            logging.error("EDIT")
             
-            offer = SellModel.all().filter("user", user).filter("amount", current_amount).filter("price", current_price)
-            offer = offer.get()
+            offers = SellModel.all().filter("user", user)
+            amount = self.request.get_all("amount")
+            price = self.request.get_all("price")
 
-               
-            offer.amount = new_amount
-            offer.price = new_price
-            offer.put()
-
-            stat = "offer successfully changed"
-            self.render("edit.html", stat = stat)
+            for x in range(1, len(amount)):
+                offers[x].amount, offers[x].price = amount[x], price[x]
+                offers[x].put()
 
         elif delete_button:
+            logging.error("EDIT")
 
             delete_amount = self.request.get("delete_amount")
             delete_price = self.request.get("delete_price")
             
-            stat = "fill every box"
-            self.render("edit.html", stat = stat)
+            derp = SellModel.all().filter("user", user).filter('amount', delete_amount).filter('price', delete_price).get()
+
+            derp.delete()
 
 
 class LogSenderHandler(InboundMailHandler):
