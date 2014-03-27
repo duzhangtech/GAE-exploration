@@ -226,6 +226,7 @@ class BuyContact(Handler):
         if sells.count() == 0:
             memcache.set("SELLS", None)
         else:
+            memcache.delete("SELLS")
             memcache.set("SELLS", list(sells))
 
         stat = "check your inbox!"
@@ -427,28 +428,30 @@ class Sell(Handler):
                             self.render("sell.html", 
                                 amount = amount, price = price, 
                                 first_name = first_name, last_name = last_name,
-                                email = email, need_code = True)
+                                email = email, need_code = True, error = "Invalid code. Resend?")
 
                     elif user: #VERIFIED, CAN PROCEED WITH SELL
                         sell = SellModel(parent = sell_key(), user = user,
                         amount = amount, price = price, fulfilled = False)
 
                         sell.put()
+
+                        v = VerifyModel.all().filter("email", email).get()
+
                         sender = "bot@trademealpoints.appspotmail.com"
                         receiver = email
-                        subject = "YOUR MEAL POINTS: LINKS AND STUFF!"
+                        subject = "MEAL POINTS: LINKS AND STUFF!"
                         
-                        #FIXME
                         body =  (
                                 "Hello!\n\n"
-                                + "This link highlights your offer on the buy page: \n\n"
+                                + "This link highlights your offer on the buy page: \n"
                                 + "trademealpoints.appspot.com/buy?e=" + email
-                                + "\n\n You can edit or remove your offer here: \n\n" 
+                                + "\n\nYou can edit or remove your offer here: \n" 
                                 + "trademealpoints.appspot.com/change?e=" + email 
-                                + "&v=" + code + "\n\n"
-                                + "You can comment/ask for features/say hi here:\n\n"
+                                + "&v=" + v.code + "\n\n"
+                                + "You can comment/ask for features/say hi here:\n"
                                 + "trademealpoints.appspot.com/faq#feed\n\n"
-                                + "Have a good one, \n\n"
+                                + "Yours, \n"
                                 + "Bot"
                                 )
 
@@ -479,12 +482,35 @@ class Sell(Handler):
                                     price = price).put()
 
                         sells = SellModel.all().ancestor(sell_key()).filter("fulfilled", False)
+                        memcache.delete("SELLS")
                         memcache.set("SELLS", list(sells))
+
+                        sender = "bot@trademealpoints.appspotmail.com"
+                        receiver = email
+                        subject = "YOUR MEAL POINTS: LINKS AND STUFF!"
+                        
+                        #FIXME
+                        body =  (
+                                "Hello!\n\n"
+                                + "This link highlights your offer on the buy page: \n"
+                                + "trademealpoints.appspot.com/buy?e=" + email
+                                + "\n\nYou can edit or remove your offer here: \n" 
+                                + "trademealpoints.appspot.com/change?e=" + email 
+                                + "&v=" + code + "\n\n"
+                                + "You can comment/ask for features/say hi here:\n"
+                                + "trademealpoints.appspot.com/faq#feed\n\n"
+                                + "Yours, \n"
+                                + "Bot"
+                                )
+
+                        mail.send_mail(sender, receiver, subject, body)
+
+
 
                         self.redirect("/buy")
 
                     elif not check_code: #OH SNAP
-                        stat = "invalid code"
+                        stat = "Invalid code"
                         self.render("sell.html", 
                                 amount = amount, price = price, 
                                 first_name = first_name, last_name = last_name,
@@ -495,14 +521,14 @@ class Sell(Handler):
             elif amount and price and email and something_wrong == True:
 
                 if not valid_amount(amount):
-                    error = "150 mp min, 2000 mp max"
+                    error = "150 to 2000 mp"
                     self.render("sell.html", 
                             amount = amount, price = price, 
                             first_name = first_name, last_name = last_name,
                             email = email, error=error)
 
                 elif not valid_price(price):
-                    error = "0.01 to 1.00 per meal point"
+                    error = "0.01 to 1.00 per mp"
                     self.render("sell.html", 
                             amount = amount, price = price, 
                             first_name = first_name, last_name = last_name,
@@ -529,13 +555,13 @@ class Sell(Handler):
             sender = "bot@trademealpoints.appspotmail.com"
             receiver = email
             subject = "MEAL POINTS VERIFICATION"
-            body =  ("Hello! Your verification code is" + code)
+            body =  ("Hello! Your verification code is " + code)
             mail.send_mail(sender, receiver, subject, body)
 
             self.render("sell.html", 
                 amount = amount, price = price, 
                 first_name = first_name, last_name = last_name,
-                email = email, need_code = True)
+                email = email, need_code = True, error = "code sent!")
 
 class Edit(Handler):
     def get(self):
@@ -563,10 +589,15 @@ class Edit(Handler):
                 subject = "EDIT MEAL POINT OFFER"
                 
                 body =  (
-                        "Hello! You can click on this link to edit or remove your offer. \n\n" 
+                         "Hello!\n\n"
+                        + "This link highlights your offer on the buy page: \n"
+                        + "trademealpoints.appspot.com/buy?e=" + email
+                        + "\n\nYou can edit or remove your offer here: \n" 
                         + "trademealpoints.appspot.com/change?e=" + email 
                         + "&v=" + code.code + "\n\n"
-                        + "Have a good one, \n\n"
+                        + "You can comment/ask for features/say hi here:\n"
+                        + "trademealpoints.appspot.com/faq#feed\n\n"
+                        + "Yours, \n"
                         + "Bot"
                         )
 
@@ -575,11 +606,11 @@ class Edit(Handler):
                 self.render("edit.html", stat = 'check your email!')
 
             else:
-                stat = "you don't have any offers on the market"
+                stat = "You don't have any offers on the market"
                 self.render("edit.html", stat = stat)
 
         else:
-            stat = "(you used your wustl email)"
+            stat = "(You used your wustl email)"
             self.render("edit.html", stat = stat)
 
 
@@ -617,6 +648,7 @@ class EditFinish(Handler):
                 logging.error("LENGTH OKAY")
 
                 offers.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
+                u = UserModel.all().filter("email", email).get()
 
                 for x in range(0, len(offers)):
                     logging.error(offers[x].amount)
@@ -624,25 +656,33 @@ class EditFinish(Handler):
 
                     change = False
                     if offers[x].amount != amount[x]:
-                        offers[x].amount = amount[x]
-                        logging.error(offers[x].amount)
-                        logging.error(amount[x])
-                        change = True
-                        logging.error("CHANGE")
-
+                        if valid_amount(amount[x]):
+                            offers[x].amount = amount[x]
+                            logging.error(offers[x].amount)
+                            logging.error(amount[x])
+                            change = True
+                            logging.error("CHANGE")
+                        else:
+                            offer = list(SellModel.all().ancestor(sell_key()).filter('user', u))
+                            offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
+                            self.render("editfinish.html", offer = offer, editstat = "150 to 2000 mp")
 
                     if offers[x].price != price[x]:
+                        if valid_price(price[x]):
+                            offers[x].price = price[x]
+                            logging.error("CHANGE")
+                            change = True
+                        else:
+                            offer = list(SellModel.all().ancestor(sell_key()).filter('user', u))
+                            offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
+                            self.render("editfinish.html", offer = offer, editstat = "0.01 to 1.00 per mp")
 
-                        offers[x].price = price[x]
-                        logging.error("CHANGE")
-
-                        change = True
-                    
                     if change == True:
                         offers[x].put()
+                        memcache.delete("SELLS")
 
 
-                u = UserModel.all().filter("email", email).get()
+               
                 offer = list(SellModel.all().ancestor(sell_key()).filter('user', u))
                 offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
                 self.render("editfinish.html", offer = offer, editstat = "Updated successfully!")
@@ -663,11 +703,12 @@ class EditFinish(Handler):
 
                 if derp:
                     derp.delete()
+                    memcache.delete("SELLS")
 
                     u = UserModel.all().filter("email", email).get()
                     offer = list(SellModel.all().ancestor(sell_key()).filter('user', u))
                     offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
-                    self.render("editfinish.html", offer = offer, deletestat = "Offer deleted.")
+                    self.render("editfinish.html", offer = offer, deletestat = "Offer removed.")
 
                 elif not derp:
                     u = UserModel.all().filter("email", email).get()
