@@ -372,7 +372,7 @@ class Sell(Handler):
         resend_button = self.request.get("resend_button")
 
         amount = self.request.get('amount')
-        price = self.request.get('price')
+        price = self.request.get('price').strip('0').strip(' ')
 
         first_name = self.request.get('first_name')
         last_name = self.request.get('last_name')
@@ -387,20 +387,17 @@ class Sell(Handler):
                         email = email)
 
         if not valid_amount(amount):
-            params['error_amount'] = "150 meal point minimum"
             something_wrong = True
 
         if not valid_price(price):
-            params['error_price'] = "0.01 to 2.00 per meal point"
             something_wrong = True
 
         if not valid_email(email):
-            params['error_email'] = "use your wustl email"
             something_wrong = True
 
         if submit_button:
             logging.error("SUBMIT")
-            if amount and price and email and (something_wrong == False):
+            if amount and price and email and (something_wrong == False): #BASIC INFO OKAY
                 
                 if not code:
                     logging.error("NOT CODE")
@@ -443,12 +440,12 @@ class Sell(Handler):
                         
                         #FIXME
                         body =  (
-                                "Hello!"
+                                "Hello!\n\n"
                                 + "This link highlights your offer on the buy page: \n\n"
                                 + "trademealpoints.appspot.com/buy?e=" + email
-                                + "\n\n You can edit or (gasp) delete your offer here: \n\n" 
+                                + "\n\n You can edit or remove your offer here: \n\n" 
                                 + "trademealpoints.appspot.com/change?e=" + email 
-                                + "&v=" + code.code + "\n\n"
+                                + "&v=" + code + "\n\n"
                                 + "You can comment/ask for features/say hi here:\n\n"
                                 + "trademealpoints.appspot.com/faq#feed\n\n"
                                 + "Have a good one, \n\n"
@@ -498,14 +495,14 @@ class Sell(Handler):
             elif amount and price and email and something_wrong == True:
 
                 if not valid_amount(amount):
-                    error = "150 mp min, 4000 mp max"
+                    error = "150 mp min, 2000 mp max"
                     self.render("sell.html", 
                             amount = amount, price = price, 
                             first_name = first_name, last_name = last_name,
                             email = email, error=error)
 
                 elif not valid_price(price):
-                    error = "0.01 to 2.00 per meal point"
+                    error = "0.01 to 1.00 per meal point"
                     self.render("sell.html", 
                             amount = amount, price = price, 
                             first_name = first_name, last_name = last_name,
@@ -513,7 +510,7 @@ class Sell(Handler):
 
 
                 elif not valid_email(email):
-                    error = "use your wustl email"
+                    error = "Use your wustl email"
                     self.render("sell.html", 
                             amount = amount, price = price, 
                             first_name = first_name, last_name = last_name,
@@ -566,7 +563,7 @@ class Edit(Handler):
                 subject = "EDIT MEAL POINT OFFER"
                 
                 body =  (
-                        "Hello! You can click on this link to edit or (gasp) delete your offer. \n\n" 
+                        "Hello! You can click on this link to edit or remove your offer. \n\n" 
                         + "trademealpoints.appspot.com/change?e=" + email 
                         + "&v=" + code.code + "\n\n"
                         + "Have a good one, \n\n"
@@ -617,14 +614,19 @@ class EditFinish(Handler):
             price = self.request.get_all("price")
 
             if (len(offers) == len(amount) and len(offers) == len(price)):
+                logging.error("LENGTH OKAY")
 
                 offers.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
 
-                for x in range(1, len(offers)):
+                for x in range(0, len(offers)):
+                    logging.error(offers[x].amount)
+                    logging.error(amount[x])
 
                     change = False
                     if offers[x].amount != amount[x]:
                         offers[x].amount = amount[x]
+                        logging.error(offers[x].amount)
+                        logging.error(amount[x])
                         change = True
                         logging.error("CHANGE")
 
@@ -689,9 +691,9 @@ class LogSenderHandler(InboundMailHandler):
             logging.info("message: %s" % m)
             self.response.out.write(m)
 
-AMOUNT_RE = re.compile(r'^[1][5-9][0-9]$|^[2-9][0-9]{2}$|^[1-3][0-9]{3}$|^4000$')
+AMOUNT_RE = re.compile(r'^[1][5-9][0-9]$|^[2-9][0-9]{2}$|^[1][0-9]{3}$|^2000$')
 
-PRICE_RE = re.compile(r'^[0-1]+\.[0-9][0-9]?$|^2\.00$')
+PRICE_RE = re.compile(r'^\.[0-9][0-9]?$|^1\.00$')
 
 EMAIL_RE  = re.compile(r'^[\S]+(?i)(@wustl\.edu)$')
 
@@ -725,7 +727,6 @@ application = webapp2.WSGIApplication([
 
                     ('/changeoffer', Edit),
                     ('/change', EditFinish),
-
 
                     ('/faq', FAQ), 
                     LogSenderHandler.mapping()],
