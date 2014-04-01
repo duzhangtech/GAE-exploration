@@ -30,43 +30,6 @@ def verify_key():
 def feedback_key():
     return db.Key.from_path('feedback_kind', 'feedback_kind')
 
-def make_secure_val(val):
-    return '%s|%s' % (val, hmac.new(secret, val).hexdigest())
-
-def check_secure_val(secure_val):
-    val = secure_val.split('|')[0]
-    if secure_val == make_secure_val(val):
-        return val
-
-class Handler(webapp2.RequestHandler):
-    def write(self, *a, **kw):
-        self.response.out.write(*a, **kw)
-
-    def render_str(self, template, **params):
-        t = jinja_env.get_template(template)
-        return t.render(params)
-
-    def render(self, template, **kw):
-        self.write(self.render_str(template, **kw))
-
-    def set_secure_cookie(self, user, val):
-        cookie_val = make_secure_val(val)
-        self.response.headers.add_header(
-            'Set-Cookie',
-            '%s=%s; Path=/' % (user, cookie_val))
-
-    def read_secure_cookie(self, user):
-        cookie_val = self.request.cookies.get(user)
-        return cookie_val and check_secure_val(cookie_val)
-
-    def make_salt(self):
-        salt = ''.join(random.choice(letters) for x in xrange(5))
-        return salt
-
-    def initialize(self, *a, **kw):
-        webapp2.RequestHandler.initialize(self, *a, **kw)
-        self.user = self.read_secure_cookie('user')
-
 class UserModel(db.Model):
     first_name = db.StringProperty(required = True)
     last_name = db.StringProperty(required = True)
@@ -86,6 +49,25 @@ class VerifyModel(db.Model):
     email = db.StringProperty()
     code = db.StringProperty()
 
+
+class Handler(webapp2.RequestHandler):
+    def write(self, *a, **kw):
+        self.response.out.write(*a, **kw)
+
+    def render_str(self, template, **params):
+        t = jinja_env.get_template(template)
+        return t.render(params)
+
+    def render(self, template, **kw):
+        self.write(self.render_str(template, **kw))
+
+    def make_salt(self):
+        salt = ''.join(random.choice(letters) for x in xrange(5))
+        return salt
+
+    def initialize(self, *a, **kw):
+        webapp2.RequestHandler.initialize(self, *a, **kw)
+
 class FAQ(Handler):
     def get(self):
         self.render("faq.html")
@@ -97,28 +79,18 @@ class FAQ(Handler):
 
 class Buy(Handler):
     def get(self):
-        sells = memcache.get("SELLS")
+        sells = SellModel.all().filter("fulfilled", False).order('price')
+        sells = list(sells)
 
-        if sells is None:
-            logging.error("EMPTY MC")
-            sells = SellModel.all().filter("fulfilled", False).order('price')
-            sells = list(sells)
-
-            if len(sells) == 0:
-                logging.error("EMPTY DB")
-                count = 0
-            else:
-                logging.error("DB WRITE TO MC")
-                memcache.set("SELLS", sells.sort(key = lambda x:((float)(x.price), (int)(x.amount))))
-                count = len(sells)
-
+        if len(sells) == 0:
+            count = 0
         else:
-            logging.error("SELLS IN MC")
-            sells.sort(key = lambda x:((float)(x.price), (int)(x.amount)))
             count = len(sells)
 
+        sells.sort(key = lambda x:((float)(x.price), (int)(x.amount)))
+        count = len(sells)
+
         email = self.request.get("e")
-        logging.error(email)
         self.render("buy.html", sells = sells, count = count, email = email)
 
 
@@ -321,7 +293,7 @@ class BuyContact(Handler):
                         first_name=first_name, 
                         amount = amount, 
                         price = price, 
-                        error = error, 
+                        stat = stat, 
                         need_code = True,
                         last_name=last_name, 
                         email = email,
@@ -344,7 +316,7 @@ class BuyContact(Handler):
                     first_name=first_name, 
                     amount = amount, 
                     price = price, 
-                    error = error, 
+                    stat = stat, 
                     last_name=last_name, 
                     email = email)
 

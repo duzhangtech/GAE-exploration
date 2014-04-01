@@ -140,6 +140,8 @@ textarea, input { outline: none; }
     width:130px;
 }
 
+
+
 .tenbelow {
     margin-bottom:10px;
 }
@@ -155,6 +157,8 @@ textarea, input { outline: none; }
 .spaceup {
     margin-top:10px;
 }
+
+
 
 .theader span {
     font-size:21px;
@@ -173,18 +177,22 @@ textarea, input { outline: none; }
 a.text_link:link{
     font-size:16px;
     color: grey;
+    text-decoration:underline;
 }
 a.text_link:hover{
     font-size:16px;
     color: #11b99c;
+    text-decoration:underline;
 }
 a.text_link:visited{
     font-size:16px;
     color: grey;
+    text-decoration:underline;
 }
 a.text_link:visited:hover{
     font-size:16px;
     color: #11b99c;
+    text-decoration:underline;
 }
 
 
@@ -202,7 +210,21 @@ h2 {
     color:#11b99c;
     margin-top:20px;
 }
-
+#derp {
+    position:absolute;
+    color:grey;
+    font-size:19px;
+    top:20px;
+    left:25%;
+    width:70px;
+    height:40px;
+    line-height:40px;
+    background-color:#fafa89;
+    border-radius:8px;
+}
+.hide {
+    display:none;
+}
 
 ::-webkit-input-placeholder {
     color:#c4c4c4;

@@ -1,78 +1,68 @@
 {% extends "base.html" %}
 
 {% block content %}
-     
+
+<div id = "derp" class = "hide">Sort!</div>
+
 <div class = "navbar">
     <a class = "current_link"  href = "/buy">BUY</a>
     <a class = "navlinks" href = "/sell">SELL</a>
     <a class = "navlinks" href = "/faq">F.A.Q</a>
 </div>
 
-<form method = "post" class = "center">
+<div class = "center">
+    
 {%if count == 0%}
-    <div class = 'spaceup'>It looks like every offer has been bought. <br>Check back later. :)</div>
+    
+<div class = 'spaceup'>It looks like every offer has been bought. <br>Check back later. :)</div>
 
 {%else%}    
-        <div class = "spacing200 tenbelow">
-            <div class = "theader">
-                <a href = "/buysortmp"><span>MP</span></a>
-                <a href = "/buysortprice"><span>$</span></a>
-                <a href = "/buy"><span>$/MP</span></a>
-            </div>
-               
-            {% if pricesort %} 
-                {% for x in range(0, count) %}
-                 <a href="/contact?amount={{sells[x][0].amount}}&price={{sells[x][0].price}}">
-                        
-                        <span class = "entry">{{sells[x][0].amount}}</span>
-                        
-                        <span class = "entry">{{sells[x][1]}}</script></span>
-                            
-                        <span class = "entry">{{sells[x][0].price}}</span>
-                     
-                    </a>
-                    <br>
-                {% endfor %}
-                
-            {% else %}
-                {% for x in range(0, count) %}
-                    
-                    <script>
-                        var price = {{sells[x].price}}.toFixed(2)
-                        var cost = {{sells[x].amount|int*sells[x].price|float}}.toFixed(1)
-                    </script>
-                    
-                    {% if sells[x].user.email == email %}
-                        <a class = "mylink" href="/contact?amount={{sells[x].amount}}&price={{sells[x].price}}">
-                            
-                            <span class = "entry">{{sells[x].amount}}</span>
-                            
-                            <span class = "entry"><script>document.write(cost);</script></span>
-                                
-                            <span class = "entry"><script>document.write(price);</script></span>
-                         
-                        </a>
-                    {%else%}
-                        <a href="/contact?amount={{sells[x].amount}}&price={{sells[x].price}}">
-                            
-                            <span class = "entry">{{sells[x].amount}}</span>
-                            
-                            <span class = "entry"><script>document.write(cost);</script></span>
-                                
-                            <span class = "entry"><script>document.write(price);</script></span>
-                         
-                        </a>
-                    {%endif%}
-                    <br>
-            
-                {% endfor %}
-            {% endif %}
-        
-        </div>
     
-    <a class = "text_link " href = "/changeoffer">edit my offer</a></span><span style = "color:#c7c7c7;">
+<div class = "spacing200 tenbelow">
+    <div class = "theader">
+        <a id = "sortmp" class = "sort"><span>MP</span></a>
+        <a id = "sortcost" class = "sort"><span>$</span></a>
+        <a id = "sortprice" class = "sort"><span>$/MP</span></a>
+    </div>
+
+    <div id = 'entrytable'>
+    {% for x in range(0, count) %}
+
+        {% if sells[x].user.email == email %}
         
-    <div style = "height:80px;"></div>
+           <a class = "entrylink" href="/contact?amount={{sells[x].amount}}&price={{sells[x].price}}">
+                
+                <span class = "entry amount">{{sells[x].amount}}</span>
+                
+                <span class = "entry cost">{{sells[x].amount|int*sells[x].price|float}}</span>
+                    
+                <span class = "entry price">{{sells[x].price}}</span>
+            <br>
+            </a>
+        
+        {%else%}
+        
+            <a class = "entrylink" href="/contact?amount={{sells[x].amount}}&price={{sells[x].price}}">
+                
+                <span class = "entry amount">{{sells[x].amount}}</span>
+                
+                <span class = "entry cost">{{sells[x].amount|int*sells[x].price|float}}</span>
+                    
+                <span class = "entry price">{{sells[x].price}}</span>
+            <br>
+            </a>
+        
+        {%endif%}
+
+    {% endfor %}
+        
+    </div>
+</div>
+    
+<a class = "text_link " href = "/changeoffer">edit my offer</a></span><span style = "color:#c7c7c7;">
+<div style = "height:80px;"></div>
+
 {%endif%}
-</form>
+
+</div>
 {% endblock %}
