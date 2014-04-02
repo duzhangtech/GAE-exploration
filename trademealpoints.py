@@ -274,28 +274,21 @@ class Sell(Handler):
         self.render("sell.html")
 
     def post(self):
-        something_wrong = False
         submit_button = self.request.get("submit_button")
         resend_button = self.request.get("resend_button")
 
-        amount = self.request.get('amount').strip([chars])
+        amount = re.sub("[^0-9]", "", self.request.get('amount').lstrip('0').replace('.', ''))
         price = self.request.get('price').strip('0').replace(" ", "").replace("$", "")
+        email = self.request.get('email').lower()
 
+        user = UserModel.all().ancestor(user_key()).filter("email", email).get()
         first_name = self.request.get('first_name')
         last_name = self.request.get('last_name')
-
-        email = self.request.get('email').lower()
-        user = UserModel.all().ancestor(user_key()).filter("email", email).get()
-
         code = self.request.get('code')
-
-        params = dict(amount = amount, 
-                        price = price,
-                        email = email)
 
         if submit_button:
 
-            #BASIC INPUT ERROR
+            #BASIC INPUT ERRORS
             if not valid_amount(amount):
                 error = "150 to 2000 mp (whole numbers)"
                 self.render("sell.html", 
@@ -304,7 +297,7 @@ class Sell(Handler):
                         email = email, error=error)
 
             elif not valid_price(price):
-                error = "0.01 to 1.00 per mp"
+                error = "$0.01 to $1 per mp"
                 self.render("sell.html", 
                         amount = amount, price = price, 
                         first_name = first_name, last_name = last_name,
@@ -321,10 +314,10 @@ class Sell(Handler):
             #BASIC INPUT OKAY
             elif amount and price and email: 
                 
-                if not code:
+                if not code: #OKAY TO SUBMIT OR NEED VERIFY?
                     user = UserModel.all().ancestor(user_key()).filter("email", email).get()
 
-                    if not user:
+                    if not user: #NEW OR IN LIMBO?
                         waiting_for_verify = VerifyModel.all().filter("email", email).get()
 
                         if not waiting_for_verify: #NEW USER, PUT IN LIMBO
@@ -344,7 +337,7 @@ class Sell(Handler):
                                 first_name = first_name, last_name = last_name,
                                 email = email, need_code = True)
 
-                        else: #ASK FOR CODE
+                        else: #IN LIMBO, ASK FOR CODE
                             self.render("sell.html", 
                                 amount = amount, price = price, 
                                 first_name = first_name, last_name = last_name,
@@ -377,15 +370,13 @@ class Sell(Handler):
 
                         mail.send_mail(sender, receiver, subject, body)
 
-
                         sells = SellModel.all().ancestor(sell_key()).filter("fulfilled =", False).order('price')
                         self.redirect('/buy')
 
-                elif first_name and last_name and code:
-                    logging.error("CODE")
+                elif first_name and last_name and code: #IS VERIFY OKAY?
                     check_code = VerifyModel.all().filter("code", code).get()
 
-                    if check_code: #COMMIT USER & OFFER
+                    if check_code: #YAY. COMMIT USER & OFFER
 
                         user = UserModel(parent = user_key(),
                                     first_name = first_name, 
@@ -399,14 +390,11 @@ class Sell(Handler):
                                     price = price).put()
 
                         sells = SellModel.all().ancestor(sell_key()).filter("fulfilled", False)
-                        memcache.delete("SELLS")
-                        memcache.set("SELLS", list(sells))
 
                         sender = "bot@trademealpoints.appspotmail.com"
                         receiver = email
                         subject = "YOUR MEAL POINTS: LINKS AND STUFF!"
                         
-                        #FIXME
                         body =  (
                                 "Hello!\n\n"
                                 + "This link highlights your offer on the buy page: \n"
@@ -422,7 +410,7 @@ class Sell(Handler):
 
                         mail.send_mail(sender, receiver, subject, body)
 
-                        self.redirect("/buy")
+                        self.redirect("/buy?e=" + email)
 
                     elif not check_code: #OH SNAP
                         stat = "Invalid code"
@@ -431,7 +419,7 @@ class Sell(Handler):
                                 first_name = first_name, last_name = last_name,
                                 email = email, need_code = True, stat = stat)
 
-            else:
+            else: #BLANK FIELD
                 error = "Fill every box"
                 self.render("sell.html", 
                             amount = amount, price = price, 
@@ -513,7 +501,7 @@ class EditFinish(Handler):
         if okaycode:
             u = UserModel.all().filter("email", email).get()
             offer = list(SellModel.all().filter('user', u))
-            offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
+            offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
             self.render("editfinish.html", offer = offer)
 
         else:

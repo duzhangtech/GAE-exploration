@@ -8,25 +8,36 @@
 </div>
 
 <form method="post" class = "center">
-<h2 style = "text-align:center;font-size:20px;margin-bottom:10px;">EDIT OFFER</h2>
     
-    {% for offer in offer%}
-    <input type="text" class = "edit" placeholder = "amount" name="amount" value="{{offer.amount}}">
-    <input type="text" class = "edit" placeholder = "price" name="price" value="{{offer.price}}"><br>
-    {% endfor %}
+{% if count == 0%}
+<h2 style = "text-align:center;font-size:20px;margin-bottom:10px;">You don't have anything on the market!</h2>
+{%elif count == 1%} 
+<h2 style = "text-align:center;font-size:20px;margin-bottom:10px;">MY OFFER</h2>
+{%else%}
+<h2 style = "text-align:center;font-size:20px;margin-bottom:10px;">MY OFFERS</h2>
+{%endif%}
+
+
+{%if count != 0%}
+
+{% for offer in offer%}
+<input type="text" class = "amount edit" placeholder = "amount" name="amount" value="{{offer.amount}}"> MEAL POINTS AT
+<input type="text" class = "price edit" placeholder = "price" name="price" value="{{offer.price}}"> PER POINT<br>
+{% endfor %}
+
+<input type="submit" id = "edit_button" class = "button spaceup" value="update" name = "edit_button">
+<br>
+<div id="editstat" class = "spaceup">{{editstat}}</div><br><br>
     
-    <input type="submit" id = "edit_button" class = "button spaceup" value="update" name = "edit_button">
-    <br>
-    <div id="editstat" class = "spaceup">{{editstat}}</div><br><br>
     
-<h2 style = "text-align:center;font-size:20px;margin-bottom:10px;color:#c94c4c;">DANGER ZONE</h2>
-<div>Type in the offer you want off the market.</div><br>
-    
-<input type="text" id = "deleteamount" placeholder = "amount" name="delete_amount">
-<input type="text" id = "deleteprice" placeholder = "price" name="delete_price"><br>
+REMOVE MY OFFER OF <input type="text" id = "deleteamount" class = "edit"  name="delete_amount"> MEAL POINTS <br> AT $ 
+<input type="text" id = "deleteprice" class = "edit" name="delete_price"> PER POINT<br>
 <input type="submit" id = "delete_button" class = "button spaceup delete" name = "delete_button" value="remove">
+    
 <div id="deletestat" class = "spaceup bottomspace">{{deletestat}}</div><br><br>
 
+{%endif%}
+    
 </form>
 
 {% endblock %}

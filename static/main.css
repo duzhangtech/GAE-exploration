@@ -98,7 +98,10 @@ input:focus, textarea:focus {
     box-shadow:0 0 3px #11b99c;
     font-size: 19px !important;
 }
-
+input.edit {
+    width:80px;
+    height:30px;
+}
 
 
 textarea {
@@ -138,6 +141,15 @@ textarea, input { outline: none; }
 
 .resend_button {
     width:130px;
+}
+#delete_button {
+    width:130px;
+}
+#delete_button:hover {
+    width:130px;
+    background-color:#c94c4c;
+    color:white;
+    border-color: #892323;
 }
 
 
