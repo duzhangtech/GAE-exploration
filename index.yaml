@@ -17,6 +17,12 @@ indexes:
 
 - kind: SellModel
   properties:
+  - name: fulfilled
+  - name: price
+  - name: amount
+
+- kind: SellModel
+  properties:
   - name: user
   - name: amount
 

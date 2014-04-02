@@ -75,72 +75,13 @@ class FAQ(Handler):
     def post(self):
         feedback = self.request.get('feedback')
         FeedbackModel(parent = feedback_key(), feedback = feedback).put()
-    
+
 
 class Buy(Handler):
     def get(self):
-        sells = SellModel.all().filter("fulfilled", False).order('price')
-        sells = list(sells)
-
-        if len(sells) == 0:
-            count = 0
-        else:
-            count = len(sells)
-
-        sells.sort(key = lambda x:((float)(x.price), (int)(x.amount)))
-        count = len(sells)
-
+        sells = SellModel.all().filter("fulfilled", False).order('price').order('amount')
         email = self.request.get("e")
-        self.render("buy.html", sells = sells, count = count, email = email)
-
-
-class BuySortMP(Handler):
-    def get(self):
-        sells = memcache.get("SELLS")
-
-        if sells is None:
-            logging.error("EMPTY MC")
-            sells = SellModel.all().filter("fulfilled", False).order('price')
-            sells = list(sells)
-
-            if len(sells) == 0:
-                logging.error("EMPTY DB")
-                count = 0
-            else:
-                logging.error("DB WRITE TO MC")
-                memcache.set("SELLS", sells.sort(key = lambda x:((int)(x.amount), (float)(x.price))))
-                count = len(sells)
-
-        else:
-            logging.error("SELLS IN MC")
-            sells.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
-            count = len(sells)
-
-        self.render("buy.html", sells = sells, count = count)
-
-
-class BuySortPrice(Handler):
-    def get(self):
-        sells = SellModel.all().filter("fulfilled", False).order('price')
-        sells = list(sells)
-        logging.error("PRICESORT")
-
-        if len(sells) == 0:
-            count = 0
-        else:
-            count = len(sells)
-
-            db = sells
-            sells = []
-
-            for s in db:
-                cost = (float)(s.price) * (int)(s.amount)
-
-                sells.append((s, cost))
-
-            sells.sort(key=lambda x: x[1])
-
-        self.render("buy.html", sells = sells, count = count, pricesort = True)
+        self.render("buy.html", sells = sells, count = sells.count(), email = email)
 
 
 class BuyContact(Handler):
@@ -731,9 +672,6 @@ def render_str(template, **params):
 application = webapp2.WSGIApplication([
                     ('/', Buy),
                     ('/buy', Buy),
-                    ('/buysortprice', BuySortPrice),
-                    ('/buysortmp', BuySortMP),
-
                     ('/contact', BuyContact),
 
                     ('/sell', Sell),

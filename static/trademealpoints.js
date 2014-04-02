@@ -29,8 +29,6 @@ $("#submit").click(function() {
             $("#feedback_title").replaceWith("<div id = 'feedback_title' style = 'font-size:24px;color: #32ac97;margin-bottom:200px;margin-top:5px;'>THANKS!</div>");
             $("#feedback").remove();
             $("#error").remove();
-            $("#name").remove();
-            $("#email").remove();
             $("#submit").remove();
             ;}
         });
@@ -59,25 +57,71 @@ $(".sort").on({
     }
 });
   
-    
+
 //SORT BY MP
 $('#sortmp').on('click', function () {
-    $('.entrylink').sort(function(a, b) {return $(a).find('span.amount').text() - $(b).find('span.amount').text();}) 
-    .appendTo('#entrytable');
+    var stat = $('#sortmp').attr("data");
+
+    if (stat == "normalsorted")  {
+        $('#sortmp').attr("data", "reversesorted");
+        
+        $('.entrylink').sort(function(a, b) {
+            return $(b).find('span.amount').text() - $(a).find('span.amount').text();
+        }).appendTo('#entrytable');    
+    } 
+    
+    else if (stat == "reversesorted" || typeof stat == "undefined") {
+        $('#sortmp').attr("data", "normalsorted");
+        
+        $('.entrylink').sort(function(a, b) {
+            return $(a).find('span.amount').text() - $(b).find('span.amount').text();
+        }).appendTo('#entrytable');    
+    }
+    
 });
     
     
 //SORT BY $
 $('#sortcost').on('click', function () {
-    $('.entrylink').sort(function(a, b) {return $(a).find('span.cost').text() - $(b).find('span.cost').text();}) 
-    .appendTo('#entrytable');
+    var stat = $('#sortcost').attr("data");
+    
+    if (stat == "normalsorted")  {
+        $('#sortcost').attr("data", "reversesorted");
+        
+        $('.entrylink').sort(function(a, b) {
+            return $(b).find('span.cost').text() - $(a).find('span.cost').text();
+        }).appendTo('#entrytable');    
+    } 
+    
+    else if (stat == "reversesorted"  || typeof stat == "undefined") {
+        $('#sortcost').attr("data", "normalsorted");
+        
+        $('.entrylink').sort(function(a, b) {
+            return $(a).find('span.cost').text() - $(b).find('span.cost').text();
+        }).appendTo('#entrytable');    
+    }
 });
       
     
 //SORT BY $/MP
 $('#sortprice').on('click', function () {
-    $('.entrylink').sort(function(a, b) {return $(a).find('span.price').text() - $(b).find('span.price').text();})
-    .appendTo('#entrytable');
+    var stat = $('#sortprice').attr("data");
+    
+    if (stat == "normalsorted")  {
+        $('#sortprice').attr("data", "reversesorted");
+        
+        $('.entrylink').sort(function(a, b) {
+            return $(b).find('span.price').text() - $(a).find('span.price').text();
+        }).appendTo('#entrytable');    
+    } 
+    
+    else if (stat == "reversesorted"  || typeof stat == "undefined") {
+        $('#sortprice').attr("data", "normalsorted");
+        
+        $('.entrylink').sort(function(a, b) {
+            return $(a).find('span.price').text() - $(b).find('span.price').text();
+        }).appendTo('#entrytable');    
+    }
 });
   
     
