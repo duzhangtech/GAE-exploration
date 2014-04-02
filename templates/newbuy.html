@@ -10,10 +10,18 @@
 
 <form method="post" class = "center">
     <div style = "font-size:19px;">
-        <div class = "spaceup">BUY <span style = "color:#32ac97;">{{amount}}</span> MEAL POINTS</div>
-        <div>AT <span style = "color:#32ac97;">${{price}}</span> PER POINT</div>
-        <script>var cost = {{amount|int*price|float}}.toFixed(1)</script>
-        <div class = "tenbelow">FOR <span style = "color:#32ac97;">$<script>document.write(cost);</script></span></div>
+        <div class = "spaceup">
+            BUY <span style = "color:#32ac97;" class = "amount">{{amount}}</span> MEAL POINTS
+        </div>
+        
+        <div>
+            AT <span style = "color:#32ac97;">$</span><span style = "color:#32ac97;" class = "price" >{{price}}</span> PER POINT
+        </div>
+        
+        <div class = "tenbelow">
+            FOR <span style = "color:#32ac97;">$</span><span style = "color:#32ac97;" class = "cost">{{amount|int*price|float}}</span>
+        </div>
+        
         <div><input type="text" placeholder = "wustl email" class = "tenbelow spaceup" name="email" value="{{email}}"></div>  
     
     

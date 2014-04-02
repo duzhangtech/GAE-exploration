@@ -9,12 +9,15 @@
 </div>
 
 <form method="post" class = "center">
+        <div id = "derp" class = "hide">Sort!</div>
 
-        <div><input type="text" placeholder = "number of mp" class = "spaceup" name="amount" value="{{amount}}"></div>
+        <div class = "spaceup">
+            <input type="text" id = "amountinput" placeholder = "number of mp"name="amount" value="{{amount}}">
+        </div>
         
-        <div><input type="text" placeholder = "price per mp"  name="price" value="{{price}}"></div>
+        <div><input type="text" id = "priceinput" placeholder = "price per mp"  name="price" value="{{price}}"></div>
         
-        <div><input type="text" placeholder = "wustl email" name="email" value="{{email}}"></div>
+        <div><input type="text" id = "emailinput" placeholder = "wustl email" name="email" value="{{email}}"></div>
     
         {%if need_code%} 
         <div><input type="text" placeholder = "first name" name="first_name" value="{{first_name}}"></div>

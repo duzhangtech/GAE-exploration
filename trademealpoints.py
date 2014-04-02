@@ -6,18 +6,15 @@ import json
 import re
 
 from string import letters
-
 from google.appengine.ext import db
 from google.appengine.api import mail
 from google.appengine.api import memcache
 from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
 
-
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader('templates'), autoescape = True) 
 
 secret = "asd8B*#lfiewnL#FF:OIWEfkjkdsa;fjk;;lk"
 
-#basic user can sell, wish, and give feedback
 def user_key():
     return db.Key.from_path('user_kind', 'user_id')
 
@@ -49,7 +46,6 @@ class VerifyModel(db.Model):
     email = db.StringProperty()
     code = db.StringProperty()
 
-
 class Handler(webapp2.RequestHandler):
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
@@ -76,13 +72,11 @@ class FAQ(Handler):
         feedback = self.request.get('feedback')
         FeedbackModel(parent = feedback_key(), feedback = feedback).put()
 
-
 class Buy(Handler):
     def get(self):
         sells = SellModel.all().filter("fulfilled", False).order('price').order('amount')
         email = self.request.get("e")
         self.render("buy.html", sells = sells, count = sells.count(), email = email)
-
 
 class BuyContact(Handler):
     def contact_seller(self, amount, price, myemail):
@@ -275,7 +269,6 @@ class BuyContact(Handler):
                 first_name = first_name, last_name = last_name,
                 email = email, need_code = True)
 
-
 class Sell(Handler):
     def get(self):
         self.render("sell.html")
@@ -285,13 +278,13 @@ class Sell(Handler):
         submit_button = self.request.get("submit_button")
         resend_button = self.request.get("resend_button")
 
-        amount = self.request.get('amount')
-        price = self.request.get('price').strip('0').strip(' ')
+        amount = self.request.get('amount').strip([chars])
+        price = self.request.get('price').strip('0').replace(" ", "").replace("$", "")
 
         first_name = self.request.get('first_name')
         last_name = self.request.get('last_name')
 
-        email = self.request.get('email')
+        email = self.request.get('email').lower()
         user = UserModel.all().ancestor(user_key()).filter("email", email).get()
 
         code = self.request.get('code')
@@ -300,21 +293,35 @@ class Sell(Handler):
                         price = price,
                         email = email)
 
-        if not valid_amount(amount):
-            something_wrong = True
-
-        if not valid_price(price):
-            something_wrong = True
-
-        if not valid_email(email):
-            something_wrong = True
-
         if submit_button:
-            logging.error("SUBMIT")
-            if amount and price and email and (something_wrong == False): #BASIC INFO OKAY
+
+            #BASIC INPUT ERROR
+            if not valid_amount(amount):
+                error = "150 to 2000 mp (whole numbers)"
+                self.render("sell.html", 
+                        amount = amount, price = price, 
+                        first_name = first_name, last_name = last_name,
+                        email = email, error=error)
+
+            elif not valid_price(price):
+                error = "0.01 to 1.00 per mp"
+                self.render("sell.html", 
+                        amount = amount, price = price, 
+                        first_name = first_name, last_name = last_name,
+                        email = email, error=error)
+
+
+            elif not valid_email(email):
+                error = "Use your wustl email"
+                self.render("sell.html", 
+                        amount = amount, price = price, 
+                        first_name = first_name, last_name = last_name,
+                        email = email, error=error)
+
+            #BASIC INPUT OKAY
+            elif amount and price and email: 
                 
                 if not code:
-                    logging.error("NOT CODE")
                     user = UserModel.all().ancestor(user_key()).filter("email", email).get()
 
                     if not user:
@@ -372,9 +379,6 @@ class Sell(Handler):
 
 
                         sells = SellModel.all().ancestor(sell_key()).filter("fulfilled =", False).order('price')
-                        memcache.delete("SELLS")
-                        memcache.set("SELLS", list(sells))
-
                         self.redirect('/buy')
 
                 elif first_name and last_name and code:
@@ -418,8 +422,6 @@ class Sell(Handler):
 
                         mail.send_mail(sender, receiver, subject, body)
 
-
-
                         self.redirect("/buy")
 
                     elif not check_code: #OH SNAP
@@ -429,32 +431,6 @@ class Sell(Handler):
                                 first_name = first_name, last_name = last_name,
                                 email = email, need_code = True, stat = stat)
 
-
-            #BASIC INPUT ERROR
-            elif amount and price and email and something_wrong == True:
-
-                if not valid_amount(amount):
-                    error = "150 to 2000 mp"
-                    self.render("sell.html", 
-                            amount = amount, price = price, 
-                            first_name = first_name, last_name = last_name,
-                            email = email, error=error)
-
-                elif not valid_price(price):
-                    error = "0.01 to 1.00 per mp"
-                    self.render("sell.html", 
-                            amount = amount, price = price, 
-                            first_name = first_name, last_name = last_name,
-                            email = email, error=error)
-
-
-                elif not valid_email(email):
-                    error = "Use your wustl email"
-                    self.render("sell.html", 
-                            amount = amount, price = price, 
-                            first_name = first_name, last_name = last_name,
-                            email = email, error=error)
-
             else:
                 error = "Fill every box"
                 self.render("sell.html", 
@@ -462,6 +438,7 @@ class Sell(Handler):
                             first_name = first_name, last_name = last_name,
                             email = email, error=error)
 
+        #RESEND CODE!
         elif resend_button:
             code = VerifyModel.all().ancestor(verify_key()).filter("email", email).get().code
 
@@ -525,7 +502,6 @@ class Edit(Handler):
         else:
             stat = "(You used your wustl email)"
             self.render("edit.html", stat = stat)
-
 
 class EditFinish(Handler):
     def get(self):
@@ -634,7 +610,6 @@ class EditFinish(Handler):
                 offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
                 self.render("editfinish.html", offer = offer, deletestat = "Fill each box")
 
-
 class LogSenderHandler(InboundMailHandler):
     def receive(self, mail_message):
         logging.info("from: " + mail_message.sender)
@@ -645,9 +620,9 @@ class LogSenderHandler(InboundMailHandler):
             logging.info("message: %s" % m)
             self.response.out.write(m)
 
-AMOUNT_RE = re.compile(r'^[1][5-9][0-9]$|^[2-9][0-9]{2}$|^[1][0-9]{3}$|^2000$')
+AMOUNT_RE = re.compile(r'^[1][5-9][0-9]\.?$|^[2-9][0-9]{2}\.?$|^[1][0-9]{3}\.?$|^2000\.?$')
 
-PRICE_RE = re.compile(r'^\.[0-9][0-9]?$|^1\.00$')
+PRICE_RE = re.compile(r'^\$*\.[0-9]*$|^\$*1$|^\$*1\.|^\$*1\.[0]*$')
 
 EMAIL_RE  = re.compile(r'^[\S]+(?i)(@wustl\.edu)$')
 
@@ -673,12 +648,9 @@ application = webapp2.WSGIApplication([
                     ('/', Buy),
                     ('/buy', Buy),
                     ('/contact', BuyContact),
-
                     ('/sell', Sell),
-
                     ('/changeoffer', Edit),
                     ('/change', EditFinish),
-
                     ('/faq', FAQ), 
                     LogSenderHandler.mapping()],
                     debug=True)

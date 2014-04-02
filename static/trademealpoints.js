@@ -124,6 +124,73 @@ $('#sortprice').on('click', function () {
     }
 });
   
+  
+//AMOUNT HINT
+$("#amountinput").focus(function() {
+    $("#amountinput").attr('placeholder', '150 to 2000 mp');
+});
     
+$("#amountinput").blur(function() {
+    $("#amountinput").attr('placeholder', 'number of mp');
+});
+   
+//PRICE HINT
+$("#priceinput").focus(function() {
+    $("#priceinput").attr('placeholder', '$0.01 to $1/mp');
+});
+    
+$("#priceinput").blur(function() {
+    $("#priceinput").attr('placeholder', 'price per mp');
+});
+    
+
+//AMOUNT REGEX
+function okayamount(amount) {
+    
+}
+    
+//PRICE REGEX
+function okayamount(amount) {
+    
+}
+    
+//EMAIL REGEX
+function okayamount(amount) {
+    
+}
+    
+//AMOUNT OKAY
+$("#amountinput").keyup(function() {
+    var amount = $("#amountinput").val();
+    
+    if (okayamount(amount)) {
+        //show okay message
+    } else {
+        //boo
+    }
+});
+    
+//PRICE OKAY
+$("#amountinput").keyup(function() {
+    var amount = $("#amountinput").val();
+    
+    if (okayamount(amount)) {
+        //show okay message
+    } else {
+        //boo
+    }
+});
+    
+//EMAIL OKAY
+$("#amountinput").keyup(function() {
+    var amount = $("#amountinput").val();
+    
+    if (okayamount(amount)) {
+        //show okay message
+    } else {
+        //boo
+    }
+});
+
 
 });

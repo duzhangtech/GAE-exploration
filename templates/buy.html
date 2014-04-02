@@ -26,21 +26,20 @@
     </div>
 
     <div id = 'entrytable'>
-    {% for x in range(0, count) %}
-
-        {% if sells[x].user.email == email %}
-            <a class = "entrylink mylink" href="/contact?amount={{sells[x].amount}}&price={{sells[x].price}}">
-        {%else%}
-            <a class = "entrylink" href="/contact?amount={{sells[x].amount}}&price={{sells[x].price}}">
-        {%endif%} 
-                <span class = "entry amount">{{sells[x].amount}}</span>
-                <span class = "entry cost">{{sells[x].amount|int*sells[x].price|float}}</span>
-                <span class = "entry price">{{sells[x].price}}</span>
-            <br>
-            </a>
-                
-    {% endfor %}
-        
+        {% for x in range(0, count) %}
+    
+            {% if sells[x].user.email == email %}
+                <a class = "entrylink mylink" href="/contact?amount={{sells[x].amount}}&price={{sells[x].price}}">
+            {%else%}
+                <a class = "entrylink" href="/contact?amount={{sells[x].amount}}&price={{sells[x].price}}">
+            {%endif%} 
+                    <span class = "entry amount">{{sells[x].amount}}</span>
+                    <span class = "entry cost">{{sells[x].amount|int*sells[x].price|float}}</span>
+                    <span class = "entry price">{{sells[x].price}}</span>
+                <br>
+                </a>
+                    
+        {% endfor %}
     </div>
 </div>
     
