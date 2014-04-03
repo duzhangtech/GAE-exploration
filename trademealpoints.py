@@ -2,10 +2,13 @@ import webapp2
 import jinja2
 import logging
 import random
+import math
 import json
 import re
 
 from string import letters
+from decimal import *
+
 from google.appengine.ext import db
 from google.appengine.api import mail
 from google.appengine.api import memcache
@@ -74,7 +77,7 @@ class FAQ(Handler):
 
 class Buy(Handler):
     def get(self):
-        sells = SellModel.all().filter("fulfilled", False).order('price').order('amount')
+        sells = SellModel.all().ancestor(sell_key()).filter("fulfilled", False).order('price').order('amount')
         email = self.request.get("e")
         self.render("buy.html", sells = sells, count = sells.count(), email = email)
 
@@ -130,11 +133,6 @@ class BuyContact(Handler):
         seller.put()
         
         sells = SellModel.all().ancestor(sell_key()).filter("fulfilled =", False).order('price')
-        if sells.count() == 0:
-            memcache.set("SELLS", None)
-        else:
-            memcache.delete("SELLS")
-            memcache.set("SELLS", list(sells))
 
         stat = "check your inbox!"
         self.render("newbuy.html", stat = stat, amount = amount, price = price)
@@ -269,6 +267,23 @@ class BuyContact(Handler):
                 first_name = first_name, last_name = last_name,
                 email = email, need_code = True)
 
+def prettyamount(amount):
+    if amount.count('.') == -1: #NO DECIMAL POINT
+        return re.sub("[^0-9]", "", amount.lstrip('0')) 
+    else: #HAS DECIMAL POINT
+        return str(math.floor(float(re.sub("[^0-9\.]", "", amount)))).strip('0').replace(".", "")
+      
+def prettyprice(price):
+    if price.count('.') > 1: #LOLZ
+        return price
+    else:
+        price = price.strip('0').replace(" ", "").replace("$", "")
+        price = "{:3.2f}".format(float(price))
+        return price
+
+def prettyemail(email):
+    return email.lower()
+
 class Sell(Handler):
     def get(self):
         self.render("sell.html")
@@ -277,9 +292,9 @@ class Sell(Handler):
         submit_button = self.request.get("submit_button")
         resend_button = self.request.get("resend_button")
 
-        amount = re.sub("[^0-9]", "", self.request.get('amount').lstrip('0').replace('.', ''))
-        price = self.request.get('price').strip('0').replace(" ", "").replace("$", "")
-        email = self.request.get('email').lower()
+        amount = prettyamount(self.request.get('amount'))
+        price = prettyprice(self.request.get('price'))
+        email = prettyemail(self.request.get('email'))
 
         user = UserModel.all().ancestor(user_key()).filter("email", email).get()
         first_name = self.request.get('first_name')
@@ -317,7 +332,37 @@ class Sell(Handler):
                 if not code: #OKAY TO SUBMIT OR NEED VERIFY?
                     user = UserModel.all().ancestor(user_key()).filter("email", email).get()
 
-                    if not user: #NEW OR IN LIMBO?
+                    if user: #YAY. CAN PROCEED WITH SELL
+                        sell = SellModel(parent = sell_key(), user = user,
+                        amount = amount, price = price, fulfilled = False)
+
+                        sell.put()
+
+                        v = VerifyModel.all().filter("email", email).get()
+
+                        sender = "bot@trademealpoints.appspotmail.com"
+                        receiver = email
+                        subject = "MEAL POINTS: LINKS AND STUFF!"
+                        
+                        body =  (
+                                "Hello!\n\n"
+                                + "This link highlights your offer on the buy page: \n"
+                                + "trademealpoints.appspot.com/buy?e=" + email
+                                + "\n\nYou can edit or remove your offers here: \n" 
+                                + "trademealpoints.appspot.com/change?e=" + email 
+                                + "&v=" + v.code + "\n\n"
+                                + "You can comment/ask for features/say hi here:\n"
+                                + "trademealpoints.appspot.com/faq#feed\n\n"
+                                + "Yours, \n"
+                                + "Bot"
+                                )
+
+                        mail.send_mail(sender, receiver, subject, body)
+
+                        sells = SellModel.all().ancestor(sell_key()).filter("fulfilled =", False).order('price')
+                        self.redirect('/buy?e=' + email)
+
+                    elif not user: #NEW USER OR IN LIMBO?
                         waiting_for_verify = VerifyModel.all().filter("email", email).get()
 
                         if not waiting_for_verify: #NEW USER, PUT IN LIMBO
@@ -342,36 +387,6 @@ class Sell(Handler):
                                 amount = amount, price = price, 
                                 first_name = first_name, last_name = last_name,
                                 email = email, need_code = True, error = "Invalid code. Resend?")
-
-                    elif user: #VERIFIED, CAN PROCEED WITH SELL
-                        sell = SellModel(parent = sell_key(), user = user,
-                        amount = amount, price = price, fulfilled = False)
-
-                        sell.put()
-
-                        v = VerifyModel.all().filter("email", email).get()
-
-                        sender = "bot@trademealpoints.appspotmail.com"
-                        receiver = email
-                        subject = "MEAL POINTS: LINKS AND STUFF!"
-                        
-                        body =  (
-                                "Hello!\n\n"
-                                + "This link highlights your offer on the buy page: \n"
-                                + "trademealpoints.appspot.com/buy?e=" + email
-                                + "\n\nYou can edit or remove your offer here: \n" 
-                                + "trademealpoints.appspot.com/change?e=" + email 
-                                + "&v=" + v.code + "\n\n"
-                                + "You can comment/ask for features/say hi here:\n"
-                                + "trademealpoints.appspot.com/faq#feed\n\n"
-                                + "Yours, \n"
-                                + "Bot"
-                                )
-
-                        mail.send_mail(sender, receiver, subject, body)
-
-                        sells = SellModel.all().ancestor(sell_key()).filter("fulfilled =", False).order('price')
-                        self.redirect('/buy')
 
                 elif first_name and last_name and code: #IS VERIFY OKAY?
                     check_code = VerifyModel.all().filter("code", code).get()
@@ -500,7 +515,7 @@ class EditFinish(Handler):
 
         if okaycode:
             u = UserModel.all().filter("email", email).get()
-            offer = list(SellModel.all().filter('user', u))
+            offer = list(SellModel.all().ancestor(sell_key()).filter('user', u))
             offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
             self.render("editfinish.html", offer = offer)
 
@@ -513,89 +528,85 @@ class EditFinish(Handler):
 
         email = self.request.get("e")
         user = UserModel.all().filter("email", email).get()
+        offer = list(SellModel.all().ancestor(sell_key()).filter('user', user).order('amount'))
+        offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
 
-        if edit_button:
-            logging.error("EDIT")
-            
-            offers = list(SellModel.all().filter("user", user).order('amount'))
+        if edit_button:            
+
             amount = self.request.get_all("amount")
             price = self.request.get_all("price")
 
-            if (len(offers) == len(amount) and len(offers) == len(price)):
-                logging.error("LENGTH OKAY")
+            #FILLED FIELDS
+            if (len(offer) == len(amount) and len(offer) == len(price)):
+                logging.error("LENGTH: " + str(len(offer)))
 
-                offers.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
-                u = UserModel.all().filter("email", email).get()
+                change = False
+                wrongamount = False
+                wrongprice = False
 
-                for x in range(0, len(offers)):
-                    logging.error(offers[x].amount)
+                for x in range(0, len(offer)):
+                    logging.error(offer[x].amount)
                     logging.error(amount[x])
 
-                    change = False
-                    if offers[x].amount != amount[x]:
+                    if offer[x].amount != amount[x]:
+                        change = True
+
                         if valid_amount(amount[x]):
-                            offers[x].amount = amount[x]
-                            logging.error(offers[x].amount)
-                            logging.error(amount[x])
-                            change = True
-                            logging.error("CHANGE")
+                            offer[x].amount = amount[x]
+                            offer[x].put()
                         else:
-                            offer = list(SellModel.all().ancestor(sell_key()).filter('user', u))
-                            offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
-                            self.render("editfinish.html", offer = offer, editstat = "150 to 2000 mp")
+                            wrongamount = True
 
-                    if offers[x].price != price[x]:
+                    if offer[x].price != price[x]:
+                        change = True
+
                         if valid_price(price[x]):
-                            offers[x].price = price[x]
-                            logging.error("CHANGE")
-                            change = True
+                            offer[x].price = price[x] 
+                            offer[x].put()
                         else:
-                            offer = list(SellModel.all().ancestor(sell_key()).filter('user', u))
-                            offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
-                            self.render("editfinish.html", offer = offer, editstat = "0.01 to 1.00 per mp")
+                            wrongprice = True
 
-                    if change == True:
-                        offers[x].put()
-                        memcache.delete("SELLS")
+                if change:
+                    logging.error("CHANGE")
+                    
+                    if wrongamount == True:
+                        offer = list(SellModel.all().ancestor(sell_key()).filter('user', user).order('amount'))
+                        offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
+                        self.render("editfinish.html", offer = offer, editstat = "150 to 2000 mp")
+                    elif wrongprice == True:
+                        offer = list(SellModel.all().ancestor(sell_key()).filter('user', user).order('amount'))
+                        offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
+                        self.render("editfinish.html", offer = offer, editstat = "0.01 to 1.00 per mp")
+                    else:
+                        offer = list(SellModel.all().ancestor(sell_key()).filter('user', user).order('amount'))
+                        offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
+                        self.render("editfinish.html", offer = offer, editstat = "Updated successfully!")
 
+                elif not change:
+                    logging.error("NO CHANGE")
+                    self.render("editfinish.html", offer = offer, editstat = "Updated successfully!")
 
-               
-                offer = list(SellModel.all().ancestor(sell_key()).filter('user', u))
-                offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
-                self.render("editfinish.html", offer = offer, editstat = "Updated successfully!")
-
-            else:
-                offer = list(SellModel.all().ancestor(sell_key()).filter('user', u))
-                offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
+            else: #BLANK FIELD
                 self.render("editfinish.html", offer = offer, editstat = "Fill each box")
 
-        elif delete_button:
-            logging.error("DEL")
-
+        elif delete_button: 
             delete_amount = self.request.get("delete_amount")
             delete_price = self.request.get("delete_price")
-            
+
             if delete_amount and delete_price:
                 derp = SellModel.all().ancestor(sell_key()).filter("user", user).filter('amount', delete_amount).filter('price', delete_price).get()
 
                 if derp:
                     derp.delete()
-                    memcache.delete("SELLS")
+                    offer = list(SellModel.all().ancestor(sell_key()).filter('user', user))
+                    offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
 
-                    u = UserModel.all().filter("email", email).get()
-                    offer = list(SellModel.all().ancestor(sell_key()).filter('user', u))
-                    offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
                     self.render("editfinish.html", offer = offer, deletestat = "Offer removed.")
 
                 elif not derp:
-                    u = UserModel.all().filter("email", email).get()
-                    offer = list(SellModel.all().ancestor(sell_key()).filter('user', u))
-                    offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
                     self.render("editfinish.html", offer = offer, deletestat = "You don't have this offer on market.")
 
             else:
-                offer = list(SellModel.all().ancestor(sell_key()).filter('user', u))
-                offer.sort(key = lambda x:((int)(x.amount), (float)(x.price)))
                 self.render("editfinish.html", offer = offer, deletestat = "Fill each box")
 
 class LogSenderHandler(InboundMailHandler):
@@ -608,29 +619,14 @@ class LogSenderHandler(InboundMailHandler):
             logging.info("message: %s" % m)
             self.response.out.write(m)
 
-AMOUNT_RE = re.compile(r'^[1][5-9][0-9]\.?$|^[2-9][0-9]{2}\.?$|^[1][0-9]{3}\.?$|^2000\.?$')
-
-PRICE_RE = re.compile(r'^\$*\.[0-9]*$|^\$*1$|^\$*1\.|^\$*1\.[0]*$')
-
-EMAIL_RE  = re.compile(r'^[\S]+(?i)(@wustl\.edu)$')
-
-NUM_RE = re.compile(r'^[0-9]*$')
-
 def valid_amount(amount):
-    return amount and AMOUNT_RE.match(amount)
+    return amount and re.compile(r'^[1][5-9][0-9]\.?$|^[2-9][0-9]{2}\.?$|^[1][0-9]{3}\.?$|^2000\.?$').match(amount)
 
 def valid_price(price):
-    return price and PRICE_RE.match(price)
+    return price and re.compile(r'^[0]?\.[0-9]*$|^1$|^1\.|^1\.[0]*$').match(price)
 
 def valid_email(email):
-    return email and EMAIL_RE.match(email)
-
-def valid_num(num):
-    return num and NUM_RE.match(str(num))
-
-def render_str(template, **params):
-    t = jinja_env.get_template(template)
-    return t.render(params)
+    return email and re.compile(r'^[\S]+(?i)(@wustl\.edu)$').match(email)
 
 application = webapp2.WSGIApplication([
                     ('/', Buy),
