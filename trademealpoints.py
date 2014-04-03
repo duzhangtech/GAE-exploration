@@ -268,18 +268,25 @@ class BuyContact(Handler):
                 email = email, need_code = True)
 
 def prettyamount(amount):
-    if amount.count('.') == -1: #NO DECIMAL POINT
+    if amount.count('.') == -1: #DERP
         return re.sub("[^0-9]", "", amount.lstrip('0')) 
-    else: #HAS DECIMAL POINT
+    elif amount.count('.') >1:
+        return amount
+    else: #HAS DECIMAL POINT. YAY
         return str(math.floor(float(re.sub("[^0-9\.]", "", amount)))).strip('0').replace(".", "")
-      
+    
 def prettyprice(price):
-    if price.count('.') > 1: #LOLZ
+    if price.count('.') > 1 or len(price) == 0: #LOLZ
         return price
     else:
         price = price.strip('0').replace(" ", "").replace("$", "")
-        price = "{:3.2f}".format(float(price))
-        return price
+        price = re.sub("[^0-9\.]", "", price)
+
+        if len(price) != 0:
+            price = "{:3.2f}".format(float(price))
+            return price
+        else: #SERIOUSLY PEOPLE
+            return price
 
 def prettyemail(email):
     return email.lower()
@@ -514,8 +521,8 @@ class EditFinish(Handler):
         okaycode = VerifyModel.all().ancestor(verify_key()).filter('email', email).filter('code', code).get()
 
         if okaycode:
-            u = UserModel.all().filter("email", email).get()
-            offer = list(SellModel.all().ancestor(sell_key()).filter('user', u))
+            user = UserModel.all().filter("email", email).get()
+            offer = list(SellModel.all().ancestor(sell_key()).filter('user', user))
             offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
             self.render("editfinish.html", offer = offer)
 
@@ -548,20 +555,20 @@ class EditFinish(Handler):
                     logging.error(offer[x].amount)
                     logging.error(amount[x])
 
-                    if offer[x].amount != amount[x]:
+                    if prettyamount(offer[x].amount) != prettyamount(amount[x]):
                         change = True
 
-                        if valid_amount(amount[x]):
-                            offer[x].amount = amount[x]
+                        if valid_amount(prettyamount(amount[x])):
+                            offer[x].amount = prettyamount(amount[x])
                             offer[x].put()
                         else:
                             wrongamount = True
 
-                    if offer[x].price != price[x]:
+                    if prettyprice(offer[x].price) != prettyprice(price[x]):
                         change = True
 
-                        if valid_price(price[x]):
-                            offer[x].price = price[x] 
+                        if valid_price(prettyprice(price[x])):
+                            offer[x].price = prettyprice(price[x])
                             offer[x].put()
                         else:
                             wrongprice = True
@@ -569,10 +576,10 @@ class EditFinish(Handler):
                 if change:
                     logging.error("CHANGE")
                     
-                    if wrongamount == True:
+                    if wrongamount == True: #HAS TO REFETCH FOR NEW VALUES...AJAX FIXME?
                         offer = list(SellModel.all().ancestor(sell_key()).filter('user', user).order('amount'))
                         offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
-                        self.render("editfinish.html", offer = offer, editstat = "150 to 2000 mp")
+                        self.render("editfinish.html", offer = offer, editstat = "Wow. Such typing. Make sure your offer is between 150 and 2000 mp")
                     elif wrongprice == True:
                         offer = list(SellModel.all().ancestor(sell_key()).filter('user', user).order('amount'))
                         offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
@@ -590,11 +597,14 @@ class EditFinish(Handler):
                 self.render("editfinish.html", offer = offer, editstat = "Fill each box")
 
         elif delete_button: 
-            delete_amount = self.request.get("delete_amount")
-            delete_price = self.request.get("delete_price")
+            amount = self.request.get("delete_amount")
+            price = self.request.get("delete_price")
 
-            if delete_amount and delete_price:
-                derp = SellModel.all().ancestor(sell_key()).filter("user", user).filter('amount', delete_amount).filter('price', delete_price).get()
+            if amount and price:
+                amount = prettyamount(self.request.get("delete_amount"))
+                price = prettyprice(self.request.get("delete_price"))
+
+                derp = SellModel.all().ancestor(sell_key()).filter("user", user).filter('amount', amount).filter('price', price).get()
 
                 if derp:
                     derp.delete()
@@ -604,10 +614,10 @@ class EditFinish(Handler):
                     self.render("editfinish.html", offer = offer, deletestat = "Offer removed.")
 
                 elif not derp:
-                    self.render("editfinish.html", offer = offer, deletestat = "You don't have this offer on market.")
+                    self.render("editfinish.html", offer = offer, delete_amount = amount, delete_price = price,deletestat = "You don't have this offer on market.")
 
             else:
-                self.render("editfinish.html", offer = offer, deletestat = "Fill each box")
+                self.render("editfinish.html", offer = offer, delete_amount = amount, delete_price = price, deletestat = "Fill each box")
 
 class LogSenderHandler(InboundMailHandler):
     def receive(self, mail_message):

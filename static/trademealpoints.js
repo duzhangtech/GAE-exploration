@@ -1,15 +1,15 @@
 $(document).ready(function(){
     
     
-//ENTRY FORMATTING
-//var cost = document.getElementsByClassName('cost'); 
-//var price = document.getElementsByClassName('price');
-//    
-//for (var ii = 0; ii < price.length; ii++) { 
-//    $(cost[ii]).text(parseFloat($(cost[ii]).text()).toFixed(1));
-//    $(price[ii]).text(parseFloat($(price[ii]).text()).toFixed(2));
-//    $(price[ii]).val(parseFloat($(price[ii]).val()).toFixed(2));
-//}
+//ENTRY FORMATTING FOR PRE PY REGEX POSTS
+var cost = document.getElementsByClassName('cost'); 
+var price = document.getElementsByClassName('price');
+    
+for (var ii = 0; ii < price.length; ii++) { 
+    $(cost[ii]).text(parseFloat($(cost[ii]).text()).toFixed(1));
+    $(price[ii]).text(parseFloat($(price[ii]).text()).toFixed(2));
+    $(price[ii]).val(parseFloat($(price[ii]).val()).toFixed(2));
+}
     
     
 //FEEDBACK
