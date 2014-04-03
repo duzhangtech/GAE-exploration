@@ -46,16 +46,15 @@ $(".navlinks").on({
         $(this).css("border-bottom", "0px");
     }
 });
-    
-    
+        
 //SHOW SORT HINT
 $(".sort").on({
-    mouseenter: function () {
-        $('#derp').fadeIn();
-    },
-    mouseleave: function () {
-        $('#derp').fadeOut();
-    }
+        mouseenter: function () {
+            $('#derp').fadeIn();
+        },
+        mouseleave: function () {
+            $('#derp').fadeOut();
+        }
 });
   
 

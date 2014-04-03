@@ -77,9 +77,25 @@ class FAQ(Handler):
 
 class Buy(Handler):
     def get(self):
-        sells = SellModel.all().ancestor(sell_key()).filter("fulfilled", False).order('price').order('amount')
+        sells = memcache.get("SELLS")
+
+        if sells is None:
+            logging.error("EMPTY MC")
+            sells = list(SellModel.all().ancestor(sell_key()).filter("fulfilled", False).order('price'))
+
+            if len(sells) == 0:
+                logging.error("EMPTY DB")
+            else:
+                logging.error("DB WRITE TO MC")
+                memcache.set("SELLS", sells.sort(key = lambda x:((float)(x.price), (int)(x.amount))))
+
+        else:
+            logging.error("SELLS IN MC")
+            sells.sort(key = lambda x:((float)(x.price), (int)(x.amount)))
+
+        count = len(sells)
         email = self.request.get("e")
-        self.render("buy.html", sells = sells, count = sells.count(), email = email)
+        self.render("buy.html", sells = sells, count = count, email = email)
 
 class BuyContact(Handler):
     def contact_seller(self, amount, price, myemail):
@@ -133,6 +149,12 @@ class BuyContact(Handler):
         seller.put()
         
         sells = SellModel.all().ancestor(sell_key()).filter("fulfilled =", False).order('price')
+        if sells.count() == 0:
+            memcache.delete("SELLS")
+            memcache.set("SELLS", None)
+        else:
+            memcache.delete("SELLS")
+            memcache.set("SELLS", list(sells))
 
         stat = "check your inbox!"
         self.render("newbuy.html", stat = stat, amount = amount, price = price)
@@ -367,6 +389,9 @@ class Sell(Handler):
                         mail.send_mail(sender, receiver, subject, body)
 
                         sells = SellModel.all().ancestor(sell_key()).filter("fulfilled =", False).order('price')
+                        memcache.delete("SELLS")
+                        memcache.set("SELLS", list(sells))
+
                         self.redirect('/buy?e=' + email)
 
                     elif not user: #NEW USER OR IN LIMBO?
@@ -411,8 +436,6 @@ class Sell(Handler):
                                     amount = amount,
                                     price = price).put()
 
-                        sells = SellModel.all().ancestor(sell_key()).filter("fulfilled", False)
-
                         sender = "bot@trademealpoints.appspotmail.com"
                         receiver = email
                         subject = "YOUR MEAL POINTS: LINKS AND STUFF!"
@@ -432,6 +455,10 @@ class Sell(Handler):
 
                         mail.send_mail(sender, receiver, subject, body)
 
+                        sells = SellModel.all().ancestor(sell_key()).filter("fulfilled", False)
+                        memcache.delete("SELLS")
+                        memcache.set("SELLS", list(sells))
+                        
                         self.redirect("/buy?e=" + email)
 
                     elif not check_code: #OH SNAP
