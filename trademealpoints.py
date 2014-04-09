@@ -3,12 +3,11 @@ import jinja2
 import logging
 import random
 import math
-import json
 import re
+import stripe
+import secretkey
 
 from string import letters
-from decimal import *
-
 from google.appengine.ext import db
 from google.appengine.api import mail
 from google.appengine.api import memcache
@@ -72,6 +71,23 @@ class FAQ(Handler):
         self.render("faq.html")
 
     def post(self):
+        # https://manage.stripe.com/account/apikeys
+        stripe.api_key = secretkey
+        token = self.request.get('stripeToken') #card deets
+        try: #charge card
+          charge = stripe.Charge.create(
+              amount=1000, # amount in cents, again
+              currency="usd",
+              card=token
+          )
+        except:
+          # The card has been declined
+          pass
+
+        self.render("faq.html", paid = True)
+
+class SubmitFeed(Handler):
+    def post(self):
         feedback = self.request.get('feedback')
         FeedbackModel(parent = feedback_key(), feedback = feedback).put()
 
@@ -80,17 +96,10 @@ class Buy(Handler):
         sells = memcache.get("SELLS")
 
         if sells is None:
-            logging.error("EMPTY MC")
             sells = list(SellModel.all().ancestor(sell_key()).filter("fulfilled", False).order('price'))
-
-            if len(sells) == 0:
-                logging.error("EMPTY DB")
-            else:
-                logging.error("DB WRITE TO MC")
+            if len(sells) != 0:
                 memcache.set("SELLS", sells.sort(key = lambda x:((float)(x.price), (int)(x.amount))))
-
         else:
-            logging.error("SELLS IN MC")
             sells.sort(key = lambda x:((float)(x.price), (int)(x.amount)))
 
         count = len(sells)
@@ -236,26 +245,23 @@ class BuyContact(Handler):
                         self.contact_seller(amount, price, email)
 
                     elif not check_code: #OH SNAP
-                        stat = "invalid code"
                         self.render("newbuy.html", 
                                 amount = amount, price = price, 
                                 first_name = first_name, last_name = last_name,
-                                email = email, need_code = True, stat = stat)
+                                email = email, need_code = True, stat = "invalid code")
 
                 elif code and not first_name or not last_name:
-                    error = "fill in every box"
                     self.render("newbuy.html", 
                         first_name=first_name, 
                         amount = amount, 
                         price = price, 
-                        stat = stat, 
+                        stat = "fill in every box", 
                         need_code = True,
                         last_name=last_name, 
                         email = email,
                         code = code)
 
             elif first_name and last_name and not valid_email(email):
-                stat = "use your wustl email"
                 self.render("newbuy.html", 
                             amount = amount, 
                             price = price, 
@@ -263,15 +269,14 @@ class BuyContact(Handler):
                             first_name = first_name, 
                             last_name = last_name,
                             email = email, 
-                            stat = stat)
+                            stat = "use your wustl email")
 
             elif not email or not valid_email(email):
-                error = "use your wustl email"
                 self.render("newbuy.html", 
                     first_name=first_name, 
                     amount = amount, 
                     price = price, 
-                    stat = stat, 
+                    stat = "use your wustl email", 
                     last_name=last_name, 
                     email = email)
 
@@ -321,10 +326,10 @@ class Sell(Handler):
         submit_button = self.request.get("submit_button")
         resend_button = self.request.get("resend_button")
 
-        amount = prettyamount(self.request.get('amount'))
-        price = prettyprice(self.request.get('price'))
-        email = prettyemail(self.request.get('email'))
-
+        amount = self.request.get('amount')
+        price = self.request.get('price')
+        email = self.request.get('email')
+        
         user = UserModel.all().ancestor(user_key()).filter("email", email).get()
         first_name = self.request.get('first_name')
         last_name = self.request.get('last_name')
@@ -332,39 +337,43 @@ class Sell(Handler):
 
         if submit_button:
 
-            #BASIC INPUT ERRORS
-            if not valid_amount(amount):
-                error = "150 to 2000 mp (whole numbers)"
-                self.render("sell.html", 
-                        amount = amount, price = price, 
-                        first_name = first_name, last_name = last_name,
-                        email = email, error=error)
+            if not amount or not price or not email: #BLANK FIELD
+                self.render("sell.html", amount = amount, price = price, 
+                            first_name = first_name, last_name = last_name,
+                            email = email, stat="Fill every box")
 
-            elif not valid_price(price):
-                error = "$0.01 to $1 per mp"
-                self.render("sell.html", 
-                        amount = amount, price = price, 
-                        first_name = first_name, last_name = last_name,
-                        email = email, error=error)
-
-
-            elif not valid_email(email):
-                error = "Use your wustl email"
-                self.render("sell.html", 
-                        amount = amount, price = price, 
-                        first_name = first_name, last_name = last_name,
-                        email = email, error=error)
-
-            #BASIC INPUT OKAY
             elif amount and price and email: 
-                
-                if not code: #OKAY TO SUBMIT OR NEED VERIFY?
+                amount = prettyamount(amount)
+                price = prettyprice(price)
+                email = prettyemail(email)
+
+                #BASIC INPUT ERRORS
+                if not valid_amount(amount):
+                    self.render("sell.html", 
+                            amount = amount, price = price, 
+                            first_name = first_name, last_name = last_name,
+                            email = email, stat="150 to 2000 mp (whole numbers)")
+
+                elif not valid_price(price):
+                    self.render("sell.html", 
+                            amount = amount, price = price, 
+                            first_name = first_name, last_name = last_name,
+                            email = email, stat="$0.01 to $1 per mp")
+
+
+                elif not valid_email(email):
+                    self.render("sell.html", 
+                            amount = amount, price = price, 
+                            first_name = first_name, last_name = last_name,
+                            email = email, stat="Use your wustl email")
+
+                #AMOUNT, PRICE, EMAIL OKAY
+                elif not code: #OKAY TO SUBMIT OR NEED TO VERIFY?
                     user = UserModel.all().ancestor(user_key()).filter("email", email).get()
 
                     if user: #YAY. CAN PROCEED WITH SELL
                         sell = SellModel(parent = sell_key(), user = user,
                         amount = amount, price = price, fulfilled = False)
-
                         sell.put()
 
                         v = VerifyModel.all().filter("email", email).get()
@@ -418,9 +427,9 @@ class Sell(Handler):
                             self.render("sell.html", 
                                 amount = amount, price = price, 
                                 first_name = first_name, last_name = last_name,
-                                email = email, need_code = True, error = "Invalid code. Resend?")
+                                email = email, need_code = True, stat = "Invalid code. Resend?")
 
-                elif first_name and last_name and code: #IS VERIFY OKAY?
+                elif first_name and last_name and code: #ALL FIELDS FILLED. IS CODE OKAY?
                     check_code = VerifyModel.all().filter("code", code).get()
 
                     if check_code: #YAY. COMMIT USER & OFFER
@@ -468,12 +477,10 @@ class Sell(Handler):
                                 first_name = first_name, last_name = last_name,
                                 email = email, need_code = True, stat = stat)
 
-            else: #BLANK FIELD
-                error = "Fill every box"
-                self.render("sell.html", 
-                            amount = amount, price = price, 
+                else: #MISSING FIRST OR LAST NAME
+                    self.render("sell.html", amount = amount, price = price, 
                             first_name = first_name, last_name = last_name,
-                            email = email, error=error)
+                            email = email, stat="Fill every box")
 
         #RESEND CODE!
         elif resend_button:
@@ -488,7 +495,7 @@ class Sell(Handler):
             self.render("sell.html", 
                 amount = amount, price = price, 
                 first_name = first_name, last_name = last_name,
-                email = email, need_code = True, error = "code sent!")
+                email = email, need_code = True, stat = "code sent!")
 
 class Edit(Handler):
     def get(self):
@@ -551,6 +558,13 @@ class EditFinish(Handler):
             user = UserModel.all().filter("email", email).get()
             offer = list(SellModel.all().ancestor(sell_key()).filter('user', user))
             offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
+
+            #TEMPORARY FIX UP FOR PRE PY REGEX COMMITS
+            for x in range(0, len(offer)):
+                offer[x].amount = prettyamount(offer[x].amount)
+                offer[x].price = prettyprice(offer[x].price)
+                offer[x].put()
+
             self.render("editfinish.html", offer = offer)
 
         else:
@@ -614,6 +628,9 @@ class EditFinish(Handler):
                     else:
                         offer = list(SellModel.all().ancestor(sell_key()).filter('user', user).order('amount'))
                         offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
+
+                        memcache.delete("SELLS")
+
                         self.render("editfinish.html", offer = offer, editstat = "Updated successfully!")
 
                 elif not change:
@@ -637,6 +654,8 @@ class EditFinish(Handler):
                     derp.delete()
                     offer = list(SellModel.all().ancestor(sell_key()).filter('user', user))
                     offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
+
+                    memcache.delete("SELLS")
 
                     self.render("editfinish.html", offer = offer, deletestat = "Offer removed.")
 
@@ -665,6 +684,7 @@ def valid_price(price):
 def valid_email(email):
     return email and re.compile(r'^[\S]+(?i)(@wustl\.edu)$').match(email)
 
+
 application = webapp2.WSGIApplication([
                     ('/', Buy),
                     ('/buy', Buy),
@@ -673,5 +693,6 @@ application = webapp2.WSGIApplication([
                     ('/changeoffer', Edit),
                     ('/change', EditFinish),
                     ('/faq', FAQ), 
+                    ('/submitfeed', SubmitFeed),
                     LogSenderHandler.mapping()],
                     debug=True)

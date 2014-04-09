@@ -5,7 +5,7 @@ body {
     color:grey;
     text-align:center;
     margin: 0 auto;
-    overflow:scroll;
+    overflow:auto;
 }
 #front-title {
     position:relative;
@@ -13,6 +13,9 @@ body {
     font-family: 'Nunito', sans-serif;
     font-size: 20px;
     color:black;    
+}
+::-webkit-scrollbar { 
+    display: none; 
 }
 .faq {
     width:340px;

@@ -23,7 +23,7 @@ $("#submit").click(function() {
     } else {
         $.ajax({
             type: "POST",
-            url: "/faq",
+            url: "/submitfeed",
             data: 'feedback=' + feedback + "&name=" + name + "&email=" + email,
             success: function() {
             
