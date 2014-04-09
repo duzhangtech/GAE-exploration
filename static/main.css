@@ -320,6 +320,15 @@ a:hover {
     width:110px;
     background-color:transparent;
 }
+.ascend {
+	width: 0; 
+	height: 0; 
+	border-left: 8px solid transparent;
+	border-right: 8px solid transparent;
+	border-bottom: 15px solid #11b99c;
+    display:inline-block;
+    margin-bottom:1px;
+}
 .descend {
 	width: 0; 
 	height: 0; 
@@ -330,36 +339,21 @@ a:hover {
     display:inline-block;
     margin-bottom:1px;
 }
-.descendwhite {
-	width: 0; 
-	height: 0; 
-	border-left: 8px solid transparent;
-	border-right: 8px solid transparent;
-	border-top: 15px solid white;
-    background-color: white;
-    display:inline-block;
-    margin-bottom:1px;
-}
-.ascend {
-	width: 0; 
-	height: 0; 
-	border-left: 8px solid transparent;
-	border-right: 8px solid transparent;
-	border-bottom: 15px solid #11b99c;
-    display:inline-block;
-    margin-bottom:1px;
-}
 .ascendwhite {
-	width: 0; 
-	height: 0; 
-	border-left: 8px solid transparent;
-	border-right: 8px solid transparent;
+	border-bottom: 15px solid white;
+}
+.ascendblue {
+	border-bottom: 15px solid #0a7663;
+}
+.descendwhite {
 	border-top: 15px solid white;
-    background-color: white;
-    display:inline-block;
-    margin-bottom:1px;
-}  
+}
 
+.descendblue {
+	border-top: 15px solid #0a7663;
+}
+
+    
 .filler {
     width:20px;
     display:inline-block;

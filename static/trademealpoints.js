@@ -47,9 +47,40 @@ $(".navlinks").on({
     }
 });
         
-    
+var clicked = false;
+
+$("#sortmp").mouseenter(function () {
+    if ($("#sortmp span div.triangle").hasClass('ascendwhite')) {
+        $("#sortmp span div.triangle").removeClass('ascendwhite');
+    }
+    else if ($("#sortcost span div.triangle").hasClass('ascend'))  { //if low to high/ascending
+        $("#sortmp span div.triangle").removeClass('ascend ascendblue').addClass('descend descendblue');
+    } 
+    else if ($("#sortcost span div.triangle").hasClass('descend')) {
+        $("#sortmp span div.triangle").removeClass('descend descendblue').addClass('ascend ascendblue');
+    }
+});
+$("#sortmp").mouseleave( function () {
+    if (clicked) {
+        clicked = false; 
+        return;
+    }
+    if ($('#sortmp').attr("current") == 'false') {
+        $("#sortmp span div.triangle").addClass('ascendwhite');
+    }
+    else if ($("#sortmp span div.triangle").hasClass('descend'))  {
+        $("#sortmp span div.triangle").removeClass('descend descendblue').addClass('ascend');
+    } 
+    else if ($("#sortmp span div.triangle").hasClass('ascend')) {
+        $("#sortmp span div.triangle").removeClass('ascend ascendblue').addClass('descend');
+    }
+}); 
 //SORT BY MP
 $('#sortmp').on('click', function () {
+    clicked = true;
+    $('#sortmp').attr("current", "true");
+    $('.theader a').not($('#sortmp')).attr("current", "false");
+    
     var stat = $('#sortmp').attr("data");
 
     if (stat == "normalsorted")  {
@@ -69,58 +100,94 @@ $('#sortmp').on('click', function () {
     }
     
 });
+   
     
-    
-//SORT BY $
-$('#sortcost').on('click', function () {
+$("#sortcost").mouseenter(function () {
+    if ($("#sortcost span div.triangle").hasClass('ascendwhite')) {
+        $("#sortcost span div.triangle").removeClass('ascendwhite');
+    }
+    else if ($("#sortcost span div.triangle").hasClass('ascend'))  { //if low to high/ascending
+        $("#sortcost span div.triangle").removeClass('ascend ascendblue').addClass('descend descendblue');
+    } 
+    else if ($("#sortcost span div.triangle").hasClass('descend')) {
+        $("#sortcost span div.triangle").removeClass('descend descendblue').addClass('ascend ascendblue');
+    }
+});
+$("#sortcost").mouseleave( function () {
+    if (clicked) {
+        clicked = false; 
+        return;
+    }
+    if ($('#sortcost').attr("current") == 'false') {
+        $("#sortcost span div.triangle").addClass('ascendwhite');
+    }
+    else if ($("#sortcost span div.triangle").hasClass('descend'))  {
+        $("#sortcost span div.triangle").removeClass('descend descendblue').addClass('ascend');
+    } 
+    else if ($("#sortprice span div.triangle").hasClass('ascend')) {
+        $("#sortcost span div.triangle").removeClass('ascend ascendblue').addClass('descend');
+    }
+}); 
+$('#sortcost').click(function () {
+    clicked = true;
+    $('#sortcost').attr("current", "true");
+    $('.theader a').not($('#sortcost')).attr("current", "false");  
+    $('.theader a').not($('#sortcost')).children('span.triangle').addClass('ascendwhite');
+
     var stat = $('#sortcost').attr("data");
     
     if (stat == "normalsorted")  {
         $('#sortcost').attr("data", "reversesorted");
-        
         $('.entrylink').sort(function(a, b) {
             return $(b).find('span.cost').text() - $(a).find('span.cost').text();
         }).appendTo('#entrytable');    
+        $("#sortcost span div.triangle").addClass('descend').removeClass('ascend descendblue');
     } 
-    
     else if (stat == "reversesorted"  || typeof stat == "undefined") {
         $('#sortcost').attr("data", "normalsorted");
-        
         $('.entrylink').sort(function(a, b) {
             return $(a).find('span.cost').text() - $(b).find('span.cost').text();
-        }).appendTo('#entrytable');    
+        }).appendTo('#entrytable');   
+        $("#sortprice span div.triangle").addClass('ascend').removeClass('descend ascendblue');
     }
 });
       
    
-//TRIANGLE HOVER
-$("#sortprice").on({
-        mouseenter: function () {
-            if ($("#sortprice span div.triangle").hasClass('ascend'))  { //if low to high/ascending
-                $("#sortprice span div.triangle").removeClass('ascend').addClass('descend');
-            } 
-            else if ($("#sortprice span div.triangle").hasClass('descend')) {
-                $("#sortprice span div.triangle").removeClass('descend').addClass('ascend');
-            }
-            $(this).on('click', function () {
-                $(this).attr('clicked', 'yes'); 
-                return false;
-            }
-        },
-        mouseleave: function () { //checks for original state, not on mouseenter
-            if($(this).attr('clicked') != 'yes') {
-                if ($("#sortprice span div.triangle").hasClass('descend'))  {
-                    $("#sortprice span div.triangle").addClass('ascend').removeClass('descend');
-                } 
-                else if ($("#sortprice span div.triangle").hasClass('ascend')) {
-                    $("#sortprice span div.triangle").addClass('descend').removeClass('ascend');
-                }
-            }
-        }
+//SORT PRICE TRIANGLE
+$("#sortprice").mouseenter(function () {
+    if ($("#sortprice span div.triangle").hasClass('ascendwhite')) {
+        $("#sortprice span div.triangle").removeClass('ascendwhite');
+    }
+    else if ($("#sortprice span div.triangle").hasClass('ascend'))  { //if low to high/ascending
+            $("#sortprice span div.triangle").removeClass('ascend ascendblue').addClass('descend descendblue');
+    } 
+    else if ($("#sortprice span div.triangle").hasClass('descend')) {
+        $("#sortprice span div.triangle").removeClass('descend descendblue').addClass('ascend ascendblue');
+    }
 });
     
-//SORT BY $/MP
-$('#sortprice').on('click', function () {
+$("#sortprice").mouseleave( function () { 
+    if (clicked) {
+        clicked = false; 
+        return;
+    }
+    if ($('#sortprice').attr("current") == 'false') {
+        $("#sortprice span div.triangle").addClass('ascendwhite');
+    }
+    else if ($("#sortprice span div.triangle").hasClass('descend'))  {
+        $("#sortprice span div.triangle").removeClass('descend descendblue').addClass('ascend');
+    } 
+    else if ($("#sortprice span div.triangle").hasClass('ascend')) {
+        $("#sortprice span div.triangle").removeClass('ascend ascendblue').addClass('descend');
+    }
+});
+    
+$('#sortprice').click(function () {
+    clicked = true;
+    $('#sortprice').attr("current", "true");
+    $('.theader a').not($('#sortprice')).attr("current", "false");
+    $('.theader a').not($('#sortprice')).children('span.triangle').addClass('ascendwhite');
+    
     var stat = $('#sortprice').attr("data");
     
     if (stat == "normalsorted")  {
@@ -128,16 +195,14 @@ $('#sortprice').on('click', function () {
         $('.entrylink').sort(function(a, b) {
             return $(b).find('span.price').text() - $(a).find('span.price').text();
         }).appendTo('#entrytable'); 
-        $("#sortprice span div.triangle").addClass('descend').removeClass('ascend');
+        $("#sortprice span div.triangle").addClass('descend').removeClass('ascend descendblue');
     } 
-    
-    else if (stat == "reversesorted"  || typeof stat == "undefined") {
+    else {
         $('#sortprice').attr("data", "normalsorted");
-        
         $('.entrylink').sort(function(a, b) {
             return $(a).find('span.price').text() - $(b).find('span.price').text();
         }).appendTo('#entrytable');    
-        $("#sortprice span div.triangle").addClass('ascend').removeClass('descend');
+        $("#sortprice span div.triangle").addClass('ascend').removeClass('descend ascendblue');
     }
 });
   
