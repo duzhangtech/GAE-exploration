@@ -47,16 +47,17 @@ $(".navlinks").on({
     }
 });
         
+    
 var clicked = false;
 
 $("#sortmp").mouseenter(function () {
     if ($("#sortmp span div.triangle").hasClass('ascendwhite')) {
         $("#sortmp span div.triangle").removeClass('ascendwhite');
     }
-    else if ($("#sortcost span div.triangle").hasClass('ascend'))  { //if low to high/ascending
+    else if ($("#sortmp span div.triangle").hasClass('ascend'))  { //if low to high/ascending
         $("#sortmp span div.triangle").removeClass('ascend ascendblue').addClass('descend descendblue');
     } 
-    else if ($("#sortcost span div.triangle").hasClass('descend')) {
+    else if ($("#sortmp span div.triangle").hasClass('descend')) {
         $("#sortmp span div.triangle").removeClass('descend descendblue').addClass('ascend ascendblue');
     }
 });
@@ -80,7 +81,8 @@ $('#sortmp').on('click', function () {
     clicked = true;
     $('#sortmp').attr("current", "true");
     $('.theader a').not($('#sortmp')).attr("current", "false");
-    
+    $('#sortcost span div.triangle, #sortprice span div.triangle').addClass('ascend ascendwhite').removeClass('descend');
+
     var stat = $('#sortmp').attr("data");
 
     if (stat == "normalsorted")  {
@@ -88,15 +90,15 @@ $('#sortmp').on('click', function () {
         $('.entrylink').sort(function(a, b) {
             return $(b).find('span.amount').text() - $(a).find('span.amount').text();
         }).appendTo('#entrytable');
-        
+        $("#sortmp span div.triangle").addClass('descend').removeClass('ascend descendblue');
     } 
     
     else if (stat == "reversesorted" || typeof stat == "undefined") {
         $('#sortmp').attr("data", "normalsorted");
-        
         $('.entrylink').sort(function(a, b) {
             return $(a).find('span.amount').text() - $(b).find('span.amount').text();
-        }).appendTo('#entrytable');    
+        }).appendTo('#entrytable');  
+        $("#sortmp span div.triangle").addClass('ascend').removeClass('descend ascendblue');
     }
     
 });
@@ -124,7 +126,7 @@ $("#sortcost").mouseleave( function () {
     else if ($("#sortcost span div.triangle").hasClass('descend'))  {
         $("#sortcost span div.triangle").removeClass('descend descendblue').addClass('ascend');
     } 
-    else if ($("#sortprice span div.triangle").hasClass('ascend')) {
+    else if ($("#sortcost span div.triangle").hasClass('ascend')) {
         $("#sortcost span div.triangle").removeClass('ascend ascendblue').addClass('descend');
     }
 }); 
@@ -132,8 +134,8 @@ $('#sortcost').click(function () {
     clicked = true;
     $('#sortcost').attr("current", "true");
     $('.theader a').not($('#sortcost')).attr("current", "false");  
-    $('.theader a').not($('#sortcost')).children('span.triangle').addClass('ascendwhite');
-
+    $('#sortmp span div.triangle, #sortprice span div.triangle').addClass('ascend ascendwhite').removeClass('descend');
+    
     var stat = $('#sortcost').attr("data");
     
     if (stat == "normalsorted")  {
@@ -148,7 +150,7 @@ $('#sortcost').click(function () {
         $('.entrylink').sort(function(a, b) {
             return $(a).find('span.cost').text() - $(b).find('span.cost').text();
         }).appendTo('#entrytable');   
-        $("#sortprice span div.triangle").addClass('ascend').removeClass('descend ascendblue');
+        $("#sortcost span div.triangle").addClass('ascend').removeClass('descend ascendblue');
     }
 });
       
@@ -174,7 +176,7 @@ $("#sortprice").mouseleave( function () {
     if ($('#sortprice').attr("current") == 'false') {
         $("#sortprice span div.triangle").addClass('ascendwhite');
     }
-    else if ($("#sortprice span div.triangle").hasClass('descend'))  {
+    else if ($("#sortprice span div.triangle").hasClass('descend'))  { //normal up
         $("#sortprice span div.triangle").removeClass('descend descendblue').addClass('ascend');
     } 
     else if ($("#sortprice span div.triangle").hasClass('ascend')) {
@@ -186,7 +188,7 @@ $('#sortprice').click(function () {
     clicked = true;
     $('#sortprice').attr("current", "true");
     $('.theader a').not($('#sortprice')).attr("current", "false");
-    $('.theader a').not($('#sortprice')).children('span.triangle').addClass('ascendwhite');
+    $('#sortmp span div.triangle, #sortcost span div.triangle').addClass('ascend ascendwhite').removeClass('descend');
     
     var stat = $('#sortprice').attr("data");
     
@@ -195,7 +197,7 @@ $('#sortprice').click(function () {
         $('.entrylink').sort(function(a, b) {
             return $(b).find('span.price').text() - $(a).find('span.price').text();
         }).appendTo('#entrytable'); 
-        $("#sortprice span div.triangle").addClass('descend').removeClass('ascend descendblue');
+        $("#sortprice span div.triangle").addClass('descend').removeClass('ascend descendblue'); 
     } 
     else {
         $('#sortprice').attr("data", "normalsorted");
@@ -225,54 +227,6 @@ $("#priceinput").blur(function() {
     $("#priceinput").attr('placeholder', 'price per mp');
 });
     
-
-//AMOUNT REGEX
-function okayamount(amount) {
-    
-}
-    
-//PRICE REGEX
-function okayamount(amount) {
-    
-}
-    
-//EMAIL REGEX
-function okayamount(amount) {
-    
-}
-    
-//AMOUNT OKAY
-$("#amountinput").keyup(function() {
-    var amount = $("#amountinput").val();
-    
-    if (okayamount(amount)) {
-        //show okay message
-    } else {
-        //boo
-    }
-});
-    
-//PRICE OKAY
-$("#amountinput").keyup(function() {
-    var amount = $("#amountinput").val();
-    
-    if (okayamount(amount)) {
-        //show okay message
-    } else {
-        //boo
-    }
-});
-    
-//EMAIL OKAY
-$("#amountinput").keyup(function() {
-    var amount = $("#amountinput").val();
-    
-    if (okayamount(amount)) {
-        //show okay message
-    } else {
-        //boo
-    }
-});
 
 
 });
