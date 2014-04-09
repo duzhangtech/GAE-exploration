@@ -82,8 +82,6 @@ a.mylink:visited:hover {
     top:35px;
     background-color:transparent;
 }
-
-
 input[type=text] {
     line-height:130%;
     font-size: 19px;
@@ -107,8 +105,6 @@ input.edit {
     width:80px;
     height:30px;
 }
-
-
 textarea {
     line-height:130%;
     font-size: inherit;
@@ -124,8 +120,6 @@ textarea {
 }
 
 textarea, input { outline: none; }
-
-
 
 .button {
     font-family:inherit;
@@ -155,8 +149,6 @@ textarea, input { outline: none; }
     border-color: #892323;
 }
 
-
-
 .tenbelow {
     margin-bottom:10px;
 }
@@ -178,7 +170,6 @@ textarea, input { outline: none; }
 .theader span {
     font-size:19px;
     display:inline-block;
-    background-color:transparent;
     width:100px;
     color:black;
     cursor:pointer;
@@ -226,18 +217,6 @@ h2 {
     color:#11b99c;
     margin-top:20px;
 }
-#derp {
-    position:absolute;
-    color:grey;
-    font-size:13px;
-    top:90px;
-    left:10px;
-    width:40px;
-    height:25px;
-    line-height:25px;
-    background-color:#fafa89;
-    border-radius:8px;
-}
 .hide {
     display:none;
 }
@@ -270,9 +249,7 @@ a:hover {
 #front-title {
     position:relative;
     top:25px;
-    font-family: 'Nunito', sans-serif;
     font-size: 23px;
-    color:black;    
 }
 .faq {
     width:370px;
@@ -281,12 +258,6 @@ a:hover {
 .navbar {
     position:relative;
     top:40px;
-    font-family: 'Nunito', sans-serif;
-    margin:0 auto;
-    text-align:center;
-    background-color:transparent;
-    color:#11b99c;
-    
 }
 .navlinks {
     font-size:23px;
@@ -331,42 +302,15 @@ a:hover {
     color: white;
     transition-duration: 400ms;
 }
-
-.resend_button {
-    width:130px;
-}
-
-#delete_button:hover {
-    background-color:#c94c4c;
-    color:white;
-    border-color: #892323;
-}
-
-
-
-.tenbelow {
-    margin-bottom:10px;
-}
-.bottomspace {
-    margin-bottom:70px;
-}
-.spacing {
-    line-height:170%;
-}
 .spacing200 {
     line-height:245%;
 }
-.spaceup {
-    margin-top:10px;
-}
-
-
 
 .theader span {
     font-size:23px;
     display:inline-block;
-    background-color:transparent;
-    width:113px;
+    background-color:white;
+    width:115px;
     color:black;
     cursor:pointer;
 }
@@ -376,79 +320,53 @@ a:hover {
     width:110px;
     background-color:transparent;
 }
-
-a.text_link:link{
-    font-size:16px;
-    color: grey;
-    text-decoration:underline;
+.descend {
+	width: 0; 
+	height: 0; 
+	border-left: 8px solid transparent;
+	border-right: 8px solid transparent;
+	border-top: 15px solid #11b99c;
+    background-color: white;
+    display:inline-block;
+    margin-bottom:1px;
 }
-a.text_link:hover{
-    font-size:16px;
-    color: #11b99c;
-    text-decoration:underline;
+.descendwhite {
+	width: 0; 
+	height: 0; 
+	border-left: 8px solid transparent;
+	border-right: 8px solid transparent;
+	border-top: 15px solid white;
+    background-color: white;
+    display:inline-block;
+    margin-bottom:1px;
 }
-a.text_link:visited{
-    font-size:16px;
-    color: grey;
-    text-decoration:underline;
+.ascend {
+	width: 0; 
+	height: 0; 
+	border-left: 8px solid transparent;
+	border-right: 8px solid transparent;
+	border-bottom: 15px solid #11b99c;
+    display:inline-block;
+    margin-bottom:1px;
 }
-a.text_link:visited:hover{
-    font-size:16px;
-    color: #11b99c;
-    text-decoration:underline;
-}
-
-
-
-h2 {
-    font-size:17px;
-    color:black;
-    font-weight:100;
-}
-.left {
-    text-align:left;
-}
-.stat {
-    position:relative;
-    color:#11b99c;
-    margin-top:20px;
-}
-#derp {
-    position:absolute;
-    color:grey;
-    font-size:19px;
-    top:20px;
-    left:10px;
-    width:70px;
-    height:40px;
-    line-height:40px;
-    background-color:#fafa89;
-    border-radius:8px;
-}
-.hide {
-    display:none;
-}
-
-::-webkit-input-placeholder {
-    color:#c4c4c4;
-    text-align:center;
-    padding-top:1px;
-    font-size:inherit;
-}
-
-
-a:link {
-    color:#717171; 
-    text-decoration:none; 
-}      
-a:visited {
-    color:#717171; 
-    text-decoration:none; 
-}
-a:hover {
-    color:#11b99c; 
-    text-decoration:none; 
-    transition: 300ms;
+.ascendwhite {
+	width: 0; 
+	height: 0; 
+	border-left: 8px solid transparent;
+	border-right: 8px solid transparent;
+	border-top: 15px solid white;
+    background-color: white;
+    display:inline-block;
+    margin-bottom:1px;
 }  
+
+.filler {
+    width:20px;
+    display:inline-block;
+}
+.smallfiller {
+    width:7px;
+    display:inline-block;
+}
     
 }

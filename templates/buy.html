@@ -2,8 +2,6 @@
 
 {% block content %}
 
-<div id = "derp" class = "hide">Sort!</div>
-
 <div class = "navbar">
     <a class = "current_link"  href = "/buy">BUY</a>
     <a class = "navlinks" href = "/sell">SELL</a>
@@ -19,10 +17,32 @@
 {%else%}    
     
 <div class = "spacing200 tenbelow">
+    
     <div class = "theader">
-        <a id = "sortmp" class = "sort"><span>MP</span></a>
-        <a id = "sortcost" class = "sort"><span>$</span></a>
-        <a id = "sortprice" class = "sort"><span>$/MP</span></a>
+        
+        <a id = "sortmp" class = "sort">
+            <span>
+                <div class="filler"></div>
+                MP
+                <div class="descendwhite triangle"></div>
+            </span>
+        </a>
+        
+        <a id = "sortcost" class = "sort">
+            <span>
+                <div class="filler"></div>
+                $
+                <div class="descendwhite triangle"></div>
+            </span>
+        </a>
+        
+        <a id = "sortprice" class = "sort">
+            <span>
+                <div class="smallfiller"></div>
+                $/MP
+                <div class="ascend triangle"></div>
+            </span>
+        </a>
     </div>
 
     <div id = 'entrytable'>

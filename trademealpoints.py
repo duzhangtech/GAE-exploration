@@ -75,15 +75,13 @@ class FAQ(Handler):
         stripe.api_key = secretkey
         token = self.request.get('stripeToken') #card deets
         try: #charge card
-          charge = stripe.Charge.create(
-              amount=1000, # amount in cents, again
+            charge = stripe.Charge.create(
+              amount=1000, #cents
               currency="usd",
               card=token
-          )
-        except:
-          # The card has been declined
-          pass
-
+            )
+        except: #card declined
+            pass
         self.render("faq.html", paid = True)
 
 class SubmitFeed(Handler):
