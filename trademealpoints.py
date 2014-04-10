@@ -5,9 +5,9 @@ import random
 import math
 import re
 import stripe
-import secretkey
 
 from string import letters
+from secretkey import secretkey
 from google.appengine.ext import db
 from google.appengine.api import mail
 from google.appengine.api import memcache
@@ -72,7 +72,8 @@ class FAQ(Handler):
 
     def post(self):
         # https://manage.stripe.com/account/apikeys
-        stripe.api_key = secretkey
+        stripe.api_key=secretkey
+        #stripe.api_key = "sk_test_mghCpDyXCi6DU9N50eFzyxN1"
         token = self.request.get('stripeToken') #card deets
         try: #charge card
             charge = stripe.Charge.create(
@@ -80,7 +81,7 @@ class FAQ(Handler):
               currency="usd",
               card=token
             )
-        except: #card declined
+        except stripe.CardError, e: #card declined
             pass
         self.render("faq.html", paid = True)
 
