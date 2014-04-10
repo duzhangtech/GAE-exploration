@@ -8,6 +8,8 @@ body {
     overflow:auto;
     padding-left:10px;
     padding-right:10px;
+    min-width:375px !important;
+    
 }
 #front-title {
     position:relative;
@@ -31,6 +33,7 @@ body {
     text-align:center;
     background-color:transparent;
     color:#11b99c;
+    width:375px;
     
 }
 .navlinks {
@@ -83,6 +86,7 @@ a.mylink:visited:hover {
     margin:0 auto;
     top:35px;
     background-color:transparent;
+    width:375px;
 }
 input[type=text] {
     line-height:130%;

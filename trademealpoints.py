@@ -7,7 +7,7 @@ import re
 import stripe
 
 from string import letters
-from secretkey import secretkey
+from secretkey import secretkey, secret
 from google.appengine.ext import db
 from google.appengine.api import mail
 from google.appengine.api import memcache
@@ -15,7 +15,6 @@ from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
 
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader('templates'), autoescape = True) 
 
-secret = "asd8B*#lfiewnL#FF:OIWEfkjkdsa;fjk;;lk"
 
 def user_key():
     return db.Key.from_path('user_kind', 'user_id')
@@ -42,7 +41,7 @@ class SellModel(db.Model):
     created = db.DateTimeProperty(auto_now = True)
 
 class FeedbackModel(db.Model):
-    feedback = db.StringProperty()
+    feedback = db.TextProperty()
 
 class VerifyModel(db.Model):
     email = db.StringProperty()
