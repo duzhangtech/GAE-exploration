@@ -7,23 +7,64 @@ body {
     margin: 0 auto;
     overflow:auto;
     padding-left:10px;
-    padding-right:10px;
-    min-width:375px !important;
-    
+    padding-right:10px;    
 }
 #front-title {
     position:relative;
     top:20px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 20px;
+    font-size: 20px !important;
     color:black;    
 }
 ::-webkit-scrollbar { 
     display: none; 
 }
+.newbuy {
+    font-size:17px;
+}
 .faq {
-    width:340px;
+    padding-left:10px;
+    padding-right:10px;
     font-size: 15px;
+}
+.ascend {
+	width: 0; 
+	height: 0; 
+	border-left: 6px solid transparent;
+	border-right: 6px solid transparent;
+	border-bottom: 13px solid #11b99c;
+    display:inline-block;
+    margin-bottom:1px;
+}
+.descend {
+	width: 0; 
+	height: 0; 
+	border-left: 6px solid transparent;
+	border-right: 6px solid transparent;
+	border-top: 13px solid #11b99c;
+    background-color: white;
+    display:inline-block;
+    margin-bottom:1px;
+}
+.ascendwhite {
+	border-bottom: 13px solid white;
+}
+.ascendblue {
+	border-bottom: 13px solid #0a7663;
+}
+.descendwhite {
+	border-top: 13px solid white;
+}
+
+.descendblue {
+	border-top: 13px solid #0a7663;
+}
+.filler {
+    width:9px;
+    display:inline-block;
+}
+.smallfiller {
+    width:10px;
+    display:inline-block;
 }
 .navbar {
     position:relative;
@@ -32,9 +73,7 @@ body {
     margin:0 auto;
     text-align:center;
     background-color:transparent;
-    color:#11b99c;
-    width:375px;
-    
+    color:#11b99c;    
 }
 .navlinks {
     font-size:19px;
@@ -86,7 +125,6 @@ a.mylink:visited:hover {
     margin:0 auto;
     top:35px;
     background-color:transparent;
-    width:375px;
 }
 input[type=text] {
     line-height:130%;
@@ -233,7 +271,23 @@ h2 {
     padding-top:1px;
     font-size:inherit;
 }
+:-moz-placeholder { /* Firefox 18- */
+    color:#c4c4c4;
+    text-align:center;
+    padding-top:1px;
+    font-size:inherit;}
 
+::-moz-placeholder {  /* Firefox 19+ */
+    color:#c4c4c4;
+    text-align:center;
+    padding-top:1px;
+    font-size:inherit;}
+
+:-ms-input-placeholder {  
+    color:#c4c4c4;
+    text-align:center;
+    padding-top:1px;
+    font-size:inherit;}
 
 a:link {
     color:#717171; 
@@ -251,11 +305,13 @@ a:hover {
     
 
 @media (min-width: 400px) {
-
+.newbuy {
+    font-size:20px;
+}
 #front-title {
     position:relative;
     top:25px;
-    font-size: 23px;
+    font-size: 23px !important;
 }
 .faq {
     width:370px;

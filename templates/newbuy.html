@@ -9,17 +9,17 @@
 </div>
 
 <form method="post" class = "center">
-    <div style = "font-size:20px;">
+    <div class = "newbuy">
         <div class = "spaceup">
-            BUY <span style = "color:#32ac97;" class = "amount">{{amount}}</span> MEAL POINTS
+            BUY <span style = "color:#11b99c;" class = "amount">{{amount}}</span> MEAL POINTS
         </div>
         
         <div>
-            AT <span style = "color:#32ac97;">$</span><span style = "color:#32ac97;" class = "price" >{{price}}</span> PER POINT
+            AT <span style = "color:#11b99c;">$</span><span style = "color:#32ac97;" class = "price" >{{price}}</span> PER POINT
         </div>
         
         <div class = "tenbelow">
-            FOR <span style = "color:#32ac97;">$</span><span style = "color:#32ac97;" class = "cost">{{amount|int*price|float}}</span>
+            FOR <span style = "color:#11b99c;">$</span><span style = "color:#32ac97;" class = "cost">{{amount|int*price|float}}</span>
         </div>
         
         <div><input type="text" placeholder = "wustl email" class = "tenbelow spaceup emailinput" name="email" value="{{email}}"></div>  

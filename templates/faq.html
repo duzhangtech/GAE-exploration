@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block content %}      
 
 <div class = "navbar">
     <a class = "navlinks" href = "/buy">BUY</a>
@@ -11,7 +11,7 @@
 <div class = "spacing center left faq">
     
 {% if paid == True %}
-<div style = "font-size:20px;color:#11b99c;margin-bottom:10px;text-align:center">Thank you. :)</div>
+<div style = "color:#11b99c;margin-bottom:10px;text-align:center">Thank you. :)</div>
 {% endif %}
     
 <div>This web app facilitates the exchange of meal points for students at Washington University in St. Louis.</div><br>
@@ -24,7 +24,7 @@
 <div>Type in your offer details. 
     When you verify your email address, your offer will instantly appear on the market.</div><br>
     
-<h2 style = "font-size:23px;color:#727272;text-align:center; margin-bottom:40px;">F.A.Q</h2>    
+<h2 style = "font-size:22px;color:#383838;text-align:center; margin-bottom:40px;">F.A.Q</h2>    
 
 <h2>How do I edit/remove my offer?</h2>    
 <div>Type in your email <a class = "text_link" target="_blank" href = "/changeoffer">here</a>. You will get a link for directly editing/removing your offer.</div><br>
@@ -34,6 +34,9 @@
     
 <h2>Do I have to pay to use trademealpoints?</h2>
 <div>No. This web app is totally free to use.</div><br>
+   
+<h2>Is there an Android app for this?</h2>
+<div><a class = "text_link" target="_blank" href = "https://play.google.com/store/apps/details?id=yf.dev.trademealpoints">Yes there is.</a></div><br>
     
 <h2>Which meal plans can transfer meal points?</h2>    
 <div>Gold, silver, bronze, and apartment.</div><br>
@@ -52,7 +55,7 @@
 <div><a class = "text_link" target="_blank" href = "http://diningservices.wustl.edu/MEALPLANS/Pages/default.aspx">Here.</a></div><br>
 
 <h2 id = "donate">How can I support Trade Meal Points?</h2>
-<div style = "margin-bottom:-15px;">You can contribute $10 towards my next cheeseburger.</div><br>
+<div style = "margin-bottom:-15px;">You are welcome to contribute $10 towards my next cheeseburger.</div><br>
     
 <form action="/faq" method="POST">
   <script
@@ -66,7 +69,7 @@
     
 <div id = "feed" style = "text-align:center;margin-bottom:140px;">
 
-    <div id = "feedback_title" style = "font-size:24px;color:#383838;margin-bottom:25px;margin-top:5px;">COMMENTS</div>
+    <div id = "feedback_title" style = "font-size:21px;color:#383838;margin-bottom:25px;margin-top:5px;">COMMENTS</div>
 
     <div><textarea type="text" id = "feedback" cols="40" rows="5"  name="feedback" value="{{feedback}}"></textarea></div>
 
