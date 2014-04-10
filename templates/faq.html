@@ -53,9 +53,8 @@
 <div><a class = "text_link" target="_blank" href = "http://diningservices.wustl.edu/MEALPLANS/Pages/default.aspx">Here.</a></div><br>
 
 <h2 id = "donate">How can I support Trade Meal Points?</h2>
-<div style = "margin-bottom:-15px;">You can donate $10, 100% of which will go towards my next cheeseburger.</div><br>
+<div style = "margin-bottom:-15px;">You can <a id="customButton" style = "cursor:pointer;text-decoration:underline;">contribute $10</a> towards my next cheeseburger.</div><br><br>
     
-
 <form action="/faq" method="POST">
   <script
     src="https://checkout.stripe.com/checkout.js" class="stripe-button"
@@ -69,14 +68,15 @@
     
 <div id = "feed" style = "text-align:center;margin-bottom:140px;">
 
-<div id = "feedback_title" style = "font-size:24px;color:#383838;margin-bottom:25px;margin-top:5px;">COMMENTS</div>
+    <div id = "feedback_title" style = "font-size:24px;color:#383838;margin-bottom:25px;margin-top:5px;">COMMENTS</div>
 
-<div><textarea type="text" id = "feedback" cols="40" rows="5"  name="feedback" value="{{feedback}}"></textarea></div>
+    <div><textarea type="text" id = "feedback" cols="40" rows="5"  name="feedback" value="{{feedback}}"></textarea></div>
 
-<div><button type="submit" id = "submit" class = "button" value="okay" >okay</button></div>
-<div id = 'error' class = "spaceup" style = 'height:30px;display:none;'>What are your thoughts?</div>
+    <div><button type="submit" id = "submit" class = "button" value="okay" >okay</button></div>
+    <div id = 'error' class = "spaceup" style = 'height:30px;display:none;'>What are your thoughts?</div>
 
 </div>
     
 </div>
+
 {% endblock %}

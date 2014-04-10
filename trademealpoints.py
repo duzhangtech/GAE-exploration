@@ -253,7 +253,7 @@ class BuyContact(Handler):
                         first_name=first_name, 
                         amount = amount, 
                         price = price, 
-                        stat = "fill in every box", 
+                        stat = "Fill each box", 
                         need_code = True,
                         last_name=last_name, 
                         email = email,
@@ -267,14 +267,14 @@ class BuyContact(Handler):
                             first_name = first_name, 
                             last_name = last_name,
                             email = email, 
-                            stat = "use your wustl email")
+                            stat = "What's your wustl email?")
 
             elif not email or not valid_email(email):
                 self.render("newbuy.html", 
                     first_name=first_name, 
                     amount = amount, 
                     price = price, 
-                    stat = "use your wustl email", 
+                    stat = "What's your wustl email?", 
                     last_name=last_name, 
                     email = email)
 

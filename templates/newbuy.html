@@ -9,7 +9,7 @@
 </div>
 
 <form method="post" class = "center">
-    <div style = "font-size:19px;">
+    <div style = "font-size:20px;">
         <div class = "spaceup">
             BUY <span style = "color:#32ac97;" class = "amount">{{amount}}</span> MEAL POINTS
         </div>
@@ -22,7 +22,7 @@
             FOR <span style = "color:#32ac97;">$</span><span style = "color:#32ac97;" class = "cost">{{amount|int*price|float}}</span>
         </div>
         
-        <div><input type="text" placeholder = "wustl email" class = "tenbelow spaceup" name="email" value="{{email}}"></div>  
+        <div><input type="text" placeholder = "wustl email" class = "tenbelow spaceup emailinput" name="email" value="{{email}}"></div>  
     
     
     {%if need_code%} 

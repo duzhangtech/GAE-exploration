@@ -6,6 +6,8 @@ body {
     text-align:center;
     margin: 0 auto;
     overflow:auto;
+    padding-left:10px;
+    padding-right:10px;
 }
 #front-title {
     position:relative;
@@ -284,7 +286,6 @@ a:hover {
     top:50px;
     background-color:transparent;
 }
-
 .button {
     font-family:inherit;
     font-size:18px;
@@ -299,6 +300,12 @@ a:hover {
 .button:hover {
     border-color: #0a7663;
     background-color:#2bad97;
+    color: white;
+    transition-duration: 400ms;
+}
+.button:active {
+    border-color: #0c5f50;
+    background-color:#1b8473;
     color: white;
     transition-duration: 400ms;
 }

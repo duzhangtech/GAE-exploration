@@ -1,5 +1,27 @@
 $(document).ready(function(){
     
+//STRIPE 
+//var handler = StripeCheckout.configure({
+//    key: 'pk_live_WDeabIN1ESOX7LlGCEtCV8XM',
+//    token: function(token, args) {
+//        jQuery.ajax({
+//        type:"POST",
+//        url: "/faq", 
+//        data:  {t:token, d:detail},
+//        });
+//    }
+//});
+//
+//$('#customButton').on('click', function(e) {
+//    handler.open({
+//      name: 'Get Meal Point Karma',
+//      description: '$10.00',
+//      amount: 1000
+//    });
+//    detail.amount = 1000;
+//    e.preventDefault();
+//});
+
     
 //ENTRY FORMATTING FOR PRE PY REGEX POSTS
 var cost = document.getElementsByClassName('cost'); 
@@ -227,6 +249,14 @@ $("#priceinput").blur(function() {
     $("#priceinput").attr('placeholder', 'price per mp');
 });
     
+$(".emailinput").focus(function() {
+    $(".emailinput").val('@wustl.edu');
+});
+    
+$(".emailinput").blur(function() {
+    $(".emailinput").val('');
+    $(".emailinput").attr('placeholder', 'wustl email');
+});
 
 
 });
