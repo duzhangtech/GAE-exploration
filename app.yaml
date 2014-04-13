@@ -15,7 +15,7 @@ handlers:
   script: handle_incoming_email.app
   login: admin
   
-- url: /faq/.*
+- url: /getkarma/.*
   script: trademealpoints.application
   secure: always
   

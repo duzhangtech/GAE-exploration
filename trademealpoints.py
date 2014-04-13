@@ -15,7 +15,6 @@ from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
 
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader('templates'), autoescape = True) 
 
-
 def user_key():
     return db.Key.from_path('user_kind', 'user_id')
 
@@ -65,16 +64,17 @@ class Handler(webapp2.RequestHandler):
     def initialize(self, *a, **kw):
         webapp2.RequestHandler.initialize(self, *a, **kw)
 
-class FAQ(Handler):
+class PayMe(Handler):
     def get(self):
-        self.render("faq.html")
+        self.render("payme.html")
 
     def post(self):
         # https://manage.stripe.com/account/apikeys
+        
+        logging.error("HERE")
         stripe.api_key=secretkey
-        #stripe.api_key = "sk_test_mghCpDyXCi6DU9N50eFzyxN1"
         token = self.request.get('stripeToken') #card deets
-        try: #charge card
+        try: 
             charge = stripe.Charge.create(
               amount=1000, #cents
               currency="usd",
@@ -82,7 +82,12 @@ class FAQ(Handler):
             )
         except stripe.CardError, e: #card declined
             pass
+
         self.render("faq.html", paid = True)
+
+class FAQ(Handler):
+    def get(self):
+        self.render("faq.html")
 
 class SubmitFeed(Handler):
     def post(self):
@@ -692,5 +697,6 @@ application = webapp2.WSGIApplication([
                     ('/change', EditFinish),
                     ('/faq', FAQ), 
                     ('/submitfeed', SubmitFeed),
+                    ('/getkarma', PayMe),
                     LogSenderHandler.mapping()],
                     debug=True)
