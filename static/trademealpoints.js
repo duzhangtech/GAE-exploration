@@ -8,35 +8,32 @@ if (jQuery.browser.mobile) {
     $('body').css({"min-width": "375px" });
 }
   
+    
 //if(document.URL == 'http://trademealpoints.appspot.com/' || document.URL == 'http://trademealpoints.appspot.com/buy') {
-    
 if(document.URL == 'http://localhost:10080/buy' || document.URL == 'http://localhost:10080/') {
-    $('#front-title').addClass('animated bounceInDown');
     $('.navlinks, .current_link').addClass('animated slideInLeft');
-    $('.center').hide();
+    $('#front-title, .center').hide();
     setTimeout(function() {
-        $('.center').show();
+        $('#front-title, .center').show();
+        $('#front-title').addClass('animated bounceInDown');
         $('.center').addClass('animated fadeInUp');
-    }, 300);
-}
+    }, 200);
+} 
     
-  
-//STRIPE
-Stripe.setPublishableKey('pk_test_9tnZ37cNgvyDCfICwHjOctXm');
-jQuery(function($) {
-  $('#payment-form').submit(function(event) {
-    var $form = $(this);
-
-    // Disable the submit button to prevent repeated clicks
-    $form.find('button').prop('disabled', true);
-
-    Stripe.card.createToken($form, stripeResponseHandler);
-
-    // Prevent the form from submitting with the default action
-    return false;
-  });
-});
+//if(document.URL == 'http://trademealpoints.appspot.com/getkarma') {
+if(document.URL == 'http://localhost:10080/getkarma') {
+    var offset = $('#payamount').offset();
+    $('#amountpic, #emailpic').css('position', 'absolute').css('top', '10px');
+    $('#emailpic').css('marginLeft', '6px');
+    $('#amountpic, #emailpic').css('position', 'absolute').css('top', '10px');
     
+    $('#cardpic, #cvcpic').css('position', 'absolute').css('top', '72px').css('marginLeft', '6px');
+    
+    $('#expirepic').css('position', 'absolute').css('top', '132px').css('marginLeft', '6px');
+    
+    $('input[type=text]').css('textAlign', 'left').css('paddingLeft', '40px');
+    $('input[type=text]#payamount').css('textAlign', 'left').css('paddingLeft', '30px');
+} 
     
 //ENTRY FORMATTING FOR PRE PY REGEX POSTS
 var cost = document.getElementsByClassName('cost'); 
@@ -77,7 +74,7 @@ $("#submit").click(function() {
 //BORDER BOTTOM ON HOVER
 $(".navlinks").on({
     mouseenter: function () {
-        $(this).css("border-bottom", "3px solid #11b99c");
+        $(this).css("border-bottom", "3px solid #4cb8ca");
     },
     mouseleave: function () {
         $(this).css("border-bottom", "0px");

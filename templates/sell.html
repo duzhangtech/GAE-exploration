@@ -11,28 +11,28 @@
 <form method="post" class = "center">
 
         <div class = "spaceup">
-            <input type="text" id = "amountinput" placeholder = "number of mp" name="amount" value="{{amount}}">
+            <input type="text" id = "amountinput" class = "animated fadeInUp" placeholder = "number of mp" name="amount" value="{{amount}}">
         </div>
         
         <div>
-            <input type="text" id = "priceinput" placeholder = "price per mp"  name="price" value="{{price}}">
+            <input type="text" id = "priceinput" class = "animated fadeInUp" placeholder = "price per mp"  name="price" value="{{price}}">
         </div>
         
         <div>
-            <input type="text" class = "emailinput" placeholder = "wustl email" name="email" value="{{email}}">
+            <input type="text" class = "emailinput animated fadeInUp" placeholder = "wustl email" name="email" value="{{email}}">
         </div>
     
         {%if need_code%} 
-        <div><input type="text" placeholder = "first name" name="first_name" value="{{first_name}}"></div>
-        <div><input type="text" placeholder = "last name"   name="last_name" value="{{last_name}}"></div>
-        <input type="text" placeholder = "verification code"  name="code" value="{{code}}"><br>
-        <button type="submit" name = "resend_button" class = "button resend_button spaceup" value = "resend code">resend code</button>
+        <div><input type="text" class = "animated fadeInUp" placeholder = "first name" name="first_name" value="{{first_name}}"></div>
+        <div><input type="text" class = "animated fadeInUp" placeholder = "last name"   name="last_name" value="{{last_name}}"></div>
+        <input type="text" class = "animated fadeInUp" placeholder = "verification code"  name="code" value="{{code}}"><br>
+        <button type="submit" name = "resend_button" class = "button narrow_button spaceup animated fadeInUp" value = "resend code">resend code</button>
         {%endif%}
 
-        <button type="submit" name = "submit_button" class = "button spaceup tenbelow" value = "okay">submit</button><br>
-        <a class = "text_link " href = "/changeoffer">edit my offer</a></span><span style = "color:#c7c7c7;">
+        <button type="submit" name = "submit_button" class = "button spaceup tenbelow animated fadeInUp" value = "okay">submit</button><br>
+        <a class = "text_link animated fadeInUp" href = "/changeoffer">edit my offer</a>
 
     
-    <div class = "stat">{{stat}}</div>
+        <div class = "stat">{{stat}}</div>
 </form>
 {% endblock %}

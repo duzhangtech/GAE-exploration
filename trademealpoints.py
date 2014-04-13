@@ -70,16 +70,19 @@ class PayMe(Handler):
 
     def post(self):
         # https://manage.stripe.com/account/apikeys
-        
-        logging.error("HERE")
+
         stripe.api_key=secretkey
         token = self.request.get('stripeToken') #card deets
+        amount = self.request.get('amount')
+        amount = int(amount)
+
         try: 
             charge = stripe.Charge.create(
-              amount=1000, #cents
+              amount=amount*1000, #cents
               currency="usd",
               card=token
             )
+            logging.error("amount " + str(amount))
         except stripe.CardError, e: #card declined
             pass
 
