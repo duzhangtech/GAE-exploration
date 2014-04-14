@@ -83,10 +83,10 @@ class PayMe(Handler):
               card=token
             )
             logging.error("amount " + str(amount))
+            #fixme: render page
         except stripe.CardError, e: #card declined
-            pass
+            pass #fixme: render page
 
-        self.render("faq.html", paid = True)
 
 class FAQ(Handler):
     def get(self):

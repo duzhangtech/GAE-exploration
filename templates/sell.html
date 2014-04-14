@@ -8,31 +8,48 @@
     <a class = "navlinks" href = "/faq">F.A.Q</a>
 </div>
 
-<form method="post" class = "center">
+<form method="post" class = "center animated fadeInUp">
 
-        <div class = "spaceup">
-            <input type="text" id = "amountinput" class = "animated fadeInUp" placeholder = "number of mp" name="amount" value="{{amount}}">
-        </div>
-        
-        <div>
-            <input type="text" id = "priceinput" class = "animated fadeInUp" placeholder = "price per mp"  name="price" value="{{price}}">
-        </div>
-        
-        <div>
-            <input type="text" class = "emailinput animated fadeInUp" placeholder = "wustl email" name="email" value="{{email}}">
-        </div>
+    <div class = "spaceup">
+        <img src = "/static/mp.png" id = "sellmp" class = "sellicon" width="30px">
+        <input type="text" id = "amountinput" placeholder = "number of mp" name="amount" value="{{amount}}">
+    </div>
+
+    <div>
+        <img src = "/static/amount.png" id = "sellamount" class = "sellicon" width="30px">
+        <input type="text" id = "priceinput" placeholder = "price per mp"  name="price" value="{{price}}">
+    </div>
+
+    <div>
+        <img src = "/static/email.png" id = "sellemail" class = "sellicon" width="30px">
+        <input type="text" class = "emailinput" placeholder = "wustl email" name="email" value="{{email}}">
+    </div>
+
+    {%if need_code%} 
+
+    <div>
+        <img src = "/static/first.png" id = "sellfirst" class = "sellicon" width="30px">
+        <input type="text" placeholder = "first name" name="first_name" value="{{first_name}}">
+    </div>
     
-        {%if need_code%} 
-        <div><input type="text" class = "animated fadeInUp" placeholder = "first name" name="first_name" value="{{first_name}}"></div>
-        <div><input type="text" class = "animated fadeInUp" placeholder = "last name"   name="last_name" value="{{last_name}}"></div>
-        <input type="text" class = "animated fadeInUp" placeholder = "verification code"  name="code" value="{{code}}"><br>
-        <button type="submit" name = "resend_button" class = "button narrow_button spaceup animated fadeInUp" value = "resend code">resend code</button>
-        {%endif%}
-
-        <button type="submit" name = "submit_button" class = "button spaceup tenbelow animated fadeInUp" value = "okay">submit</button><br>
-        <a class = "text_link animated fadeInUp" href = "/changeoffer">edit my offer</a>
-
+    <div>
+         <img src = "/static/last.png" id = "selllast" class = "sellicon" width="30px">
+        <input type="text" placeholder = "last name"   name="last_name" value="{{last_name}}">
+    </div>
     
-        <div class = "stat">{{stat}}</div>
+    <div>
+        <img src = "/static/cvc.png" id = "sellverify" class = "sellicon" width="30px">
+        <input type="text" placeholder = "verification code"  name="code" value="{{code}}">
+    </div>
+    
+    <button type="submit" name = "resend_button" class = "button narrow_button spaceup" value = "resend code">resend code</button>
+
+    {%endif%}
+
+    <button type="submit" name = "submit_button" class = "button spaceup tenbelow" value = "okay">submit</button><br>
+    <a class = "text_link animated fadeInUp" href = "/changeoffer">edit my offer</a>
+
+
+    <div class = "stat">{{stat}}</div>
 </form>
 {% endblock %}

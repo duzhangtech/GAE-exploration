@@ -41,37 +41,38 @@
     
 <body>
 
-<a href = "/getkarma" id = "coffeeme" class = "animated fadeIn">Buy me a coffee</a>
+<div id = "coffeeme" class = "animated fadeIn">
+    Buy me a <span style = "color:#4ab8ca;">$</span><input type="text" id = 'payamount' name = 'amount'>
+    <span style = "margin-left:-2px;"> coffee</span>
+</div>
 
 <form action="" method="POST" id="payment-form" class = 'coffee animated fadeIn'>
-
+    
     <div>
-        <img src = "/static/amount.png" id = "amountpic" class = "icon" width="30px">
-        <input type="text" id = 'payamount' placeholder = "amount" name = 'amount'>
-        
-        <img src = "/static/email.png" id = "emailpic" width="30px">
+        <img src = "/static/email.png" id = "emailpic" class = "icon" width="30px">
         <input type="text" id = 'payemail' placeholder = "email" name = 'email'/>
     </div>
     
     <div>
         <img src = "/static/card.png" id = "cardpic" class = "icon" width="30px">
         <input type="text" placeholder = "card number" data-stripe="number"/>
-        <img src = "/static/cvc.png" id = "cvcpic" wclass = "icon" width="30px">
-        <input type="text" placeholder = "cvc" class = "narrowinput" size="4" data-stripe="cvc"/>
     </div>    
     
     <div>
-        <img src = "/static/calendar.png" id = "expirepic" class = "icon" width="30px">
-        <input type="text" placeholder = "expires mm" data-stripe="exp-month"/>
-        <input type="text" placeholder = "yyyy" class = "narrowinput" data-stripe="exp-year"/>
+        <img src = "/static/cvc.png" id = "cvcpic" class = "icon" width="30px">
+        <input type="text" id = "paycvc" placeholder = "cvc" maxlength = '4' class = "narrowinput" data-stripe="cvc"/>
+
+        <img src = "/static/calendar.png" id = "expirepic" class = "icon" width="27px">
+        <input type="text" placeholder = "mm" id = "paymonth" maxlength = '2' data-stripe="exp-month"/>
+        <input type="text" placeholder = "yy" id = "payyear" maxlength = '2' class = "narrowinput" data-stripe="exp-year"/>
     </div> 
     
-    <button type="submit" class = "button spaceup">Caffeine me</button>
+    <button type="submit" id = "paybutton" class = "button spaceup">Caffeine me</button>
     <div class="payment-errors spaceup"></div> 
 </form>
     
 <div id = 'payme' class = "animated fadeInUp"><a href = "https://stripe.com" class = "lightlink" target="_blank">Stripe</a> 
-    takes care of the encrypted transaction and sends you a receipt. 
+    encrypts the transaction and sends you a receipt. 
     <br>Trade Meal Points doesn't keep any of your card information.</div>
 </body>
 </html>

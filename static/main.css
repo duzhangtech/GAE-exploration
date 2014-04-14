@@ -18,8 +18,8 @@ body {
 }
 #coffeeme {
     position:relative;
-    top:60px;
-    font-size: 25px !important;
+    top:75px;
+    font-size: 23px !important;
     color:black;    
 }
 .coffee {
@@ -36,16 +36,13 @@ body {
     background-color:white;
 }
 
-::-webkit-scrollbar { 
-    display: none; 
-}
+
 .newbuy {
     font-size:17px;
 }
 .faq {
-    padding-left:10px;
-    padding-right:10px;
     font-size: 15px;
+    width:340px;
 }
 .ascend {
 	width: 0; 
@@ -147,22 +144,60 @@ a.mylink:visited:hover {
     top:35px;
     background-color:transparent;
 }
+.sellicon {
+    position:absolute;
+    margin-top:10px;
+    margin-left:8px;
+}
+
 input[type=text] {
     line-height:130%;
     font-size: 19px;
     font-family:inherit;
     color:inherit;
     
-    width:180px;
+    width:185px;
     height:45px;
     margin-bottom:10px;
-    border: 2px solid #bcbcbc;
+    border: 1px solid #bcbcbc;
     border-radius:5px;
-    text-align:center;
+    text-align:left;
+    padding-left:45px;
+}
+
+input[type=text]#payamount{
+    font-size: 23px !important;
+    font-family:inherit;
+    color:#4cb8ca;
+    width:28px;
+    height:30px;
+    margin-bottom:10px;
+    border: 0px;
+    text-align:left;
+    padding-left: 0px;
+}
+
+
+input[type=text]#paycvc{
+    padding-left:45px;
+    width:43px;
+}
+
+input[type=text]#paymonth{
+    padding-left:40px;
+    width:43px;
+}
+input[type=text]#payyear {
+    padding-left:10px;
+    width:33px;
+    margin-left:0px;
+}
+#paybutton {
+    width:230px;
 }
 input:focus, textarea:focus { 
     outline:none;
-    border: 2px solid #4cb8ca;
+    border: 1px solid #4cb8ca;
     box-shadow:0 0 3px #4cb8ca;
     font-size: 19px !important;
 }
@@ -173,12 +208,6 @@ input.edit {
 input.narrowinput {
     width:100px;
 }
-input#payamount {
-    width:80px;
-}
-input#payemail {
-    width:210px;
-}
 
 textarea {
     line-height:130%;
@@ -187,9 +216,9 @@ textarea {
     color:#8b8b8b;
     margin-bottom:10px;
     padding: 10px;
-    width:160px;
+    width:188px;
     height:100px;
-    border: 2px solid #bcbcbc;
+    border: 1px solid #bcbcbc;
     border-radius:8px;
     text-align:left;
 }
@@ -200,7 +229,7 @@ textarea, input { outline: none; }
     font-family:inherit;
     font-size:18px;
     
-    width:185px;
+    width:190px;
     height:45px;
     background-color:transparent;
     color:#4cb8ca;
@@ -222,7 +251,7 @@ textarea, input { outline: none; }
 
 
 .narrow_button {
-    width:130px;
+    width:130px !important;
 }
 
 #delete_button:hover {
@@ -342,7 +371,16 @@ a:hover {
 }  
     
 
-@media (min-width: 400px) {
+@media (min-width: 500px) {
+
+.icon {
+    position:absolute;
+    margin-top:10px;
+    margin-left: 6px;
+}
+#expirepic {
+     margin-top:12px;
+}
 .newbuy {
     font-size:20px;
 }
@@ -388,7 +426,7 @@ a:hover {
     font-family:inherit;
     font-size:18px;
     
-    width:185px;
+    width:208px;
     height:45px;
     background-color:transparent;
     color:#4cb8ca;
@@ -448,14 +486,14 @@ a:hover {
 	border-bottom: 15px solid white;
 }
 .ascendblue {
-	border-bottom: 15px solid #0a7663;
+	border-bottom: 15px solid #288595;
 }
 .descendwhite {
 	border-top: 15px solid white;
 }
 
 .descendblue {
-	border-top: 15px solid #0a7663;
+	border-top: 15px solid #288595;
 }
 
     

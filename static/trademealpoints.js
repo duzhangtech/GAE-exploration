@@ -22,19 +22,41 @@ if(document.URL == 'http://localhost:10080/buy' || document.URL == 'http://local
     
 //if(document.URL == 'http://trademealpoints.appspot.com/getkarma') {
 if(document.URL == 'http://localhost:10080/getkarma') {
-    var offset = $('#payamount').offset();
-    $('#amountpic, #emailpic').css('position', 'absolute').css('top', '10px');
-    $('#emailpic').css('marginLeft', '6px');
-    $('#amountpic, #emailpic').css('position', 'absolute').css('top', '10px');
+    $('#payamount').val("10");
+    $('#payamount').focus();
+}
     
-    $('#cardpic, #cvcpic').css('position', 'absolute').css('top', '72px').css('marginLeft', '6px');
+//APPEND SLASH
+var hadslash = false;
     
-    $('#expirepic').css('position', 'absolute').css('top', '132px').css('marginLeft', '6px');
+$("#paymonth").keyup(function() {
+    var month = $("#paymonth").val();
+    var slashes = month.split('/') -1;
+        
+    if (month.length == 2 && slashes != 1 && hadslash == false) {
+        $("#paymonth").val(month + "/").delay(300);
+        hadslash = true;
+    } else {
+        $("#paymonth").val(month);
+        hadslash = false;
+    }
+});
     
-    $('input[type=text]').css('textAlign', 'left').css('paddingLeft', '40px');
-    $('input[type=text]#payamount').css('textAlign', 'left').css('paddingLeft', '30px');
-} 
+
+//EXPAND INPUT BOX IF CHAR > 2
+$("#payamount").keyup(function() {
+    var amount = $("#payamount").val();
+        
+    if (amount.length > 2) {
+        var extra = amount.length - 2;
+        var space = 28 + (14*extra);
+        $("#payamount").css("width", space + "px");
+    } else {
+        $("#payamount").css("width", "28px");
+    }
+});
     
+
 //ENTRY FORMATTING FOR PRE PY REGEX POSTS
 var cost = document.getElementsByClassName('cost'); 
 var price = document.getElementsByClassName('price');
@@ -62,9 +84,7 @@ $("#submit").click(function() {
             success: function() {
             
             $("#feedback_title").replaceWith("<div id = 'feedback_title' style = 'font-size:24px;color: #32ac97;margin-bottom:200px;margin-top:5px;'>THANKS!</div>");
-            $("#feedback").remove();
-            $("#error").remove();
-            $("#submit").remove();
+            $("#feedback, #error, #submit").remove();
             ;}
         });
     }
@@ -254,7 +274,7 @@ $("#amountinput").blur(function() {
    
 //PRICE HINT
 $("#priceinput").focus(function() {
-    $("#priceinput").attr('placeholder', '$0.01 to $1');
+    $("#priceinput").attr('placeholder', '0.01 to 1');
 });
     
 $("#priceinput").blur(function() {
