@@ -7,36 +7,38 @@
     <a class = "navlinks" href = "/faq">F.A.Q</a>
 </div>
 
-<form method="post" class = "center">
+<form method="post" class = "center animated fadeIn">
     
 {%if offer|length == 0%}
-<h2 style = "text-align:center;font-size:20px;margin-bottom:10px;color:grey;">You don't have anything on the market!
-    <a href = "/sell">Sell?</a></h2>
+    <h2 style = "text-align:center;font-size:20px;margin-bottom:10px;color:grey;">
+        You don't have anything on the market!
+        <a href = "/sell">Sell?</a>
+    </h2>
 {%elif offer|length == 1%} 
-<h2 style = "text-align:center;font-size:20px;margin-bottom:10px;">MY OFFER</h2>
+    <h2 style = "text-align:center;font-size:20px;margin-bottom:10px;">MY OFFER</h2>
 {%else%}
-<h2 style = "text-align:center;font-size:20px;margin-bottom:10px;">MY OFFERS</h2>
+    <h2 style = "text-align:center;font-size:20px;margin-bottom:10px;">MY OFFERS</h2>
 {%endif%}
 
 
 {%if offer|length != 0%}
 
 {% for offer in offer%}
-<input type="text" class = "amount edit" placeholder = "amount" name="amount" value="{{offer.amount}}"> MEAL POINTS AT
-<input type="text" class = "price edit" placeholder = "price" name="price" value="{{offer.price}}"> PER POINT<br>
+<div>
+    <input type="text" class = "myamount changeinput" name="amount" value="{{offer.amount}}"> 
+        <span>MEAL POINTS AT</span>
+    <input type="text" class = "myprice changeinput" name="price" value="{{offer.price}}"> 
+        <span>PER POINT</span>
+    <button type="button" class = "deletebutton">x</button>
+</div>
+    
 {% endfor %}
 
+<div>
 <input type="submit" id = "edit_button" class = "button spaceup" value="update" name = "edit_button">
-<br>
+</div>
 <div id="editstat" class = "spaceup stat">{{editstat}}</div><br><br>
     
-    
-REMOVE MY OFFER OF <input type="text" id = "deleteamount" class = "edit"  name="delete_amount" value = "{{delete_amount}}"> MEAL POINTS <br> AT $ 
-<input type="text" id = "deleteprice" class = "edit" name="delete_price" value = "{{delete_price}}"> PER POINT<br>
-<input type="submit" id = "delete_button" class = "button spaceup delete" name = "delete_button" value="remove">
-    
-<div id="deletestat" class = "spaceup bottomspace stat">{{deletestat}}</div><br><br>
-
 {%endif%}
     
 </form>

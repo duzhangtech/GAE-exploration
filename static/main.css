@@ -41,11 +41,23 @@ input:focus, textarea:focus {
     font-size: 19px !important;
 }
 
-input[type=text].coolinput{  /*input box awesomeness*/
+input[type=text].coolinput{  
     font-size: 23px !important;
     font-family:inherit;
     color:#4cb8ca;
     width:30px;
+    height:32px;
+    margin-bottom:10px;
+    border: 0px;
+    border-radius: 7px !important;
+    text-align:left;
+    padding-left: 0px;
+}
+input[type=text].changeinput{  
+    font-size: 23px !important;
+    font-family:inherit;
+    color:#4cb8ca;
+    width:50px;
     height:32px;
     margin-bottom:10px;
     border: 0px;
@@ -181,11 +193,6 @@ textarea, input { outline: none; }
     color:white;
     border-color:#2494a7;
     background-color:#2494a7;
-}
-#delete_button:hover {
-    background-color:#c94c4c;
-    color:white;
-    border-color: #892323;
 }
 
 
@@ -514,6 +521,10 @@ a.mylink:visited:hover {
         color: white;
         transition-duration: 400ms;
     }
+    .narrowbutton, .narrowbutton:hover {
+        width:130px;
+    }
+
     
     
     .spacing200 {

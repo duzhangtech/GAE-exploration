@@ -118,13 +118,14 @@ class PayMe(Handler):
                   card=token,
                   email=email
                 )
+                amount=int(amount)
                 charge = stripe.Charge.create(
                   customer=customer.id,
                   amount=amount*1000, #cents
                   currency="usd"
                 )              
 
-                logging.error("amount " + str(amount))
+                logging.error("amount " + str(amount*1000))
 
                 self.render("payme.html", woohoo = True)
 
@@ -156,25 +157,6 @@ class Buy(Handler):
         count = len(sells)
 
         email = self.request.get("e")
-        # code = self.request.get('v')
-        # okaycode = VerifyModel.all().ancestor(verify_key()).filter('email', email).filter('code', code).get()
-
-        # if okaycode:
-        #     user = UserModel.all().filter("email", email).get()
-        #     offer = list(SellModel.all().ancestor(sell_key()).filter('user', user))
-        #     offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
-
-        #     #TEMPORARY FIX UP FOR PRE PY REGEX COMMITS
-        #     for x in range(0, len(offer)):
-        #         offer[x].amount = prettyamount(offer[x].amount)
-        #         offer[x].price = prettyprice(offer[x].price)
-        #         offer[x].put()
-
-        #     self.render("editfinish.html", offer = offer)
-
-        # else:
-        #     self.redirect('/changeoffer')
-
 
         self.render("buy.html", sells = sells, count = count, email = email)
 
@@ -631,7 +613,7 @@ class EditFinish(Handler):
 
         if okaycode:
             user = UserModel.all().filter("email", email).get()
-            offer = list(SellModel.all().ancestor(sell_key()).filter('user', user))
+            offer = list(SellModel.all().ancestor(sell_key()).filter('user', user).filter('fulfilled', False))
             offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
 
             #TEMPORARY FIX UP FOR PRE PY REGEX COMMITS
@@ -652,7 +634,7 @@ class EditFinish(Handler):
 
         email = self.request.get("e")
         user = UserModel.all().filter("email", email).get()
-        offer = list(SellModel.all().ancestor(sell_key()).filter('user', user).order('amount'))
+        offer = list(SellModel.all().ancestor(sell_key()).filter('user', user).filter('fulfilled', False).order('amount'))
         offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
 
         if edit_button:            
@@ -694,15 +676,15 @@ class EditFinish(Handler):
                     logging.error("CHANGE")
                     
                     if wrongamount == True: #HAS TO REFETCH FOR NEW VALUES...AJAX FIXME?
-                        offer = list(SellModel.all().ancestor(sell_key()).filter('user', user).order('amount'))
+                        offer = list(SellModel.all().ancestor(sell_key()).filter('user', user).filter('fulfilled', False).order('amount'))
                         offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
                         self.render("editfinish.html", offer = offer, editstat = "Wow. Such typing. Make sure your offer is between 150 and 2000 mp")
                     elif wrongprice == True:
-                        offer = list(SellModel.all().ancestor(sell_key()).filter('user', user).order('amount'))
+                        offer = list(SellModel.all().ancestor(sell_key()).filter('user', user).filter('fulfilled', False).order('amount'))
                         offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
                         self.render("editfinish.html", offer = offer, editstat = "0.01 to 1.00 per mp")
                     else:
-                        offer = list(SellModel.all().ancestor(sell_key()).filter('user', user).order('amount'))
+                        offer = list(SellModel.all().ancestor(sell_key()).filter('user', user).filter('fulfilled', False).order('amount'))
                         offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
 
                         memcache.delete("SELLS")
@@ -741,6 +723,18 @@ class EditFinish(Handler):
             else:
                 self.render("editfinish.html", offer = offer, delete_amount = amount, delete_price = price, deletestat = "Fill each box")
 
+class DeleteOffer(Handler):
+    def post(self):
+        email = self.request.get('email')
+        amount = self.request.get('amount')
+        price = self.request.get('price')
+
+        user = UserModel.all().filter('email', email).get()
+        offer = SellModel.all().filter('user', user).filter('fulfilled', False).filter('amount', amount).filter('price', price).get()
+        offer.delete()
+        logging.error("OKAY DELETED YAY")
+        memcache.delete("SELLS")
+
 class LogSenderHandler(InboundMailHandler):
     def receive(self, mail_message):
         logging.info("from: " + mail_message.sender)
@@ -768,6 +762,7 @@ application = webapp2.WSGIApplication([
                     ('/sell', Sell),
                     ('/changeoffer', Edit),
                     ('/change', EditFinish),
+                    ('/delete', DeleteOffer),
                     ('/faq', FAQ), 
                     ('/submitfeed', SubmitFeed),
                     ('/getkarma', PayMe),

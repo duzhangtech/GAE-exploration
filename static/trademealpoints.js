@@ -27,8 +27,33 @@ if(document.URL == 'http://localhost:10080/getkarma') {
     $('.coolinput').focus();
 }   
     
-$(".coolinput").css("width", "30px");
     
+$('.deletebutton').click(function() {
+    var url = document.URL;
+    var email = url.substring(url.indexOf('e=')+2, url.indexOf('&v='));
+    var amount = $(this).parent().children('.myamount').val();
+    var price = $(this).parent().children('.myprice').val();
+    console.log(email);
+    console.log(amount);
+    console.log(price);
+    $.ajax({
+        type: "POST",
+        url: "/delete",
+        data: 'email=' + email + "&amount=" + amount + "&price=" + price,
+        success: function() {
+            location.reload();
+        ;}
+    });
+    
+});
+
+    
+if (document.URL.indexOf('/change?') != -1) {
+    $(".myamount").focus();
+}
+    
+    
+$(".coolinput").css("width", "30px"); 
 //EXPAND INPUT BOX IF CHAR > 2
 $(".coolinput").keyup(function() {
     var amount = $(".coolinput").val();
