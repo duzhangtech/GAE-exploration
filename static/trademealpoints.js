@@ -5,7 +5,7 @@ $(document).ready(function(){
 if (jQuery.browser.mobile) {
     $('body').css({ "min-width": "" });
 } else {
-    $('body').css({"min-width": "375px" });
+    $('body').css({"min-width": "370px" });
 }
   
     
@@ -31,9 +31,40 @@ if(document.URL == 'http://localhost:10080/getkarma') {
 //EXPAND INPUT BOX IF CHAR > 2
 $("#payamount").keyup(function() {
     var amount = $("#payamount").val();
-    $("#payamount").css("width", 14*amount.length + "px");
+    if (amount.length > 0) {
+        $("#payamount").css("width", 15*amount.length + "px");
+    } else {
+        $("#payamount").css("width", "15px");
+    }
 });
     
+    
+//MIN $1
+$("input[type=text]#payamount").blur(function() {
+    var amount = $(this).val();
+    if (amount.length == 0) {
+        $(this).val("1");
+    }
+});
+    
+function respond() {
+    if ($(window).width() > 450) {
+        $('#expirepic').removeClass('hide');
+        $('#mmpic, #yypic').addClass('hide');
+        $('#paymonth').attr('placeholder', 'MM');
+        $('#payyear').attr('placeholder', 'YY');
+    } else {
+        $('#expirepic').addClass('hide');
+        $('#mmpic, #yypic').removeClass('hide');
+        $('#paymonth').attr('placeholder', 'Expiration month');
+        $('#payyear').attr('placeholder', 'Expiration year');
+    }
+}
+respond();
+    
+$(window).resize(function() {
+   respond();
+});
 
 //ENTRY FORMATTING FOR PRE PY REGEX POSTS
 var cost = document.getElementsByClassName('cost'); 

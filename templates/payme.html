@@ -49,20 +49,23 @@
 {% if woohoo == True %}
     
     <div style = "color:#11b99c;margin-bottom:10px;text-align:center" class = 'paymebox animated fadeIn'>
-        Thank you. <br>A receipt has been sent to your inbox.
+        Thank you. <br>
+        A receipt has been sent to your inbox. <br><br>
+        <a href = "/buy" class = "light_text_link">Go back to the marketplace.</a>
     </div>
 
 {% else %}
     
     <form action="" method="POST" id="payment-form" class = 'paymebox animated fadeIn'>
-        <div id = "paymetitle" class = "animated fadeIn">
-        Buy me a <span style = "color:#4ab8ca;">$</span><input type="text" id = 'payamount' name = 'amount' value = "{{amount}}">
-        <span style = "margin-left:-2px;"> coffee</span>
-    </div>
+        
+        <div id = "paymetitle" class = "animated fadeIn tenbelow">
+            Buy me a <span style = "color:#4ab8ca;">$</span><input type="text" id = 'payamount' name = 'amount' value = "{{amount}}">
+            <span style = "margin-left:-2px;"> coffee</span>
+        </div>
 
         <div>
             <img src = "/static/email.png" id = "emailpic" class = "icon" width="30px">
-            <input type="email" id = 'payemail' placeholder = "Email" name = 'email' value = "{{email}}"/>
+            <input type="text" id = 'payemail' placeholder = "Email" name = 'email' value = "{{email}}"/>
         </div>
 
         <div>
@@ -72,11 +75,14 @@
 
         <div>
             <img src = "/static/cvc.png" id = "cvcpic" class = "icon" width="30px">
-            <input type="text" id = "paycvc" placeholder = "cvc" maxlength = '4' class = "inputhack" data-stripe="cvc"/>
+            <input type="text" id = "paycvc" placeholder = "CVC" maxlength = '4' class = "inputhack" data-stripe="cvc"/>
 
-            <img src = "/static/calendar.png" id = "expirepic" class = "icon" width="27px">
-            <input type="text" placeholder = "mm" id = "paymonth" maxlength = '2' data-stripe="exp-month"/>
-            <input type="text" placeholder = "yy" id = "payyear" maxlength = '2' class = "narrowinput" data-stripe="exp-year"/>
+            <img src = "/static/calendar.png" id = "expirepic" class = "icon hide" width="27px">
+            <img src = "/static/mm.png" id = "mmpic" class = "icon" width="27px">
+            <input type="text" placeholder = "Expiration month" id = "paymonth" maxlength = '2' data-stripe="exp-month"/>
+            
+            <img src = "/static/yy.png" id = "yypic" class = "icon" width="27px">
+            <input type="text" placeholder = "Expiration year" id = "payyear" maxlength = '2' data-stripe="exp-year"/>
         </div> 
 
         <button type="submit" id = "paybutton" class = "button spaceup">Caffeine me</button>
@@ -86,9 +92,9 @@
 
     </form>
 
-    <div id = 'stripe' class = "animated fadeInUp"><a href = "https://stripe.com" class = "lightlink" target="_blank">Stripe</a> 
+    <div id = 'stripe' class = "animated fadeInUp"><a href = "https://stripe.com" class = "light_text_link" target="_blank">Stripe</a> 
         encrypts the transaction and sends you a receipt. 
-        <br>Trade Meal Points doesn't keep any of your card information.
+        <br>Trade Meal Points doesn't store your card information.
     </div>
     
 {% endif %}

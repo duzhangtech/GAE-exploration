@@ -9,18 +9,19 @@ body {
     text-align:center;
     margin: 0 auto;
     overflow:auto;
-    padding-left:10px;
-    padding-right:10px;    
 }
+
 #front-title {
     position:relative;
     top:20px;
     font-size: 20px !important;
     color:black;    
 }
+
+
 #paymetitle {
     position:relative;
-    font-size: 23px !important;
+    font-size: 23px;
     color:black;    
 }
 .paymebox {
@@ -30,35 +31,52 @@ body {
     background-color:transparent;
 }
 #buymecoffee, #stripe {
-    font:10px;
+    font-size:15px;
     position: fixed;
     bottom: 0px;
     padding-bottom: 3px;
     width: 100%;
+    color:#bfbfbf;
     background-color:white;
 }
-input[type=text]#payamount{
-    font-size: 23px !important;
-    font-family:inherit;
-    color:#4cb8ca;
-    width:28px !important;
-    height:30px;
-    margin-bottom:10px;
-    border: 0px !important;
-    text-align:left;
-    padding-left: 0px;
+
+a.light_text_link:link {
+    color:#bfbfbf;
+    text-decoration: underline;
 }
-#payment-form input[type=text]{
-    width:100vw;
-    margin-bottom: 0px;
-    border-radius:0px;
-    border-bottom:white;
+a.light_text_link:hover {
+    color:#9f9f9f;
+    text-decoration: underline;
+}
+a.light_text_link:active {
+    color:#bfbfbf;
+    text-decoration: underline;
+}
+a.light_text_link:visited {
+    color:#9f9f9f;
+    text-decoration: underline;
 }
 
-#paybutton {
+.button {
+    font-family:inherit;
+    font-size:18px;
+    
+    width:100vw;
+    height:50px;
+    border: 2px solid #4cb8ca;
+    border-radius:0px;
+    color:white;
+    background-color:#4cb8ca;
+}
+.button:hover {
     width:100vw;
     border-radius:0px;
+    color:white;
+    border-color:#2494a7;
+    background-color:#2494a7;
 }
+
+
 .icon {
     position:absolute;
     margin-top:10px;
@@ -70,38 +88,60 @@ input[type=text]#payamount{
     margin-left:8px;
 }
 
-input[type=text], input[type=email] {
+
+input[type=text] {
+    width:100vw;
+    margin-bottom: 10px;
+    border: 1px solid #bcbcbc;
+    border-radius:0px !important;
+    
     line-height:130%;
     font-size: 19px;
     font-family:inherit;
     color:inherit;
     
-    width:180px;
     height:45px;
-    margin-bottom:10px;
-    border: 1px solid #bcbcbc;
-    border-radius:5px;
     text-align:left;
     padding-left:45px;
 }
-
-
 input:focus, textarea:focus { 
     outline:none;
     border: 1px solid #4cb8ca;
-    border-bottom: 1px solid #4cb8ca;
-
     box-shadow:0 0 3px #4cb8ca;
     font-size: 19px !important;
 }
-input.edit {
-    width:80px;
-    height:30px;
+
+input[type=text]#payamount{  /*input box awesomeness*/
+    font-size: 23px !important;
+    font-family:inherit;
+    color:#4cb8ca;
+    width:30px;
+    height:32px;
+    margin-bottom:10px;
+    border: 0px;
+    border-radius: 7px !important;
+    text-align:left;
+    padding-left: 0px;
 }
-input.narrowinput {
-    width:100px;
+textarea {
+     width:100vw;
+    margin-bottom: 10px;
+    border: 1px solid #bcbcbc;
+    border-radius:0px !important;
+    
+    line-height:130%;
+    font-size: 19px;
+    font-family:inherit;
+    color:inherit;
+    
+    height:45px;
+    text-align:left;
+    padding-left:45px;
+    height:100px;
+
 }
 
+textarea, input { outline: none; }
 
 
 
@@ -110,9 +150,12 @@ input.narrowinput {
 }
 .faq {
     font-size: 15px;
-    width:340px;
+    padding-left:10px;
+    padding-right:10px;
 }
-.ascend {
+
+
+.ascend { /* TRIANGLES */
 	width: 0; 
 	height: 0; 
 	border-left: 6px solid transparent;
@@ -135,14 +178,14 @@ input.narrowinput {
 	border-bottom: 13px solid white;
 }
 .ascendblue {
-	border-bottom: 13px solid #0a7663;
+	border-bottom: 13px solid #2494a7;
 }
 .descendwhite {
 	border-top: 13px solid white;
 }
 
 .descendblue {
-	border-top: 13px solid #0a7663;
+	border-top: 13px solid #2494a7;
 }
 .filler {
     width:9px;
@@ -152,6 +195,9 @@ input.narrowinput {
     width:10px;
     display:inline-block;
 }
+
+
+
 .navbar {
     position:relative;
     top:30px;
@@ -218,51 +264,6 @@ a.mylink:visited:hover {
 }
 
 
-textarea {
-    line-height:130%;
-    font-size: inherit;
-    font-family:inherit;
-    color:#8b8b8b;
-    margin-bottom:10px;
-    padding: 10px;
-    width:188px;
-    height:100px;
-    border: 1px solid #bcbcbc;
-    border-radius:8px;
-    text-align:left;
-}
-
-textarea, input { outline: none; }
-
-.button {
-    font-family:inherit;
-    font-size:18px;
-    
-    width:190px;
-    height:45px;
-    background-color:transparent;
-    color:#4cb8ca;
-    border: 2px solid #4cb8ca;
-    border-radius:6px;
-}
-.button:hover {
-    border-color: #4cb8ca;
-    background-color:#4cb8ca;
-    color: white;
-    transition-duration: 400ms;
-}
-.button:active {
-    border-color: #329cad;
-    background-color:#329cad;
-    color: white;
-    transition-duration: 400ms;
-}
-
-
-.narrow_button {
-    width:130px !important;
-}
-
 #delete_button:hover {
     background-color:#c94c4c;
     color:white;
@@ -286,8 +287,7 @@ textarea, input { outline: none; }
 }
 
 
-
-.theader span {
+.theader span {  /* TABLE STUFF */
     font-size:19px;
     display:inline-block;
     width:100px;
@@ -300,6 +300,8 @@ textarea, input { outline: none; }
     width:100px;
     background-color:transparent;
 }
+
+
 
 a.text_link:link{
     font-size:16px;
@@ -381,25 +383,33 @@ a:hover {
     
 
 @media (min-width: 450px) {
-    
+
 input[type=text] {
-    width:161px;
-}
-#payment-form input[type=text] {
-    width:185px;
+    width:160px;
     margin-bottom: 10px;
-    border-radius:5px;
-    border-bottom:1px solid #bcbcbc;
+    border-radius: 5px !important;
 }
     
-input[type=email]#payemail {
-    padding-left:45px;
+#payment-form input[type=text] {
     width:190px;
+    margin-bottom: 10px;
+    border-radius: 5px !important;
 }
-input[type=text]#paycard {
-    padding-left:45px;
-    width:190px;
+    
+input[type=text]#payamount{  /*input box awesomeness*/
+    font-size: 25px !important;
+    font-family:inherit;
+    color:#4cb8ca;
+    width:30px;
+    height:32px;
+    margin-bottom:10px;
+    border: 0px !important;
+    border-radius: 7px;
+    text-align:left;
+    padding-left: 0px;
 }
+    
+
 input[type=text]#paycvc{
     padding-left:45px;
     width:50px;
@@ -414,10 +424,25 @@ input[type=text]#payyear {
     width:33px;
     margin-left:0px;
 }
+
 #paybutton {
     width:235px;
+    height:50px;
+    background-color:transparent;
+    color:#4cb8ca;
+    border: 2px solid #4cb8ca;
     border-radius:5px;
 }
+#paybutton:hover {
+    width:235px;
+    color:white;
+    border-color:#4cb8ca;
+    background-color:#4cb8ca;
+    border-radius:5px;
+}
+
+    
+    
 .icon {
     position:absolute;
     margin-top:10px;
