@@ -97,7 +97,6 @@ class PayMe(Handler):
 
         if not re.match(r"^[^@]+@[^@]+\.[^@]+$", email):
             somethingwrong = True
-            logging.error("WRONG EMAIL")
             params['emailstat'] = "Please enter a valid email"
 
         if not okaycoffee(amount):
@@ -105,7 +104,7 @@ class PayMe(Handler):
             params['amountstat'] = "Please enter a valid amount"
 
         elif okaycoffee(amount):
-            amount = int(amount)
+            amount = float(amount)
             if amount < 1:
                 somethingwrong = True
                 params['amountstat'] = "Coffee costs at least $1"
@@ -129,8 +128,9 @@ class PayMe(Handler):
 
                 self.render("payme.html", woohoo = True)
 
-            except stripe.CardError, e: #card declined
-                self.render("payme.html", stat = "Your card was declined")
+            except stripe.CardError, e: 
+                params['stat'] = "Your card was declined."
+                self.render("payme.html", **params)
 
 
 class FAQ(Handler):
@@ -154,7 +154,28 @@ class Buy(Handler):
             sells.sort(key = lambda x:((float)(x.price), (int)(x.amount)))
 
         count = len(sells)
+
         email = self.request.get("e")
+        # code = self.request.get('v')
+        # okaycode = VerifyModel.all().ancestor(verify_key()).filter('email', email).filter('code', code).get()
+
+        # if okaycode:
+        #     user = UserModel.all().filter("email", email).get()
+        #     offer = list(SellModel.all().ancestor(sell_key()).filter('user', user))
+        #     offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
+
+        #     #TEMPORARY FIX UP FOR PRE PY REGEX COMMITS
+        #     for x in range(0, len(offer)):
+        #         offer[x].amount = prettyamount(offer[x].amount)
+        #         offer[x].price = prettyprice(offer[x].price)
+        #         offer[x].put()
+
+        #     self.render("editfinish.html", offer = offer)
+
+        # else:
+        #     self.redirect('/changeoffer')
+
+
         self.render("buy.html", sells = sells, count = count, email = email)
 
 class BuyContact(Handler):
@@ -363,7 +384,7 @@ def prettyprice(price):
         price = re.sub("[^0-9\.]", "", price)
 
         if len(price) == 1 and price.count('.') == 1:
-            return "0.0"
+            return "0"
         elif len(price) != 0: #should be okay here
             price = "{:3.2f}".format(float(price))
             return price
@@ -606,7 +627,6 @@ class EditFinish(Handler):
     def get(self):
         email = self.request.get('e')
         code = self.request.get('v')
-
         okaycode = VerifyModel.all().ancestor(verify_key()).filter('email', email).filter('code', code).get()
 
         if okaycode:
@@ -624,6 +644,7 @@ class EditFinish(Handler):
 
         else:
             self.redirect('/changeoffer')
+        
 
     def post(self):
         edit_button = self.request.get('edit_button')

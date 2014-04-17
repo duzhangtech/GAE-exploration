@@ -59,7 +59,7 @@
     <form action="" method="POST" id="payment-form" class = 'paymebox animated fadeIn'>
         
         <div id = "paymetitle" class = "animated fadeIn tenbelow">
-            Buy me a <span style = "color:#4ab8ca;">$</span><input type="text" id = 'payamount' name = 'amount' value = "{{amount}}">
+            Buy me a <span style = "color:#4ab8ca;">$</span><input type="text" class = 'coolinput' name = 'amount' value = "{{amount}}">
             <span style = "margin-left:-2px;"> coffee</span>
         </div>
 
@@ -89,11 +89,12 @@
         <div class="payment-errors stat spaceup"></div> 
         <div class = "stat spaceup">{{amountstat}}</div>
         <div class = "stat spaceup">{{emailstat}}</div>
+        <div class = "stat spaceup">{{stat}}</div>
 
     </form>
 
     <div id = 'stripe' class = "animated fadeInUp"><a href = "https://stripe.com" class = "light_text_link" target="_blank">Stripe</a> 
-        encrypts the transaction and sends you a receipt. 
+        encrypts the transaction and emails you a receipt. 
         <br>Trade Meal Points doesn't store your card information.
     </div>
     

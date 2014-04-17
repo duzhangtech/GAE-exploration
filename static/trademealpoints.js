@@ -23,24 +23,25 @@ if(document.URL == 'http://localhost:10080/buy' || document.URL == 'http://local
 //if(document.URL == 'http://trademealpoints.appspot.com/getkarma') {
 if(document.URL == 'http://localhost:10080/getkarma') {
     $('body').css('paddingLeft', '0px').css('paddingRight', '0px');
-    $('#payamount').val("10");
-    $('#payamount').focus();
+    $('.coolinput').val("10");
+    $('.coolinput').focus();
 }   
     
-
+$(".coolinput").css("width", "30px");
+    
 //EXPAND INPUT BOX IF CHAR > 2
-$("#payamount").keyup(function() {
-    var amount = $("#payamount").val();
+$(".coolinput").keyup(function() {
+    var amount = $(".coolinput").val();
     if (amount.length > 0) {
-        $("#payamount").css("width", 15*amount.length + "px");
+        $(".coolinput").css("width", 15*amount.length + "px");
     } else {
-        $("#payamount").css("width", "15px");
+        $(".coolinput").css("width", "15px");
     }
 });
     
     
 //MIN $1
-$("input[type=text]#payamount").blur(function() {
+$("input[type=text].coolinput").blur(function() {
     var amount = $(this).val();
     if (amount.length == 0) {
         $(this).val("1");

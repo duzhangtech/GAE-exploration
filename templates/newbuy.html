@@ -9,6 +9,7 @@
 </div>
 
 <form method="post" class = "center animated fadeIn">
+    
     <div class = "newbuy">
         <div class = "spaceup">
             BUY <span style = "color:#4ab8ca;" class = "amount">{{amount}}</span> MEAL POINTS
@@ -24,20 +25,21 @@
         
         <div>
             <img src = "/static/email.png" id = "emailpic" class = "icon" width="30px">
-            <input type="text" placeholder = "wustl email" class = "tenbelow spaceup emailinput" name="email" value="{{email}}">
+            <input type="text" placeholder = "wustl email" class = "tenbelow emailinput" name="email" value="{{email}}">
         </div>  
     
-    
-    {%if need_code%} 
-        <div><input type="text" placeholder = "first name" class = "tenbelow" name="first_name" value="{{first_name}}"></div>
-        <div><input type="text" placeholder = "last name" name="last_name" class = "tenbelow" value="{{last_name}}"></div>
-        <div><input type="text" placeholder = "verification code" name="code" class = "tenbelow" value="{{code}}"></div>
-        <button type="submit" name = "resend_button" class = "button spaceup resend_button" value = "resend code">resend code</button>
+        {%if need_code%} 
+            <div><input type="text" placeholder = "first name" class = "tenbelow" name="first_name" value="{{first_name}}"></div>
+            <div><input type="text" placeholder = "last name" name="last_name" class = "tenbelow" value="{{last_name}}"></div>
+            <div><input type="text" placeholder = "verification code" name="code" class = "tenbelow" value="{{code}}"></div>
+            <button type="submit" name = "resend_button" class = "button spaceup resend_button" value = "resend code">resend code</button>
         {%endif%}
+
+        <button type="submit"  name = "submit_button" class = "button spaceup" value="contact seller">contact seller</button>
+    </div>
     
-    <button type="submit"  name = "submit_button" class = "button spaceup" value="contact seller">contact seller</button>
-</div>
     <div class = "stat">{{stat}}</div>
+    
 </form>
 
 {% endblock %}
