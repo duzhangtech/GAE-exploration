@@ -630,8 +630,6 @@ class EditFinish(Handler):
 
     def post(self):
         edit_button = self.request.get('edit_button')
-        delete_button = self.request.get('delete_button')
-
         email = self.request.get("e")
         user = UserModel.all().filter("email", email).get()
         offer = list(SellModel.all().ancestor(sell_key()).filter('user', user).filter('fulfilled', False).order('amount'))
@@ -698,30 +696,6 @@ class EditFinish(Handler):
             else: #BLANK FIELD
                 self.render("editfinish.html", offer = offer, editstat = "Fill each box")
 
-        elif delete_button: 
-            amount = self.request.get("delete_amount")
-            price = self.request.get("delete_price")
-
-            if amount and price:
-                amount = prettyamount(self.request.get("delete_amount"))
-                price = prettyprice(self.request.get("delete_price"))
-
-                derp = SellModel.all().ancestor(sell_key()).filter("user", user).filter('amount', amount).filter('price', price).get()
-
-                if derp:
-                    derp.delete()
-                    offer = list(SellModel.all().ancestor(sell_key()).filter('user', user))
-                    offer.sort(key = lambda x:((float)(x.amount), (float)(x.price)))
-
-                    memcache.delete("SELLS")
-
-                    self.render("editfinish.html", offer = offer, deletestat = "Offer removed.")
-
-                elif not derp:
-                    self.render("editfinish.html", offer = offer, delete_amount = amount, delete_price = price,deletestat = "You don't have this offer on market.")
-
-            else:
-                self.render("editfinish.html", offer = offer, delete_amount = amount, delete_price = price, deletestat = "Fill each box")
 
 class DeleteOffer(Handler):
     def post(self):

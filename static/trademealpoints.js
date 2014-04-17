@@ -9,8 +9,8 @@ if (jQuery.browser.mobile) {
 }
   
     
-//if(document.URL == 'http://trademealpoints.appspot.com/' || document.URL == 'http://trademealpoints.appspot.com/buy') {
-if(document.URL == 'http://localhost:10080/buy' || document.URL == 'http://localhost:10080/') {
+if(document.URL == 'http://trademealpoints.appspot.com/' || document.URL == 'http://trademealpoints.appspot.com/buy') {
+//if(document.URL == 'http://localhost:10080/buy' || document.URL == 'http://localhost:10080/') {
     $('.navlinks, .current_link').addClass('animated slideInLeft');
     $('#front-title, .center').hide();
     setTimeout(function() {
@@ -20,11 +20,10 @@ if(document.URL == 'http://localhost:10080/buy' || document.URL == 'http://local
     }, 200);
 } 
     
-//if(document.URL == 'http://trademealpoints.appspot.com/getkarma') {
-if(document.URL == 'http://localhost:10080/getkarma') {
-    $('body').css('paddingLeft', '0px').css('paddingRight', '0px');
-    $('.coolinput').val("10");
+if(document.URL.indexOf('/getkarma') != -1) {
+//if(document.URL == 'http://localhost:10080/getkarma') {
     $('.coolinput').focus();
+    $('.coolinput').val("10");
 }   
     
     
@@ -79,6 +78,7 @@ function respond() {
         $('#mmpic, #yypic').addClass('hide');
         $('#paymonth').attr('placeholder', 'MM');
         $('#payyear').attr('placeholder', 'YY');
+        
     } else {
         $('#expirepic').addClass('hide');
         $('#mmpic, #yypic').removeClass('hide');

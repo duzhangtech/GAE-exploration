@@ -8,17 +8,18 @@ handlers:
 - url: /static
   static_dir: static
 
-- url: /.*
+- url: /getkarma
   script: trademealpoints.application
-
+  secure: always
+  
 - url: /_ah/mail/.+
   script: handle_incoming_email.app
   login: admin
   
-- url: /getkarma/.*
+- url: /.*
   script: trademealpoints.application
-  secure: always
-  
+  secure: never
+
 libraries:
 - name: webapp2
   version: latest

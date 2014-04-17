@@ -8,7 +8,8 @@ body {
     color:grey;
     text-align:center;
     margin: 0 auto;
-    overflow:auto;
+    overflow-y:auto;
+    overflow-x:hidden;
 }
 
 #front-title {
@@ -159,8 +160,8 @@ textarea, input { outline: none; }
     background-color:transparent;
     display:inline-block;
     width:55px;
-    margin-left:25px;
-    margin-right:25px;
+    margin-left:20px;
+    margin-right:27px;
 }
 .navlinks:hover {
     color:#717171;
@@ -222,9 +223,19 @@ textarea, input { outline: none; }
     top:80px;
     background-color:transparent;
 }
-#buymecoffee, #stripe {
+#buymecoffee {
     font-size:15px;
     position: fixed;
+    bottom: 0px;
+    padding-bottom: 3px;
+    width: 100%;
+    color:#bfbfbf;
+    background-color:white;
+}
+
+#stripe {
+    font-size:15px;
+    position: relative;
     bottom: 0px;
     padding-bottom: 3px;
     width: 100%;
@@ -447,7 +458,7 @@ a.mylink:visited:hover {
     #expirepic {
          margin-top:12px;
     }
-    #buymecoffee, #stripe {
+    #buymecoffee, #stripe{
         position: fixed;
         bottom: 0px;
         padding-bottom: 3px;
