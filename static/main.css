@@ -1,4 +1,6 @@
-html {-webkit-font-smoothing: antialiased} /*deal with weird safari bug*/
+html {
+    -webkit-font-smoothing: antialiased
+}
 body {
     font-family: 'Nunito', sans-serif;
     font-weight: 300;
@@ -16,25 +18,91 @@ body {
     font-size: 20px !important;
     color:black;    
 }
-#coffeeme {
+#paymetitle {
     position:relative;
-    top:75px;
     font-size: 23px !important;
     color:black;    
 }
-.coffee {
+.paymebox {
     position:relative;
     margin:0 auto;
     top:80px;
     background-color:transparent;
 }
-#payme {
+#buymecoffee, #stripe {
+    font:10px;
     position: fixed;
     bottom: 0px;
     padding-bottom: 3px;
     width: 100%;
     background-color:white;
 }
+input[type=text]#payamount{
+    font-size: 23px !important;
+    font-family:inherit;
+    color:#4cb8ca;
+    width:28px !important;
+    height:30px;
+    margin-bottom:10px;
+    border: 0px !important;
+    text-align:left;
+    padding-left: 0px;
+}
+#payment-form input[type=text]{
+    width:100vw;
+    margin-bottom: 0px;
+    border-radius:0px;
+    border-bottom:white;
+}
+
+#paybutton {
+    width:100vw;
+    border-radius:0px;
+}
+.icon {
+    position:absolute;
+    margin-top:10px;
+    margin-left: 6px;
+}
+.sellicon {
+    position:absolute;
+    margin-top:10px;
+    margin-left:8px;
+}
+
+input[type=text], input[type=email] {
+    line-height:130%;
+    font-size: 19px;
+    font-family:inherit;
+    color:inherit;
+    
+    width:180px;
+    height:45px;
+    margin-bottom:10px;
+    border: 1px solid #bcbcbc;
+    border-radius:5px;
+    text-align:left;
+    padding-left:45px;
+}
+
+
+input:focus, textarea:focus { 
+    outline:none;
+    border: 1px solid #4cb8ca;
+    border-bottom: 1px solid #4cb8ca;
+
+    box-shadow:0 0 3px #4cb8ca;
+    font-size: 19px !important;
+}
+input.edit {
+    width:80px;
+    height:30px;
+}
+input.narrowinput {
+    width:100px;
+}
+
+
 
 
 .newbuy {
@@ -116,6 +184,8 @@ body {
 .current_link:hover {
     color:#717171;
 }
+
+
 a.current_link:link{
     border-bottom:3px solid #4cb8ca;
 }
@@ -125,6 +195,8 @@ a.current_link:visited{
 }
 a.current_link:visited:hover{
 }
+
+
 a.mylink:link {
     color: #4cb8ca;
 }
@@ -144,70 +216,7 @@ a.mylink:visited:hover {
     top:35px;
     background-color:transparent;
 }
-.sellicon {
-    position:absolute;
-    margin-top:10px;
-    margin-left:8px;
-}
 
-input[type=text] {
-    line-height:130%;
-    font-size: 19px;
-    font-family:inherit;
-    color:inherit;
-    
-    width:185px;
-    height:45px;
-    margin-bottom:10px;
-    border: 1px solid #bcbcbc;
-    border-radius:5px;
-    text-align:left;
-    padding-left:45px;
-}
-
-input[type=text]#payamount{
-    font-size: 23px !important;
-    font-family:inherit;
-    color:#4cb8ca;
-    width:28px;
-    height:30px;
-    margin-bottom:10px;
-    border: 0px;
-    text-align:left;
-    padding-left: 0px;
-}
-
-
-input[type=text]#paycvc{
-    padding-left:45px;
-    width:43px;
-}
-
-input[type=text]#paymonth{
-    padding-left:40px;
-    width:43px;
-}
-input[type=text]#payyear {
-    padding-left:10px;
-    width:33px;
-    margin-left:0px;
-}
-#paybutton {
-    width:230px;
-}
-input:focus, textarea:focus { 
-    outline:none;
-    border: 1px solid #4cb8ca;
-    box-shadow:0 0 3px #4cb8ca;
-    font-size: 19px !important;
-}
-input.edit {
-    width:80px;
-    height:30px;
-}
-input.narrowinput {
-    width:100px;
-}
 
 textarea {
     line-height:130%;
@@ -371,8 +380,44 @@ a:hover {
 }  
     
 
-@media (min-width: 500px) {
+@media (min-width: 450px) {
+    
+input[type=text] {
+    width:161px;
+}
+#payment-form input[type=text] {
+    width:185px;
+    margin-bottom: 10px;
+    border-radius:5px;
+    border-bottom:1px solid #bcbcbc;
+}
+    
+input[type=email]#payemail {
+    padding-left:45px;
+    width:190px;
+}
+input[type=text]#paycard {
+    padding-left:45px;
+    width:190px;
+}
+input[type=text]#paycvc{
+    padding-left:45px;
+    width:50px;
+}
 
+input[type=text]#paymonth{
+    padding-left:38px;
+    width:43px;
+}
+input[type=text]#payyear {
+    padding-left:10px;
+    width:33px;
+    margin-left:0px;
+}
+#paybutton {
+    width:235px;
+    border-radius:5px;
+}
 .icon {
     position:absolute;
     margin-top:10px;
@@ -381,6 +426,16 @@ a:hover {
 #expirepic {
      margin-top:12px;
 }
+#buymecoffee, #stripe {
+    position: fixed;
+    bottom: 0px;
+    padding-bottom: 3px;
+    width: 100%;
+    background-color:white;
+}
+    
+    
+    
 .newbuy {
     font-size:20px;
 }

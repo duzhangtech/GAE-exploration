@@ -27,28 +27,27 @@
 
     {%if need_code%} 
 
-    <div>
-        <img src = "/static/first.png" id = "sellfirst" class = "sellicon" width="30px">
-        <input type="text" placeholder = "first name" name="first_name" value="{{first_name}}">
-    </div>
+        <div>
+            <img src = "/static/first.png" id = "sellfirst" class = "sellicon" width="30px">
+            <input type="text" placeholder = "first name" name="first_name" value="{{first_name}}">
+        </div>
+
+        <div>
+             <img src = "/static/last.png" id = "selllast" class = "sellicon" width="30px">
+            <input type="text" placeholder = "last name"   name="last_name" value="{{last_name}}">
+        </div>
+
+        <div>
+            <img src = "/static/cvc.png" id = "sellverify" class = "sellicon" width="30px">
+            <input type="text" placeholder = "verification code"  name="code" value="{{code}}">
+        </div>
     
-    <div>
-         <img src = "/static/last.png" id = "selllast" class = "sellicon" width="30px">
-        <input type="text" placeholder = "last name"   name="last_name" value="{{last_name}}">
-    </div>
-    
-    <div>
-        <img src = "/static/cvc.png" id = "sellverify" class = "sellicon" width="30px">
-        <input type="text" placeholder = "verification code"  name="code" value="{{code}}">
-    </div>
-    
-    <button type="submit" name = "resend_button" class = "button narrow_button spaceup" value = "resend code">resend code</button>
+        <button type="submit" name = "resend_button" class = "button narrow_button spaceup" value = "resend code">resend code</button>
 
     {%endif%}
 
     <button type="submit" name = "submit_button" class = "button spaceup tenbelow" value = "okay">submit</button><br>
     <a class = "text_link animated fadeInUp" href = "/changeoffer">edit my offer</a>
-
 
     <div class = "stat">{{stat}}</div>
 </form>

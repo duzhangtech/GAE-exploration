@@ -64,28 +64,73 @@ class Handler(webapp2.RequestHandler):
     def initialize(self, *a, **kw):
         webapp2.RequestHandler.initialize(self, *a, **kw)
 
+def okaycoffee(payment):
+    if payment.count('.') > 1 or len(payment) == 0: 
+        return False
+
+    else: #has . or none
+        if len(payment) == 1 and payment.count('.') == 1: #entry is just .
+            return False
+
+        elif payment.count('.') == 1:
+            payment = payment.strip('0')
+            return payment and re.compile(r'^[0-9]?\.[0-9]*$').match(payment)
+
+        elif payment.count('.') == 0:
+            return payment and re.compile(r'^[0-9]+$').match(payment)
+
 class PayMe(Handler):
     def get(self):
         self.render("payme.html")
 
     def post(self):
         # https://manage.stripe.com/account/apikeys
-
         stripe.api_key=secretkey
-        token = self.request.get('stripeToken') #card deets
-        amount = self.request.get('amount')
-        amount = int(amount)
 
-        try: 
-            charge = stripe.Charge.create(
-              amount=amount*1000, #cents
-              currency="usd",
-              card=token
-            )
-            logging.error("amount " + str(amount))
-            #fixme: render page
-        except stripe.CardError, e: #card declined
-            pass #fixme: render page
+        token = self.request.get('stripeToken')
+        email  = self.request.get('email')
+        amount = self.request.get('amount')
+
+        somethingwrong = False
+
+        params = dict(amount = amount, email = email)
+
+        if not re.match(r"^[^@]+@[^@]+\.[^@]+$", email):
+            somethingwrong = True
+            logging.error("WRONG EMAIL")
+            params['emailstat'] = "Please enter a valid email"
+
+        if not okaycoffee(amount):
+            somethingwrong = True
+            params['amountstat'] = "Please enter a valid amount"
+
+        elif okaycoffee(amount):
+            amount = int(amount)
+            if amount < 1:
+                somethingwrong = True
+                params['amountstat'] = "Coffee costs at least $1"
+
+        if somethingwrong:
+            self.render("payme.html", **params)
+
+        else: 
+            try: 
+                customer = stripe.Customer.create(
+                  card=token,
+                  email=email
+                )
+                charge = stripe.Charge.create(
+                  customer=customer.id,
+                  amount=amount*1000, #cents
+                  currency="usd"
+                )              
+
+                logging.error("amount " + str(amount))
+
+                self.render("payme.html", woohoo = True)
+
+            except stripe.CardError, e: #card declined
+                self.render("payme.html", stat = "Your card was declined")
 
 
 class FAQ(Handler):
@@ -303,19 +348,23 @@ class BuyContact(Handler):
 def prettyamount(amount):
     if amount.count('.') == -1: #DERP
         return re.sub("[^0-9]", "", amount.lstrip('0')) 
+    elif len(amount) == 1 and amount.count('.') == 1: #why would you type this
+        return "0.0"    
     elif amount.count('.') >1:
         return amount
-    else: #HAS DECIMAL POINT. YAY
+    else: 
         return str(math.floor(float(re.sub("[^0-9\.]", "", amount)))).strip('0').replace(".", "")
     
 def prettyprice(price):
     if price.count('.') > 1 or len(price) == 0: #LOLZ
         return price
-    else:
+    else: #has . or is 1
         price = price.strip('0').replace(" ", "").replace("$", "")
         price = re.sub("[^0-9\.]", "", price)
 
-        if len(price) != 0:
+        if len(price) == 1 and price.count('.') == 1:
+            return "0.0"
+        elif len(price) != 0: #should be okay here
             price = "{:3.2f}".format(float(price))
             return price
         else: #SERIOUSLY PEOPLE

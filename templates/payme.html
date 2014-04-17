@@ -1,7 +1,8 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
+    
 <head>
+    
     <link href='http://fonts.googleapis.com/css?family=Josefin+Sans:600|Nunito' rel='stylesheet' type='text/css'>
     <link type="text/css" rel="stylesheet" href="/static/main.css" />
     <link type="text/css" rel="stylesheet" href="/static/animate.min.css" />
@@ -12,27 +13,30 @@
     <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
     
     <script>
+        
     Stripe.setPublishableKey('pk_test_9tnZ37cNgvyDCfICwHjOctXm');
+        
     var stripeResponseHandler = function(status, response) {
-      var $form = $('#payment-form');
-      if (response.error) {
-        $form.find('.payment-errors').text(response.error.message);
-        $form.find('button').prop('disabled', false);
-      } else {
-        var token = response.id; // token contains id, last4, and card type
-        // Insert the token into the form so it gets submitted to the server
-        $form.append($('<input type="hidden" name="stripeToken" />').val(token));
-        $form.get(0).submit(); // and re-submit
-      }
+        var $form = $('#payment-form');
+        if (response.error) {
+            $form.find('.payment-errors').text(response.error.message);
+            $form.find('button').prop('disabled', false);
+        } else {
+            var token = response.id; // token contains id, last4, and card type
+            $form.append($('<input type="hidden" name="stripeToken" />').val(token));
+            $form.get(0).submit(); //re-submit
+        }
     };
+        
     jQuery(function($) {
-      $('#payment-form').submit(function(e) {
-        var $form = $(this);
-        $form.find('button').prop('disabled', true); // Disable the submit button to prevent repeated clicks
-        Stripe.card.createToken($form, stripeResponseHandler);
-        return false; // Prevent the form from submitting with the default action
-      });
+        $('#payment-form').submit(function(e) {
+            var $form = $(this);
+            $form.find('button').prop('disabled', true); //prevent repeated clicks
+            Stripe.card.createToken($form, stripeResponseHandler);
+            return false; // prevent default form submit
+        });
     });
+        
     </script>
     
     <title>Get Meal Karma</title>
@@ -41,38 +45,53 @@
     
 <body>
 
-<div id = "coffeeme" class = "animated fadeIn">
-    Buy me a <span style = "color:#4ab8ca;">$</span><input type="text" id = 'payamount' name = 'amount'>
-    <span style = "margin-left:-2px;"> coffee</span>
-</div>
-
-<form action="" method="POST" id="payment-form" class = 'coffee animated fadeIn'>
     
-    <div>
-        <img src = "/static/email.png" id = "emailpic" class = "icon" width="30px">
-        <input type="text" id = 'payemail' placeholder = "email" name = 'email'/>
+{% if woohoo == True %}
+    
+    <div style = "color:#11b99c;margin-bottom:10px;text-align:center" class = 'paymebox animated fadeIn'>
+        Thank you. <br>A receipt has been sent to your inbox.
+    </div>
+
+{% else %}
+    
+    <form action="" method="POST" id="payment-form" class = 'paymebox animated fadeIn'>
+        <div id = "paymetitle" class = "animated fadeIn">
+        Buy me a <span style = "color:#4ab8ca;">$</span><input type="text" id = 'payamount' name = 'amount' value = "{{amount}}">
+        <span style = "margin-left:-2px;"> coffee</span>
+    </div>
+
+        <div>
+            <img src = "/static/email.png" id = "emailpic" class = "icon" width="30px">
+            <input type="email" id = 'payemail' placeholder = "Email" name = 'email' value = "{{email}}"/>
+        </div>
+
+        <div>
+            <img src = "/static/card.png" id = "cardpic" class = "icon" width="30px">
+            <input type="text" id = 'paycard' placeholder = "Card number" data-stripe="number"/>
+        </div>    
+
+        <div>
+            <img src = "/static/cvc.png" id = "cvcpic" class = "icon" width="30px">
+            <input type="text" id = "paycvc" placeholder = "cvc" maxlength = '4' class = "inputhack" data-stripe="cvc"/>
+
+            <img src = "/static/calendar.png" id = "expirepic" class = "icon" width="27px">
+            <input type="text" placeholder = "mm" id = "paymonth" maxlength = '2' data-stripe="exp-month"/>
+            <input type="text" placeholder = "yy" id = "payyear" maxlength = '2' class = "narrowinput" data-stripe="exp-year"/>
+        </div> 
+
+        <button type="submit" id = "paybutton" class = "button spaceup">Caffeine me</button>
+        <div class="payment-errors stat spaceup"></div> 
+        <div class = "stat spaceup">{{amountstat}}</div>
+        <div class = "stat spaceup">{{emailstat}}</div>
+
+    </form>
+
+    <div id = 'stripe' class = "animated fadeInUp"><a href = "https://stripe.com" class = "lightlink" target="_blank">Stripe</a> 
+        encrypts the transaction and sends you a receipt. 
+        <br>Trade Meal Points doesn't keep any of your card information.
     </div>
     
-    <div>
-        <img src = "/static/card.png" id = "cardpic" class = "icon" width="30px">
-        <input type="text" placeholder = "card number" data-stripe="number"/>
-    </div>    
+{% endif %}
     
-    <div>
-        <img src = "/static/cvc.png" id = "cvcpic" class = "icon" width="30px">
-        <input type="text" id = "paycvc" placeholder = "cvc" maxlength = '4' class = "narrowinput" data-stripe="cvc"/>
-
-        <img src = "/static/calendar.png" id = "expirepic" class = "icon" width="27px">
-        <input type="text" placeholder = "mm" id = "paymonth" maxlength = '2' data-stripe="exp-month"/>
-        <input type="text" placeholder = "yy" id = "payyear" maxlength = '2' class = "narrowinput" data-stripe="exp-year"/>
-    </div> 
-    
-    <button type="submit" id = "paybutton" class = "button spaceup">Caffeine me</button>
-    <div class="payment-errors spaceup"></div> 
-</form>
-    
-<div id = 'payme' class = "animated fadeInUp"><a href = "https://stripe.com" class = "lightlink" target="_blank">Stripe</a> 
-    encrypts the transaction and sends you a receipt. 
-    <br>Trade Meal Points doesn't keep any of your card information.</div>
 </body>
 </html>

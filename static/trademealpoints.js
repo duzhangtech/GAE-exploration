@@ -22,38 +22,16 @@ if(document.URL == 'http://localhost:10080/buy' || document.URL == 'http://local
     
 //if(document.URL == 'http://trademealpoints.appspot.com/getkarma') {
 if(document.URL == 'http://localhost:10080/getkarma') {
+    $('body').css('paddingLeft', '0px').css('paddingRight', '0px');
     $('#payamount').val("10");
     $('#payamount').focus();
-}
-    
-//APPEND SLASH
-var hadslash = false;
-    
-$("#paymonth").keyup(function() {
-    var month = $("#paymonth").val();
-    var slashes = month.split('/') -1;
-        
-    if (month.length == 2 && slashes != 1 && hadslash == false) {
-        $("#paymonth").val(month + "/").delay(300);
-        hadslash = true;
-    } else {
-        $("#paymonth").val(month);
-        hadslash = false;
-    }
-});
+}   
     
 
 //EXPAND INPUT BOX IF CHAR > 2
 $("#payamount").keyup(function() {
     var amount = $("#payamount").val();
-        
-    if (amount.length > 2) {
-        var extra = amount.length - 2;
-        var space = 28 + (14*extra);
-        $("#payamount").css("width", space + "px");
-    } else {
-        $("#payamount").css("width", "28px");
-    }
+    $("#payamount").css("width", 14*amount.length + "px");
 });
     
 
@@ -83,7 +61,7 @@ $("#submit").click(function() {
             data: 'feedback=' + feedback + "&name=" + name + "&email=" + email,
             success: function() {
             
-            $("#feedback_title").replaceWith("<div id = 'feedback_title' style = 'font-size:24px;color: #32ac97;margin-bottom:200px;margin-top:5px;'>THANKS!</div>");
+            $("#feedback_title").replaceWith("<div id = 'feedback_title' style = 'font-size:24px;color: #4cb8ca;margin-bottom:200px;margin-top:5px;'>THANKS!</div>");
             $("#feedback, #error, #submit").remove();
             ;}
         });
