@@ -7,7 +7,6 @@ import re
 import stripe
 
 from string import letters
-from secretkey import secretkey, secret
 from google.appengine.ext import db
 from google.appengine.api import mail
 from google.appengine.api import memcache
@@ -30,6 +29,7 @@ def feedback_key():
 class UserModel(db.Model):
     first_name = db.StringProperty(required = True)
     last_name = db.StringProperty(required = True)
+    phone = db.StringProperty(required = False)
     email = db.StringProperty(required = True)
 
 class SellModel(db.Model):
@@ -64,74 +64,73 @@ class Handler(webapp2.RequestHandler):
     def initialize(self, *a, **kw):
         webapp2.RequestHandler.initialize(self, *a, **kw)
 
-def okaycoffee(payment):
-    if payment.count('.') > 1 or len(payment) == 0: 
-        return False
+# def okaycoffee(payment):
+#     if payment.count('.') > 1 or len(payment) == 0: 
+#         return False
 
-    else: #has . or none
-        if len(payment) == 1 and payment.count('.') == 1: #entry is just .
-            return False
+#     else: #has . or none
+#         if len(payment) == 1 and payment.count('.') == 1: #entry is just .
+#             return False
 
-        elif payment.count('.') == 1:
-            payment = payment.strip('0')
-            return payment and re.compile(r'^[0-9]?\.[0-9]*$').match(payment)
+#         elif payment.count('.') == 1:
+#             payment = payment.strip('0')
+#             return payment and re.compile(r'^[0-9]?\.[0-9]*$').match(payment)
 
-        elif payment.count('.') == 0:
-            return payment and re.compile(r'^[0-9]+$').match(payment)
+#         elif payment.count('.') == 0:
+#             return payment and re.compile(r'^[0-9]+$').match(payment)
 
-class PayMe(Handler):
-    def get(self):
-        self.render("payme.html")
+# class PayMe(Handler):
+#     def get(self):
+#         self.render("payme.html")
 
-    def post(self):
-        # https://manage.stripe.com/account/apikeys
-        stripe.api_key=secretkey
+#     def post(self):
+#         # https://manage.stripe.com/account/apikeys
 
-        token = self.request.get('stripeToken')
-        email  = self.request.get('email')
-        amount = self.request.get('amount')
+#         token = self.request.get('stripeToken')
+#         email  = self.request.get('email')
+#         amount = self.request.get('amount')
 
-        somethingwrong = False
+#         somethingwrong = False
 
-        params = dict(amount = amount, email = email)
+#         params = dict(amount = amount, email = email)
 
-        if not re.match(r"^[^@]+@[^@]+\.[^@]+$", email):
-            somethingwrong = True
-            params['emailstat'] = "Please enter a valid email"
+#         if not re.match(r"^[^@]+@[^@]+\.[^@]+$", email):
+#             somethingwrong = True
+#             params['emailstat'] = "Please enter a valid email"
 
-        if not okaycoffee(amount):
-            somethingwrong = True
-            params['amountstat'] = "Please enter a valid amount"
+#         if not okaycoffee(amount):
+#             somethingwrong = True
+#             params['amountstat'] = "Please enter a valid amount"
 
-        elif okaycoffee(amount):
-            amount = float(amount)
-            if amount < 1:
-                somethingwrong = True
-                params['amountstat'] = "Coffee costs at least $1"
+#         elif okaycoffee(amount):
+#             amount = float(amount)
+#             if amount < 1:
+#                 somethingwrong = True
+#                 params['amountstat'] = "Coffee costs at least $1"
 
-        if somethingwrong:
-            self.render("payme.html", **params)
+#         if somethingwrong:
+#             self.render("payme.html", **params)
 
-        else: 
-            try: 
-                customer = stripe.Customer.create(
-                  card=token,
-                  email=email
-                )
-                amount=int(amount)
-                charge = stripe.Charge.create(
-                  customer=customer.id,
-                  amount=amount*1000, #cents
-                  currency="usd"
-                )              
+#         else: 
+#             try: 
+#                 customer = stripe.Customer.create(
+#                   card=token,
+#                   email=email
+#                 )
+#                 amount=int(amount)
+#                 charge = stripe.Charge.create(
+#                   customer=customer.id,
+#                   amount=amount*1000, #cents
+#                   currency="usd"
+#                 )              
 
-                logging.error("amount " + str(amount*1000))
+#                 logging.error("amount " + str(amount*1000))
 
-                self.render("payme.html", woohoo = True)
+#                 self.render("payme.html", woohoo = True)
 
-            except stripe.CardError, e: 
-                params['stat'] = "Your card was declined."
-                self.render("payme.html", **params)
+#             except stripe.CardError, e: 
+#                 params['stat'] = "Your card was declined."
+#                 self.render("payme.html", **params)
 
 
 class FAQ(Handler):
@@ -163,7 +162,7 @@ class Buy(Handler):
 class BuyContact(Handler):
     def contact_seller(self, amount, price, myemail):
         subject = "A BUYER!"
-        sender = "bot@trademealpoints.appspotmail.com"
+        sender = "duzhangtech@gmail.com"
         
         seller = SellModel.all().ancestor(sell_key()).filter("amount", amount).filter("price", price).get()
         logging.error("AMOUNT: " + amount + "PRICE" + price)
@@ -172,39 +171,28 @@ class BuyContact(Handler):
         receiver = seller.user.email
 
         body = (
-            "Hey hey, savvy meal point seller. It looks like %s %s is interested in buying your offer of %s meal points at $%s per point! \n\n" % (buyer.first_name, buyer.last_name, amount, price) 
+            "Hey hey, savvy Dining Dollar seller. It looks like %s %s is interested in buying your offer of %s Dining Dollars at $%s per point! \n\n" % (buyer.first_name, buyer.last_name, amount, price) 
 
             + "You can reach %s %s at %s. \n \n" % (buyer.first_name, buyer.last_name, myemail) 
 
-            + "To complete this transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (buyer.first_name)
-
-            + "Remember that WashU is going to take a 15 point transaction fee, 7.5 points per person. \n\n" 
+            + "To complete this transaction, arrange with %s to visit https://hdh.ucsd.edu/sso/DDContribution \n\n" % (buyer.first_name)
 
             + "If you have any questions/comments/just want to say hi, please leave them in the feedback box on the FAQ page! \n\n"
 
-            + "All right, I'm done now. You've been a real spiffy human to serve. Have an A1 Day! \n\n"
-
-            + "Mechanically yours, \n"
-            + "Bot\n\n"
-
-            + "P.S. Your offer no longer appears on the 'buy' page. If you do not complete this transaction and wish to relist your offer, simply re-enter your info on the 'sell' page.")
+            + "P.S. Your offer no longer appears on the 'buy' page. If you do not complete this transaction and wish to relist your offer, simply re-enter your info on the 'sell' page."
+            )
 
         mail.send_mail(sender, receiver, subject, body)
 
         receiver = myemail
-        subject = "MEAL POINTS"
+        subject = "Dining Dollars"
         body = (
-            "Hey hey, savvy meal point buyer. You can reach %s %s at %s regarding %s's offer of %s meal points at $%s per point. \n \n" % (seller.user.first_name, seller.user.last_name, seller.user.email, seller.user.first_name, amount, price)
+            "Hey hey, savvy Dining Dollar buyer. You can reach %s %s at %s or at %s regarding %s's offer of %s Dining Dollars at $%s per point. \n \n" % (seller.user.first_name, seller.user.last_name, seller.user.email, seller.user.phone, seller.user.first_name, amount, price)
 
-            + "To complete this transaction, arrange with %s to visit Dining Services Offices in the South Forth House to sign the transaction form.\n\n" % (seller.user.first_name)
-
-            + "Remember that WashU is going to take a 15 point transaction fee, 7.5 points per person. \n\n" 
+            + "To complete this transaction, arrange with %s to visit https://hdh.ucsd.edu/sso/DDContribution \n\n" % (seller.user.first_name)
 
             + "If you have any questions/comments/just want to say hi, please leave them in the feedback box on the FAQ page! \n\n"
-
-            + "All right, I'm done now. You've been a real spiffy human to serve. Have an A1 Day!\n\n"
-            + "Mechanically yours, \n"
-            + "Bot")
+        )
 
         mail.send_mail(sender, receiver, subject, body)
 
@@ -240,6 +228,7 @@ class BuyContact(Handler):
         amount = self.request.get("amount")
         price = self.request.get("price")
 
+        phone = self.request.get('phone')
         first_name = self.request.get('first_name')
         last_name = self.request.get('last_name')
         email = self.request.get('email')
@@ -262,27 +251,27 @@ class BuyContact(Handler):
                                             email = email, 
                                             code = code).put()
 
-                            sender = "bot@trademealpoints.appspotmail.com"
+                            sender = "duzhangtech@gmail.com"
                             receiver = email
-                            subject = "MEAL POINTS VERIFICATION"
+                            subject = "Dining Dollars VERIFICATION"
                             body =  ("Hello! Your verification code is" + code)
                             mail.send_mail(sender, receiver, subject, body)
 
                             self.render("newbuy.html", 
                                 amount = amount, price = price, 
-                                first_name = first_name, last_name = last_name,
+                                first_name = first_name, last_name = last_name, phone = phone, 
                                 email = email, need_code = True)
 
                         elif waiting_for_verify: #ASK FOR CODE
                             self.render("newbuy.html", 
                                 amount = amount, price = price, 
-                                first_name = first_name, last_name = last_name,
+                                first_name = first_name, last_name = last_name, phone = phone, 
                                 email = email, need_code = True)
 
                     elif user: #VERIFIED, CAN CONTACT SELLER
                         self.contact_seller(amount, price, email)
 
-                elif code and first_name and last_name:
+                elif code and first_name and phone and last_name:
                     logging.error("CODE")
                     check_code = VerifyModel.all().filter("code", code).get()
 
@@ -293,6 +282,7 @@ class BuyContact(Handler):
                         user = UserModel(parent = user_key(),
                                     first_name = first_name, 
                                     last_name = last_name,
+                                    phone = phone, 
                                     email = email)
                         user.put()
 
@@ -301,7 +291,7 @@ class BuyContact(Handler):
                     elif not check_code: #OH SNAP
                         self.render("newbuy.html", 
                                 amount = amount, price = price, 
-                                first_name = first_name, last_name = last_name,
+                                first_name = first_name, last_name = last_name, phone = phone, 
                                 email = email, need_code = True, stat = "invalid code")
 
                 elif code and not first_name or not last_name:
@@ -311,41 +301,44 @@ class BuyContact(Handler):
                         price = price, 
                         stat = "Fill each box", 
                         need_code = True,
+                        phone = phone, 
                         last_name=last_name, 
                         email = email,
                         code = code)
 
-            elif first_name and last_name and not valid_email(email):
+            elif first_name and last_name and phone and not valid_email(email):
                 self.render("newbuy.html", 
                             amount = amount, 
                             price = price, 
                             need_code = True,
                             first_name = first_name, 
                             last_name = last_name,
+                            phone = phone, 
                             email = email, 
-                            stat = "What's your wustl email?")
+                            stat = "What's your UCSD email?")
 
             elif not email or not valid_email(email):
                 self.render("newbuy.html", 
                     first_name=first_name, 
                     amount = amount, 
                     price = price, 
-                    stat = "What's your wustl email?", 
+                    stat = "What's your UCSD email?", 
                     last_name=last_name, 
+                    phone = phone, 
                     email = email)
 
         elif resend_button:
             code = VerifyModel.all().ancestor(verify_key()).filter("email", email).get().code
 
-            sender = "bot@trademealpoints.appspotmail.com"
+            sender = "duzhangtech@gmail.com"
             receiver = email
-            subject = "MEAL POINTS VERIFICATION"
+            subject = "Dining Dollars VERIFICATION"
             body =  ("Hello! Your verification code is " + code)
             mail.send_mail(sender, receiver, subject, body)
 
             self.render("newbuy.html", 
                 amount = amount, price = price, 
-                first_name = first_name, last_name = last_name,
+                first_name = first_name, last_name = last_name, phone = phone, 
                 email = email, need_code = True)
 
 def prettyamount(amount):
@@ -387,10 +380,12 @@ class Sell(Handler):
         amount = self.request.get('amount')
         price = self.request.get('price')
         email = self.request.get('email')
+
         
         user = UserModel.all().ancestor(user_key()).filter("email", email).get()
         first_name = self.request.get('first_name')
         last_name = self.request.get('last_name')
+        phone = self.request.get('phone')
         code = self.request.get('code')
 
         if submit_button:
@@ -398,7 +393,7 @@ class Sell(Handler):
             if not amount or not price or not email: #BLANK FIELD
                 self.render("sell.html", amount = amount, price = price, 
                             first_name = first_name, last_name = last_name,
-                            email = email, stat="Fill every box")
+                            email = email, phone = phone, stat="Fill every box")
 
             elif amount and price and email: 
                 amount = prettyamount(amount)
@@ -409,21 +404,21 @@ class Sell(Handler):
                 if not valid_amount(amount):
                     self.render("sell.html", 
                             amount = amount, price = price, 
-                            first_name = first_name, last_name = last_name,
-                            email = email, stat="150 to 2000 mp (whole numbers)")
+                            first_name = first_name, last_name = last_name, phone = phone, 
+                            email = email, stat="10 to 2000 dd (whole numbers)")
 
                 elif not valid_price(price):
                     self.render("sell.html", 
                             amount = amount, price = price, 
-                            first_name = first_name, last_name = last_name,
-                            email = email, stat="$0.01 to $1 per mp")
+                            first_name = first_name, last_name = last_name, phone = phone, 
+                            email = email, stat="$0.01 to $1 per dd")
 
 
                 elif not valid_email(email):
                     self.render("sell.html", 
                             amount = amount, price = price, 
-                            first_name = first_name, last_name = last_name,
-                            email = email, stat="Use your wustl email")
+                            first_name = first_name, last_name = last_name, phone = phone, 
+                            email = email, stat="Use your UCSD email")
 
                 #AMOUNT, PRICE, EMAIL OKAY
                 elif not code: #OKAY TO SUBMIT OR NEED TO VERIFY?
@@ -436,21 +431,19 @@ class Sell(Handler):
 
                         v = VerifyModel.all().filter("email", email).get()
 
-                        sender = "bot@trademealpoints.appspotmail.com"
+                        sender = "duzhangtech@gmail.com"
                         receiver = email
-                        subject = "MEAL POINTS: LINKS AND STUFF!"
+                        subject = "Dining Dollars: LINKS AND STUFF!"
                         
                         body =  (
                                 "Hello!\n\n"
                                 + "This link highlights your offer on the buy page: \n"
-                                + "trademealpoints.appspot.com/buy?e=" + email
+                                + "ucsdexchange.appspot.com/buy?e=" + email
                                 + "\n\nYou can edit or remove your offers here: \n" 
-                                + "trademealpoints.appspot.com/change?e=" + email 
+                                + "ucsdexchange.appspot.com/change?e=" + email 
                                 + "&v=" + v.code + "\n\n"
                                 + "You can comment/ask for features/say hi here:\n"
-                                + "trademealpoints.appspot.com/faq#feed\n\n"
-                                + "Yours, \n"
-                                + "Bot"
+                                + "ucsdexchange.appspot.com/faq#feed\n\n"
                                 )
 
                         mail.send_mail(sender, receiver, subject, body)
@@ -470,24 +463,24 @@ class Sell(Handler):
                                             email = email, 
                                             code = code).put()
 
-                            sender = "bot@trademealpoints.appspotmail.com"
+                            sender = "duzhangtech@gmail.com"
                             receiver = email
-                            subject = "MEAL POINTS VERIFICATION"
+                            subject = "Dining Dollars VERIFICATION"
                             body =  ("Hello! Your verification code is " + code)
                             mail.send_mail(sender, receiver, subject, body)
 
                             self.render("sell.html", 
                                 amount = amount, price = price, 
-                                first_name = first_name, last_name = last_name,
+                                first_name = first_name, last_name = last_name, phone = phone, 
                                 email = email, need_code = True)
 
                         else: #IN LIMBO, ASK FOR CODE
                             self.render("sell.html", 
                                 amount = amount, price = price, 
-                                first_name = first_name, last_name = last_name,
+                                first_name = first_name, last_name = last_name, phone = phone, 
                                 email = email, need_code = True, stat = "Invalid code. Resend?")
 
-                elif first_name and last_name and code: #ALL FIELDS FILLED. IS CODE OKAY?
+                elif phone and first_name and last_name and code: #ALL FIELDS FILLED. IS CODE OKAY?
                     check_code = VerifyModel.all().filter("code", code).get()
 
                     if check_code: #YAY. COMMIT USER & OFFER
@@ -495,6 +488,7 @@ class Sell(Handler):
                         user = UserModel(parent = user_key(),
                                     first_name = first_name, 
                                     last_name = last_name,
+                                    phone = phone, 
                                     email = email)
                         user.put()
 
@@ -503,21 +497,19 @@ class Sell(Handler):
                                     amount = amount,
                                     price = price).put()
 
-                        sender = "bot@trademealpoints.appspotmail.com"
+                        sender = "duzhangtech@gmail.com"
                         receiver = email
-                        subject = "YOUR MEAL POINTS: LINKS AND STUFF!"
+                        subject = "YOUR Dining Dollars: LINKS AND STUFF!"
                         
                         body =  (
                                 "Hello!\n\n"
                                 + "This link highlights your offer on the buy page: \n"
-                                + "trademealpoints.appspot.com/buy?e=" + email
+                                + "ucsdexchange.appspot.com/buy?e=" + email
                                 + "\n\nYou can edit or remove your offer here: \n" 
-                                + "trademealpoints.appspot.com/change?e=" + email 
+                                + "ucsdexchange.appspot.com/change?e=" + email 
                                 + "&v=" + code + "\n\n"
                                 + "You can comment/ask for features/say hi here:\n"
-                                + "trademealpoints.appspot.com/faq#feed\n\n"
-                                + "Yours, \n"
-                                + "Bot"
+                                + "ucsdexchange.appspot.com/faq#feed\n\n"
                                 )
 
                         mail.send_mail(sender, receiver, subject, body)
@@ -532,27 +524,27 @@ class Sell(Handler):
                         stat = "Invalid code"
                         self.render("sell.html", 
                                 amount = amount, price = price, 
-                                first_name = first_name, last_name = last_name,
+                                first_name = first_name, last_name = last_name, phone = phone, 
                                 email = email, need_code = True, stat = stat)
 
                 else: #MISSING FIRST OR LAST NAME
                     self.render("sell.html", amount = amount, price = price, 
-                            first_name = first_name, last_name = last_name,
+                            first_name = first_name, last_name = last_name, phone = phone, 
                             email = email, stat="Fill every box")
 
         #RESEND CODE!
         elif resend_button:
             code = VerifyModel.all().ancestor(verify_key()).filter("email", email).get().code
 
-            sender = "bot@trademealpoints.appspotmail.com"
+            sender = "duzhangtech@gmail.com"
             receiver = email
-            subject = "MEAL POINTS VERIFICATION"
+            subject = "Dining Dollars VERIFICATION"
             body =  ("Hello! Your verification code is " + code)
             mail.send_mail(sender, receiver, subject, body)
 
             self.render("sell.html", 
                 amount = amount, price = price, 
-                first_name = first_name, last_name = last_name,
+                first_name = first_name, last_name = last_name, phone = phone, 
                 email = email, need_code = True, stat = "code sent!")
 
 class Edit(Handler):
@@ -576,19 +568,19 @@ class Edit(Handler):
 
                     code.put()
 
-                sender = "bot@trademealpoints.appspotmail.com"
+                sender = "duzhangtech@gmail.com"
                 receiver = email
-                subject = "EDIT MEAL POINT OFFER"
+                subject = "EDIT Dining Dollar OFFER"
                 
                 body =  (
                          "Hello!\n\n"
                         + "This link highlights your offer on the buy page: \n"
-                        + "trademealpoints.appspot.com/buy?e=" + email
+                        + "ucsdexchange.appspot.com/buy?e=" + email
                         + "\n\nYou can edit or remove your offer here: \n" 
-                        + "trademealpoints.appspot.com/change?e=" + email 
+                        + "ucsdexchange.appspot.com/change?e=" + email 
                         + "&v=" + code.code + "\n\n"
                         + "You can comment/ask for features/say hi here:\n"
-                        + "trademealpoints.appspot.com/faq#feed\n\n"
+                        + "ucsdexchange.appspot.com/faq#feed\n\n"
                         + "Yours, \n"
                         + "Bot"
                         )
@@ -602,7 +594,7 @@ class Edit(Handler):
                 self.render("edit.html", stat = stat)
 
         else:
-            stat = "(You used your wustl email)"
+            stat = "(You used your UCSD email)"
             self.render("edit.html", stat = stat)
 
 class EditFinish(Handler):
@@ -720,13 +712,13 @@ class LogSenderHandler(InboundMailHandler):
             self.response.out.write(m)
 
 def valid_amount(amount):
-    return amount and re.compile(r'^[1][5-9][0-9]\.?$|^[2-9][0-9]{2}\.?$|^[1][0-9]{3}\.?$|^2000\.?$').match(amount)
+    return amount and re.compile(r'^[0-9][0-9]\.?$|^[0-9][0-9]{2}\.?$|^[1][0-9]{3}\.?$|^2000\.?$').match(amount)
 
 def valid_price(price):
     return price and re.compile(r'^[0]?\.[0-9]*$|^1$|^1\.|^1\.[0]*$').match(price)
 
 def valid_email(email):
-    return email and re.compile(r'^[\S]+(?i)(@wustl\.edu)$').match(email)
+    return email and re.compile(r'^[\S]+(?i)(@gmail\.com)$|^[\S]+(?i)(\.edu)$').match(email)
 
 
 application = webapp2.WSGIApplication([
@@ -739,6 +731,6 @@ application = webapp2.WSGIApplication([
                     ('/delete', DeleteOffer),
                     ('/faq', FAQ), 
                     ('/submitfeed', SubmitFeed),
-                    ('/getkarma', PayMe),
+                    # ('/getkarma', PayMe),
                     LogSenderHandler.mapping()],
                     debug=True)

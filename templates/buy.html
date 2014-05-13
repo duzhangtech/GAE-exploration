@@ -2,6 +2,8 @@
 
 {% block content %}
 
+    <div id = " " style="position: fixed; width: 100%; text-align: center; bottom: 0px;" class = "animated fadeInUp"> Want this at a different school? email - icmpexch@gmail.com </div>   
+
 <div class = "navbar">
     <a class = "current_link"  href = "/buy">BUY</a>
     <a class = "navlinks" href = "/sell">SELL</a>
@@ -23,7 +25,7 @@
         <a id = "sortmp" class = "sort" current = "false">
             <span>
                 <div class="filler"></div>
-                MP
+                DD
                 <div class="ascend ascendwhite triangle"></div>
             </span>
         </a>
@@ -39,13 +41,14 @@
         <a id = "sortprice" class = "sort" data = "normalsorted" current = "true">
             <span>
                 <div class="smallfiller"></div>
-                $/MP
+                $/DD
                 <div class="ascend triangle"></div>
             </span>
         </a>
     </div>
+<!--     <div style="width: 70%; height: 20%; top: 30%; left: 17%; position: fixed; background: rgba(0,0,0,0.8);"> After 2 hours of launching, we have completed more than 30 deals and sent out 200 emails through the system. In order to ensure the stability of the system, we are taking a 120 minute break, please come back in 2 hours, all the current orders will not disappear, thanks for your patience! </div>
+    <div id = 'entrytable'> -->
 
-    <div id = 'entrytable'>
         {% for x in range(0, count) %}
     
             {% if sells[x].user.email == email %}
@@ -60,10 +63,12 @@
                 </a>
                     
         {% endfor %}
+
+        <a class = "text_link " style="z-index: 1000;" href = "/changeoffer">edit my offer</a></span><span style = "color:#c7c7c7;">
     </div>
 </div>
     
-<a class = "text_link " href = "/changeoffer">edit my offer</a></span><span style = "color:#c7c7c7;">
+
 <div style = "height:80px;"></div>
 
 {%endif%}

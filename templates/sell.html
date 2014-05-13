@@ -12,20 +12,26 @@
 
     <div class = "spaceup">
         <img src = "/static/mp.png" id = "sellmp" class = "sellicon" width="30px">
-        <input type="text" id = "amountinput" placeholder = "number of mp" name="amount" value="{{amount}}">
+        <input type="text" id = "amountinput" placeholder = "number of dd" name="amount" value="{{amount}}">
     </div>
 
     <div>
         <img src = "/static/amount.png" id = "sellamount" class = "sellicon" width="30px">
-        <input type="text" id = "priceinput" placeholder = "price per mp"  name="price" value="{{price}}">
+        <input type="text" id = "priceinput" placeholder = "price per dd"  name="price" value="{{price}}">
     </div>
 
     <div>
         <img src = "/static/email.png" id = "sellemail" class = "sellicon" width="30px">
-        <input type="text" class = "emailinput" placeholder = "wustl email" name="email" value="{{email}}">
+        <input type="text" class = "emailinput" placeholder = "ucsd email" name="email" value="{{email}}">
     </div>
 
+
     {%if need_code%} 
+
+        <div>
+            <img src = "/static/email.png" id = "sellphone" class = "sellicon" width="30px">
+            <input type="text" placeholder = "phone number" name="phone" value="{{phone}}">
+        </div>
 
         <div>
             <img src = "/static/first.png" id = "sellfirst" class = "sellicon" width="30px">
@@ -41,14 +47,14 @@
             <img src = "/static/cvc.png" id = "sellverify" class = "sellicon" width="30px">
             <input type="text" placeholder = "verification code"  name="code" value="{{code}}">
         </div>
-    
+        <div style="width: 100%;" > No code received? Click resend. </div>
         <button type="submit" name = "resend_button" class = "button narrowbutton spaceup" value = "resend code">resend code</button>
 
     {%endif%}
 
     <button type="submit" name = "submit_button" class = "button spaceup tenbelow" value = "okay">submit</button><br>
     <a class = "text_link animated fadeInUp" href = "/changeoffer">edit my offer</a>
-
+    <div style="position: fixed; bottom: -20%; text-align: center; width: 100%;">WARNING: make sure you still have your weekly minimal balance after dining dollar transfer!!!</div>
     <div class = "stat">{{stat}}</div>
 </form>
 {% endblock %}
