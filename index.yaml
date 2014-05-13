@@ -35,6 +35,12 @@ indexes:
   ancestor: yes
   properties:
   - name: fulfilled
+  - name: created
+
+- kind: SellModel
+  ancestor: yes
+  properties:
+  - name: fulfilled
   - name: price
 
 - kind: SellModel

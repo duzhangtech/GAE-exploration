@@ -2,7 +2,9 @@
 
 {% block content %}
 
+
     <div id = " " style="position: fixed; width: 100%; text-align: center; bottom: 0px;" class = "animated fadeInUp"> Want this at a different school? email - icmpexch@gmail.com </div>   
+
 
 <div class = "navbar">
     <a class = "current_link"  href = "/buy">BUY</a>
@@ -10,13 +12,20 @@
     <a class = "navlinks" href = "/faq">F.A.Q</a>
 </div>
 
+
+
 <div class = "center">
-    
+   
 {%if count == 0%}
     
 <h2 class = 'spaceup'>It looks like every offer has been bought. <br>Check back later. :)</h2>
 
 {%else%}    
+
+    <h4 style="color: #4cb8ca; margin-top: 20px; margin-bottom: 20px;">
+        <span class = "banner">{{total_transaction}}</span> Dining Dollars Have Been Transacted <br><br>
+        Last Transaction Was  <span class = "banner">{{ last.dd }}</span> DD at <span class = "banner">{{last.dollar}}</span> per DD 
+    </h4> 
     
 <div class = "spacing200 tenbelow">
     

@@ -46,6 +46,10 @@ class VerifyModel(db.Model):
     email = db.StringProperty()
     code = db.StringProperty()
 
+class HistoryModel(db.Model):
+    description = db.StringProperty(required = True)
+    amount = db.StringProperty(required = True)
+
 class Handler(webapp2.RequestHandler):
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
@@ -137,6 +141,25 @@ class FAQ(Handler):
     def get(self):
         self.render("faq.html")
 
+class Summary(Handler):
+    def get(self):
+        sells = list(SellModel.all().ancestor(sell_key()).filter("fulfilled", True).order('created'))
+        last = sells[-1]
+        last = last.amount + "," + last.price
+        k = HistoryModel(description = 'last_transaction', amount = last)
+        k.put()
+        if len(sells) == 0:
+            total_transaction = 0
+        else:
+            total_transaction = 1000 + sum([(int)(sells[x].amount) for x in range(0, len(sells))])
+        a = HistoryModel.all().filter('description', 'total_transaction').get()
+        if a is None:
+            t = HistoryModel(description = 'total_transaction', amount = str(total_transaction))
+            t.put()
+        else:
+            a.amount = str(total_transaction)
+            a.put()
+
 class SubmitFeed(Handler):
     def post(self):
         feedback = self.request.get('feedback')
@@ -156,8 +179,11 @@ class Buy(Handler):
         count = len(sells)
 
         email = self.request.get("e")
-
-        self.render("buy.html", sells = sells, count = count, email = email)
+        
+        a = HistoryModel.all().filter('description', 'total_transaction').get()
+        last = HistoryModel.all().filter('description', 'last_transaction').get().amount.split(",")
+        last = {'dd': last[0], 'dollar': last[1]}
+        self.render("buy.html", sells = sells, count = count, email = email, total_transaction = a.amount, last = last)
 
 class BuyContact(Handler):
     def contact_seller(self, amount, price, myemail):
@@ -731,6 +757,7 @@ application = webapp2.WSGIApplication([
                     ('/delete', DeleteOffer),
                     ('/faq', FAQ), 
                     ('/submitfeed', SubmitFeed),
+                    ('/summary', Summary),
                     # ('/getkarma', PayMe),
                     LogSenderHandler.mapping()],
                     debug=True)
